@@ -1,43 +1,67 @@
-const messages = [
-    "Initializing...",
-    "Loading Interface...",
-    "Authenticating...",
-    "Access Granted"
+const loader = document.getElementById("loader");
+const loadingText = document.getElementById("loading-text");
+const hero = document.querySelector(".hero-content");
+
+const bootMessages = [
+    "Initializing Security Core...",
+    "Loading Neural Interface...",
+    "Verifying Identity...",
+    "Identity Verified",
+    "Welcome back, Samanyu."
 ];
 
-const loadingText = document.getElementById("loading-text");
-const loader = document.getElementById("loader");
+let messageIndex = 0;
+let letterIndex = 0;
 
-let index = 0;
+function typeMessage() {
 
-function nextMessage() {
+    if (messageIndex >= bootMessages.length) {
+        finishLoading();
+        return;
+    }
 
-    loadingText.textContent = messages[index];
+    const currentMessage = bootMessages[messageIndex];
 
-    index++;
+    if (letterIndex < currentMessage.length) {
 
-    if(index < messages.length){
+        loadingText.textContent =
+            currentMessage.substring(0, letterIndex + 1) + "▋";
 
-        setTimeout(nextMessage,700);
+        letterIndex++;
 
-    }else{
+        setTimeout(typeMessage, 70);
 
-        setTimeout(()=>{
+    } else {
 
-            loader.style.opacity="0";
+        setTimeout(() => {
 
-            setTimeout(()=>{
-                loader.style.display="none";
-            },700);
+            messageIndex++;
+            letterIndex = 0;
 
-        },800);
+            typeMessage();
+
+        }, 1200);
 
     }
 
 }
 
-window.onload=()=>{
+function finishLoading() {
 
-    nextMessage();
+    loader.style.opacity = "0";
+
+    setTimeout(() => {
+
+        loader.style.display = "none";
+
+        hero.classList.add("show");
+
+    }, 800);
 
 }
+
+window.onload = () => {
+
+    typeMessage();
+
+};
