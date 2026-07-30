@@ -418,7 +418,26 @@ justify-content:space-between;
 align-items:center;
 
 background:rgba(17,24,39,.45);
+#terminal-text{
+    color:#F9FAFB;
+    font-family:"JetBrains Mono", monospace;
+    font-size:16px;
+    line-height:1.8;
+    white-space:pre-wrap;
+}
 
+.cursor{
+    display:inline-block;
+    width:10px;
+    background:#22D3EE;
+    animation:blink 1s infinite;
+}
+
+@keyframes blink{
+    50%{
+        opacity:0;
+    }
+}
 backdrop-filter:blur(18px);
 
 border:1px solid rgba(255,255,255,.08);
