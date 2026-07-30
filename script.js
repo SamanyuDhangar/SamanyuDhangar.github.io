@@ -197,3 +197,44 @@ function animate(){
 }
 
 animate();
+const terminalData =
+`$ whoami
+Samanyu Dhangar
+
+$ role
+Aspiring Cloud Security Engineer
+
+$ education
+B.Tech Computer Science Engineering
+
+$ learning
+Linux
+CCNA
+TryHackMe
+Python
+AWS Cloud
+
+$ mission
+Build secure cloud infrastructure.
+
+`;
+
+const terminal = document.getElementById("terminal-text");
+
+let index = 0;
+
+function typeTerminal(){
+
+    if(index < terminalData.length){
+
+        terminal.textContent += terminalData.charAt(index);
+
+        index++;
+
+        setTimeout(typeTerminal,25);
+
+    }
+
+}
+
+typeTerminal();
