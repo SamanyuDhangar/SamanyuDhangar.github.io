@@ -148,3 +148,24 @@ box-shadow:0 0 20px #7C3AED;
     opacity:1;
     transform:translateY(0);
 }
+/* ==========================
+   SPACE BACKGROUND
+========================== */
+
+#space{
+
+position:fixed;
+
+top:0;
+
+left:0;
+
+width:100%;
+
+height:100%;
+
+z-index:-1;
+
+background:#050505;
+
+}
