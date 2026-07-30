@@ -93,3 +93,58 @@ enterBtn.addEventListener("click", () => {
     },1200);
 
 });
+const text = [
+    "Aspiring Cloud Security Engineer",
+    "Learning Linux",
+    "Studying CCNA",
+    "Building Cyber Projects"
+];
+
+let word = 0;
+let letter = 0;
+
+function type() {
+
+    const target = document.getElementById("typing");
+
+    if(letter < text[word].length){
+
+        target.textContent += text[word].charAt(letter);
+
+        letter++;
+
+        setTimeout(type,70);
+
+    }
+
+    else{
+
+        setTimeout(erase,1800);
+
+    }
+
+}
+
+function erase(){
+
+    const target = document.getElementById("typing");
+
+    if(letter>0){
+
+        target.textContent=text[word].substring(0,--letter);
+
+        setTimeout(erase,40);
+
+    }
+
+    else{
+
+        word=(word+1)%text.length;
+
+        setTimeout(type,300);
+
+    }
+
+}
+
+type();
