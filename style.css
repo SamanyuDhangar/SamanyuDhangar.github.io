@@ -107,20 +107,35 @@ box-shadow:0 0 20px #7C3AED;
 .loader-content{
     text-align:center;
 }
-
 .loader-title{
+
     font-family:'JetBrains Mono', monospace;
+
+    font-size:18px;
+
+    letter-spacing:10px;
+
     color:#7C3AED;
-    letter-spacing:8px;
-    font-size:14px;
-    margin-bottom:25px;
+
+    margin-bottom:40px;
+
+}
+   #loading-text{
+
+    font-family:'JetBrains Mono', monospace;
+
+    font-size:32px;
+
+    color:#ECECEC;
+
+    letter-spacing:2px;
+
+    text-shadow:0 0 10px rgba(124,58,237,.5);
+
+    min-height:50px;
+
 }
 
-#loading-text{
-    font-size:18px;
-    color:#d5d5d5;
-    font-family:'JetBrains Mono', monospace;
-}
 /* Hero starts hidden */
 
 .hero-content{
