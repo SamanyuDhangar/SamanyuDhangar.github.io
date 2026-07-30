@@ -1,240 +1,216 @@
-const loader = document.getElementById("loader");
-const loadingText = document.getElementById("loading-text");
-const hero = document.querySelector(".hero-content");
+// ==============================
+// SECTION NAVIGATION
+// ==============================
 
-const bootMessages = [
-    "Initializing Security Core...",
-    "Loading Neural Interface...",
-    "Verifying Identity...",
-    "Identity Verified",
-    "Welcome back, Samanyu."
-];
+const sections = document.querySelectorAll("section");
+const buttons = document.querySelectorAll(".nav-btn");
 
-let messageIndex = 0;
-let letterIndex = 0;
 
-function typeMessage() {
+// Hide all sections
+function hideAllSections() {
 
-    if (messageIndex >= bootMessages.length) {
-        finishLoading();
-        return;
-    }
+    sections.forEach(section => {
 
-    const currentMessage = bootMessages[messageIndex];
+        section.style.display = "none";
 
-    if (letterIndex < currentMessage.length) {
+    });
 
-        loadingText.textContent =
-            currentMessage.substring(0, letterIndex + 1) + "▋";
+}
 
-        letterIndex++;
 
-        setTimeout(typeMessage, 70);
+// Show selected section
+function showSection(id) {
 
-    } else {
+    hideAllSections();
 
-        setTimeout(() => {
+    const section = document.getElementById(id);
 
-            messageIndex++;
-            letterIndex = 0;
+    if(section){
 
-            typeMessage();
+        section.style.display = "block";
 
-        }, 1200);
+        section.classList.add("active");
 
     }
 
 }
 
-function finishLoading() {
 
-    loader.style.opacity = "0";
+// Navigation button clicks
 
-    setTimeout(() => {
+buttons.forEach(button => {
 
-        loader.style.display = "none";
+    button.addEventListener("click", () => {
 
-        hero.classList.add("show");
+        const target = button.getAttribute("data-section");
 
-    }, 800);
+        showSection(target);
 
-}
+    });
+
+});
+
+
+// ==============================
+// START WITH HOME PAGE
+// ==============================
 
 window.onload = () => {
 
-    typeMessage();
+    showSection("home");
 
 };
-const enterBtn = document.getElementById("enterBtn");
 
-enterBtn.addEventListener("click", () => {
 
-    document.body.classList.add("glitch");
+// ==============================
+// TYPING EFFECT
+// ==============================
 
-    loader.style.display = "flex";
-    loader.style.opacity = "1";
 
-    loadingText.textContent = "Opening Secure Interface...";
-
-    setTimeout(() => {
-
-        loader.style.opacity = "0";
-
-        setTimeout(() => {
-
-            loader.style.display = "none";
-
-            document.body.classList.remove("glitch");
-
-            hero.classList.add("show");
-
-        },700);
-
-    },1200);
-
-});
-const text = [
-    "Aspiring Cloud Security Engineer",
-    "Learning Linux",
-    "Studying CCNA",
-    "Building Cyber Projects"
-];
-
-let word = 0;
-let letter = 0;
-
-function type() {
-
-    const target = document.getElementById("typing");
-
-    if(letter < text[word].length){
-
-        target.textContent += text[word].charAt(letter);
-
-        letter++;
-
-        setTimeout(type,70);
-
-    }
-
-    else{
-
-        setTimeout(erase,1800);
-
-    }
-
-}
-
-function erase(){
-
-    const target = document.getElementById("typing");
-
-    if(letter>0){
-
-        target.textContent=text[word].substring(0,--letter);
-
-        setTimeout(erase,40);
-
-    }
-
-    else{
-
-        word=(word+1)%text.length;
-
-        setTimeout(type,300);
-
-    }
-
-}
-
-type();
-const canvas = document.getElementById("particles");
-const ctx = canvas.getContext("2d");
-
-function resize(){
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-
-resize();
-window.addEventListener("resize", resize);
-
-const particles = [];
-
-for(let i=0;i<120;i++){
-    particles.push({
-        x:Math.random()*canvas.width,
-        y:Math.random()*canvas.height,
-        r:Math.random()*2+1,
-        dx:(Math.random()-0.5)*0.3,
-        dy:(Math.random()-0.5)*0.3
-    });
-}
-
-function animate(){
-
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    ctx.fillStyle="#7C3AED";
-
-    particles.forEach(p=>{
-
-        p.x+=p.dx;
-        p.y+=p.dy;
-
-        if(p.x<0)p.x=canvas.width;
-        if(p.x>canvas.width)p.x=0;
-        if(p.y<0)p.y=canvas.height;
-        if(p.y>canvas.height)p.y=0;
-
-        ctx.beginPath();
-        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-        ctx.fill();
-
-    });
-
-    requestAnimationFrame(animate);
-}
-
-animate();
-const terminalData =
-`$ whoami
-Samanyu Dhangar
-
-$ role
-Aspiring Cloud Security Engineer
-
-$ education
-B.Tech Computer Science Engineering
-
-$ learning
-Linux
-CCNA
-TryHackMe
-Python
-AWS Cloud
-
-$ mission
-Build secure cloud infrastructure.
-
-`;
-
-const terminal = document.getElementById("terminal-text");
+const text = "Cyber Security Enthusiast";
 
 let index = 0;
 
-function typeTerminal(){
 
-    if(index < terminalData.length){
+function typingEffect(){
 
-        terminal.textContent += terminalData.charAt(index);
+    const element = document.querySelector(".typing");
+
+
+    if(element && index < text.length){
+
+        element.innerHTML += text.charAt(index);
 
         index++;
 
-        setTimeout(typeTerminal,25);
+        setTimeout(typingEffect,150);
 
     }
 
 }
 
-typeTerminal();
+
+window.addEventListener("load", typingEffect);
+
+
+// ==============================
+// PARTICLE BACKGROUND
+// ==============================
+
+
+const canvas = document.getElementById("particles");
+
+if(canvas){
+
+const ctx = canvas.getContext("2d");
+
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+
+let particles = [];
+
+
+for(let i=0;i<100;i++){
+
+particles.push({
+
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+size:Math.random()*3,
+speedX:(Math.random()-0.5),
+speedY:(Math.random()-0.5)
+
+});
+
+
+}
+
+
+
+function animateParticles(){
+
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+
+
+particles.forEach(p=>{
+
+
+ctx.beginPath();
+
+ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+
+ctx.fillStyle="cyan";
+
+ctx.fill();
+
+
+
+p.x+=p.speedX;
+
+p.y+=p.speedY;
+
+
+
+if(p.x<0||p.x>canvas.width)
+p.speedX*=-1;
+
+
+if(p.y<0||p.y>canvas.height)
+p.speedY*=-1;
+
+
+
+});
+
+
+
+requestAnimationFrame(animateParticles);
+
+
+}
+
+
+
+animateParticles();
+
+
+
+window.addEventListener("resize",()=>{
+
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+});
+
+
+}
+
+
+// ==============================
+// LOADER
+// ==============================
+
+
+window.addEventListener("load",()=>{
+
+
+const loader=document.getElementById("loader");
+
+
+if(loader){
+
+setTimeout(()=>{
+
+loader.style.display="none";
+
+},1500);
+
+
+}
+
+
+});
