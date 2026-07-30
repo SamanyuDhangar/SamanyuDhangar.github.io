@@ -65,3 +65,31 @@ window.onload = () => {
     typeMessage();
 
 };
+const enterBtn = document.getElementById("enterBtn");
+
+enterBtn.addEventListener("click", () => {
+
+    document.body.classList.add("glitch");
+
+    loader.style.display = "flex";
+    loader.style.opacity = "1";
+
+    loadingText.textContent = "Opening Secure Interface...";
+
+    setTimeout(() => {
+
+        loader.style.opacity = "0";
+
+        setTimeout(() => {
+
+            loader.style.display = "none";
+
+            document.body.classList.remove("glitch");
+
+            hero.classList.add("show");
+
+        },700);
+
+    },1200);
+
+});
