@@ -89,3 +89,35 @@ background:#7C3AED;
 box-shadow:0 0 20px #7C3AED;
 
 }
+/* ===========================
+   LOADING SCREEN
+=========================== */
+
+#loader{
+    position:fixed;
+    inset:0;
+    background:#050505;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+    transition:opacity .7s ease;
+}
+
+.loader-content{
+    text-align:center;
+}
+
+.loader-title{
+    font-family:'JetBrains Mono', monospace;
+    color:#7C3AED;
+    letter-spacing:8px;
+    font-size:14px;
+    margin-bottom:25px;
+}
+
+#loading-text{
+    font-size:18px;
+    color:#d5d5d5;
+    font-family:'JetBrains Mono', monospace;
+}
