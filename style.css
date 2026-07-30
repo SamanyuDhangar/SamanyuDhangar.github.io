@@ -169,3 +169,36 @@ z-index:-1;
 background:#050505;
 
 }
+#enterBtn{
+    padding:18px 60px;
+    background:transparent;
+    border:1px solid #7C3AED;
+    color:white;
+    font-size:18px;
+    letter-spacing:4px;
+    cursor:pointer;
+    transition:.4s;
+}
+
+#enterBtn:hover{
+    background:#7C3AED;
+    box-shadow:0 0 30px #7C3AED;
+    transform:scale(1.05);
+}
+
+/* Screen glitch */
+
+.glitch{
+    animation:glitch .35s linear;
+}
+
+@keyframes glitch{
+
+0%{transform:translate(0);}
+20%{transform:translate(-6px,2px);}
+40%{transform:translate(6px,-2px);}
+60%{transform:translate(-4px,2px);}
+80%{transform:translate(4px,-1px);}
+100%{transform:translate(0);}
+
+}
