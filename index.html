@@ -10,202 +10,502 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="style.css">
 </head>
 
-
 <body>
 
 <canvas id="particles"></canvas>
-    
+
+<!-- ===========================
+     LOADER
+============================ -->
+
 <div id="loader">
 
     <div class="loader-content">
 
-        <p class="loader-title">PROJECT : ECLIPSE</p>
+        <h1 class="loader-title">
+            PROJECT : ECLIPSE
+        </h1>
 
-        <p id="loading-text">Initializing...</p>
+        <p id="loading-text">
+            Initializing...
+        </p>
 
     </div>
 
 </div>
 
+<!-- ===========================
+     NAVBAR
+============================ -->
+
 <nav class="navbar">
 
     <div class="logo">
-        PROJECT ECLIPSE
+        PROJECT : ECLIPSE
     </div>
 
     <ul>
 
-        <li><a href="#home">Home</a></li>
+        <li><a href="#home">HOME</a></li>
 
-        <li><a href="#about">About</a></li>
+        <li><a href="#about">ABOUT</a></li>
 
-        <li><a href="#skills">Skills</a></li>
+        <li><a href="#skills">SKILLS</a></li>
 
-        <li><a href="#projects">Projects</a></li>
+        <li><a href="#projects">PROJECTS</a></li>
 
-        <li><a href="#contact">Contact</a></li>
+        <li><a href="#contact">CONTACT</a></li>
 
     </ul>
 
 </nav>
-    
-<section class="hero">
+
+<!-- ===========================
+     HERO
+============================ -->
+
+<section id="home" class="hero">
 
     <div class="hero-overlay"></div>
 
     <div class="hero-content">
 
-        <p class="project">PROJECT : ECLIPSE</p>
+        <p class="project">
+
+            PROJECT : ECLIPSE
+
+        </p>
 
         <h1>
+
             Samanyu
+
             <span>Dhangar</span>
+
         </h1>
 
         <h2 id="typing"></h2>
 
         <p class="subtitle">
 
-            Building secure systems.
-            Learning Linux, Networking,
-            Cloud & Cybersecurity.
+            Aspiring Cloud Security Engineer
+
+            <br><br>
+
+            Learning Linux • Networking • Cloud • Cybersecurity
 
         </p>
 
-      <div class="hero-buttons">
+        <div class="hero-buttons">
 
-    <button id="enterBtn">
-        ENTER SYSTEM
-    </button>
+            <button id="enterBtn">
 
-    <button id="exploreBtn" class="ghost">
-        EXPLORE
-    </button>
+                ENTER SYSTEM
 
-</div>
+            </button>
+
+            <button id="exploreBtn" class="ghost">
+
+                EXPLORE
+
+            </button>
+
+        </div>
+
     </div>
 
     <div class="scroll-indicator">
 
-        SCROLL
-
-        ↓
+        SCROLL ↓
 
     </div>
 
 </section>
+
+<!-- ===========================
+     EVERYTHING BELOW IS HIDDEN
+============================ -->
+
+<div id="portfolioContent" class="hidden">
+    <!-- ===========================
+     ABOUT
+=========================== -->
+
 <section id="about" class="about">
 
-    <h2 class="section-title">ABOUT ME</h2>
+    <div class="container">
 
-    <div class="terminal">
+        <h2 class="section-title">
 
-        <div class="terminal-header">
-            <span class="red"></span>
-            <span class="yellow"></span>
-            <span class="green"></span>
+            ABOUT ME
+
+        </h2>
+
+        <div class="terminal">
+
+            <div class="terminal-header">
+
+                <span class="red"></span>
+
+                <span class="yellow"></span>
+
+                <span class="green"></span>
+
+            </div>
+
+            <div class="terminal-body">
+
+<pre id="terminal-text">
+$ whoami
+
+Samanyu Dhangar
+
+$ role
+
+Aspiring Cloud Security Engineer
+
+$ education
+
+B.Tech Computer Science Engineering
+
+$ currently_learning
+
+Linux
+CCNA
+TryHackMe
+Git
+GitHub
+Python
+AWS
+
+$ goal
+
+Become a Professional Cloud Security Engineer
+
+$ status
+
+Building Project Eclipse...
+</pre>
+
+            </div>
+
         </div>
-<div class="terminal-body">
-    <pre id="terminal-text"></pre>
-</div>
-      
 
     </div>
+
+</section>
+
+<!-- ===========================
+     SKILLS
+=========================== -->
+
 <section id="skills" class="skills">
 
-<h2 class="section-title">SKILLS</h2>
+    <div class="container">
 
-<div class="skills-grid">
+        <h2 class="section-title">
 
-<div class="skill-card">
-<h3>Linux</h3>
-<p>Learning Linux commands, Bash and system administration.</p>
-</div>
+            SKILLS
 
-<div class="skill-card">
-<h3>Networking</h3>
-<p>Currently studying CCNA and networking fundamentals.</p>
-</div>
+        </h2>
 
-<div class="skill-card">
-<h3>Cybersecurity</h3>
-<p>Learning through TryHackMe and security labs.</p>
-</div>
+        <div class="skills-grid">
 
-<div class="skill-card">
-<h3>Programming</h3>
-<p>C++, HTML, CSS, JavaScript and Python (Learning).</p>
-</div>
+            <div class="skill-card">
 
-</div>
+                <h3>🐧 Linux</h3>
+
+                <p>
+
+                    Bash, File System,
+                    Permissions,
+                    Terminal
+
+                </p>
+
+            </div>
+
+            <div class="skill-card">
+
+                <h3>🌐 Networking</h3>
+
+                <p>
+
+                    CCNA,
+                    TCP/IP,
+                    Routing,
+                    Switching
+
+                </p>
+
+            </div>
+
+            <div class="skill-card">
+
+                <h3>🛡 Cybersecurity</h3>
+
+                <p>
+
+                    TryHackMe,
+                    Web Security,
+                    Linux Security
+
+                </p>
+
+            </div>
+
+            <div class="skill-card">
+
+                <h3>💻 Programming</h3>
+
+                <p>
+
+                    C++
+                    HTML
+                    CSS
+                    JavaScript
+                    Python
+
+                </p>
+
+            </div>
+
+            <div class="skill-card">
+
+                <h3>☁ Cloud</h3>
+
+                <p>
+
+                    AWS
+                    IAM
+                    EC2
+                    Cloud Security
+
+                </p>
+
+            </div>
+
+            <div class="skill-card">
+
+                <h3>🧰 Tools</h3>
+
+                <p>
+
+                    Git
+                    GitHub
+                    VS Code
+                    Wireshark
+                    Packet Tracer
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </section>
-    <section id="projects" class="projects">
+<!-- ===========================
+     PROJECTS
+=========================== -->
 
-<h2 class="section-title">PROJECTS</h2>
+<section id="projects" class="projects">
 
-<div class="project-grid">
+    <div class="container">
 
-<div class="project-card">
+        <h2 class="section-title">
+            PROJECTS
+        </h2>
 
-<h3>Project Eclipse</h3>
+        <div class="project-grid">
 
-<p>
-Personal Cybersecurity Portfolio Website.
-</p>
+            <div class="project-card">
 
-</div>
+                <h3>PROJECT ECLIPSE</h3>
 
-<div class="project-card">
+                <p>
+                    My personal cybersecurity portfolio built with
+                    HTML, CSS and JavaScript.
+                </p>
 
-<h3>C++ Calculator</h3>
+                <a href="#" class="project-btn">
+                    View Project
+                </a>
 
-<p>
-Simple calculator made using C++.
-</p>
+            </div>
 
-</div>
+            <div class="project-card">
 
-<div class="project-card">
+                <h3>C++ CALCULATOR</h3>
 
-<h3>More Coming...</h3>
+                <p>
+                    Beginner calculator application written in C++.
+                </p>
 
-<p>
-Future Linux, Python and Cloud projects.
-</p>
+                <a href="#" class="project-btn">
+                    GitHub
+                </a>
 
-</div>
+            </div>
 
-</div>
+            <div class="project-card">
+
+                <h3>LINUX LABS</h3>
+
+                <p>
+                    Linux commands and Bash practice from TryHackMe.
+                </p>
+
+                <a href="#" class="project-btn">
+                    Coming Soon
+                </a>
+
+            </div>
+
+            <div class="project-card">
+
+                <h3>AWS SECURITY</h3>
+
+                <p>
+                    Future cloud security projects will appear here.
+                </p>
+
+                <a href="#" class="project-btn">
+                    Coming Soon
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
 
 </section>
-    <section id="contact" class="contact">
 
-<h2 class="section-title">CONTACT</h2>
+<!-- ===========================
+     ROADMAP
+=========================== -->
 
-<p>Email : your@email.com</p>
+<section id="roadmap" class="roadmap">
 
-<p>GitHub : github.com/SamanyuDhangar</p>
+    <div class="container">
 
-<p>TryHackMe : Coming Soon</p>
+        <h2 class="section-title">
+            MY ROADMAP
+        </h2>
+
+        <div class="timeline">
+
+            <div class="timeline-item done">
+                ✅ HTML / CSS
+            </div>
+
+            <div class="timeline-item done">
+                ✅ Git & GitHub
+            </div>
+
+            <div class="timeline-item">
+                🔄 Linux
+            </div>
+
+            <div class="timeline-item">
+                🔄 CCNA
+            </div>
+
+            <div class="timeline-item">
+                ⏳ Python
+            </div>
+
+            <div class="timeline-item">
+                ⏳ AWS
+            </div>
+
+            <div class="timeline-item">
+                ⏳ Cloud Security
+            </div>
+
+        </div>
+
+    </div>
 
 </section>
-    <script src="script.js"></script>
-    <footer>
 
-<p>
+<!-- ===========================
+     CONTACT
+=========================== -->
 
-© 2026 Samanyu Dhangar
+<section id="contact" class="contact">
 
-</p>
+    <div class="container">
+
+        <h2 class="section-title">
+            CONTACT
+        </h2>
+
+        <div class="contact-box">
+
+            <p>
+
+                📧 Email
+
+                <br><br>
+
+                your@email.com
+
+            </p>
+
+            <p>
+
+                💻 GitHub
+
+                <br><br>
+
+                github.com/SamanyuDhangar
+
+            </p>
+
+            <p>
+
+                🛡 TryHackMe
+
+                <br><br>
+
+                Coming Soon
+
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ===========================
+     FOOTER
+=========================== -->
+
+<footer>
+
+    <p>
+
+        © 2026 Samanyu Dhangar
+
+        <br>
+
+        PROJECT : ECLIPSE
+
+    </p>
 
 </footer>
-</section>
+
+</div>
+
 <script src="script.js"></script>
 
 </body>
