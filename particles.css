@@ -1,0 +1,10 @@
+#cyber-particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -999;       /* Pushes the particles behind everything else */
+    pointer-events: none; /* Allows you to click your original buttons */
+    background-color: transparent; 
+}
