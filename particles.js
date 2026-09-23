@@ -8,29 +8,101 @@ function resizeCanvas() {
 }
 window.addEventListener('resize', resizeCanvas);
 
-const particleCount = 80;       
-const connectionDistance = 120;  
+// Configuration Settings
+const particleCount = 100;       
+const connectionDistance = 140;  
 let particles = [];
+
+// Mouse tracking context for interactive hacking element
+const mouse = {
+    x: null,
+    y: null,
+    radius: 150 // Distance where mouse pushes particles away
+};
+
+window.addEventListener('mousemove', (event) => {
+    mouse.x = event.x;
+    mouse.y = event.y;
+});
+
+window.addEventListener('mouseout', () => {
+    mouse.x = null;
+    mouse.y = null;
+});
 
 class Particle {
     constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 1; 
-        this.speedX = Math.random() * 0.6 - 0.3;
-        this.speedY = Math.random() * 0.6 - 0.3;
+        this.size = Math.random() * 2.5 + 1; 
+        this.speedX = Math.random() * 1 - 0.5;
+        this.speedY = Math.random() * 1 - 0.5;
+        this.baseX = this.x;
+        this.baseY = this.y;
+        
+        // Dynamic binary-stream tag attachment
+        this.isBinaryNode = Math.random() > 0.85;
+        this.binaryChar = Math.random() > 0.5 ? "1" : "0";
+        this.charTimer = 0;
     }
+
     update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
-        if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+        // Interactive Mouse Repel Force
+        if (mouse.x != null && mouse.y != null) {
+            let dx = mouse.x - this.x;
+            let dy = mouse.y - this.y;
+            let distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < mouse.radius) {
+                let forceDirectionX = dx / distance;
+                let forceDirectionY = dy / distance;
+                let maxForce = (mouse.radius - distance) / mouse.radius;
+                let force = maxForce * 3; // Push speed multiplier
+                
+                this.x -= forceDirectionX * force;
+                this.y -= forceDirectionY * force;
+            } else {
+                // Return gracefully to trajectory
+                this.x += this.speedX;
+                this.y += this.speedY;
+            }
+        } else {
+            this.x += this.speedX;
+            this.y += this.speedY;
+        }
+
+        // Screen wrap around bounds check
+        if (this.x < 0) this.x = canvas.width;
+        if (this.x > canvas.width) this.x = 0;
+        if (this.y < 0) this.y = canvas.height;
+        if (this.y > canvas.height) this.y = 0;
+
+        // Animate digital values on nodes
+        if (this.isBinaryNode) {
+            this.charTimer++;
+            if (this.charTimer > 40) {
+                this.binaryChar = Math.random() > 0.5 ? "1" : "0";
+                this.charTimer = 0;
+            }
+        }
     }
+
     draw() {
-        ctx.fillStyle = 'rgba(0, 255, 170, 0.7)'; 
+        ctx.fillStyle = 'rgba(0, 255, 136, 0.8)';
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#00ff88';
+        
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
+
+        // If it's a binary stream node, overlay code numbers onto it
+        if (this.isBinaryNode) {
+            ctx.fillStyle = 'rgba(0, 255, 136, 0.6)';
+            ctx.font = '10px monospace';
+            ctx.fillText(this.binaryChar, this.x + 6, this.y + 4);
+        }
+        ctx.shadowBlur = 0; // Clear blur layer
     }
 }
 
@@ -50,8 +122,10 @@ function drawLines() {
 
             if (distance < connectionDistance) {
                 const opacity = 1 - (distance / connectionDistance);
-                ctx.strokeStyle = `rgba(0, 255, 170, ${opacity * 0.2})`;
-                ctx.lineWidth = 0.8;
+                
+                // Draw digital matrix grid green wires
+                ctx.strokeStyle = `rgba(0, 255, 136, ${opacity * 0.35})`;
+                ctx.lineWidth = 1;
                 ctx.beginPath();
                 ctx.moveTo(particles[a].x, particles[a].y);
                 ctx.lineTo(particles[b].x, particles[b].y);
