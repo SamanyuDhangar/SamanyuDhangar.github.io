@@ -1,513 +1,313 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>PROJECT : ECLIPSE</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Samanyu Dhangar — Project Eclipse cybersecurity and cloud security portfolio.">
+  <meta name="theme-color" content="#05070a">
+  <title>PROJECT : ECLIPSE | Samanyu Dhangar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+  <div class="noise"></div>
+  <div class="grid"></div>
+  <div class="cursor-glow"></div>
 
-<canvas id="particles"></canvas>
+  <div id="boot-screen" class="boot-screen">
+    <div class="boot-box">
+      <div class="boot-label">PROJECT : ECLIPSE // INITIALIZING</div>
+      <div id="boot-log" class="boot-log"></div>
+      <div class="boot-progress"><span id="boot-progress-bar"></span></div>
+      <div class="boot-percent"><span id="boot-percent">0</span>%</div>
+    </div>
+  </div>
 
-<!-- ===========================
-     LOADER
-============================ -->
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="Project Eclipse home">
+      <span class="brand-mark">⌁</span>
+      <span>PROJECT : ECLIPSE</span>
+    </a>
+    <button id="menu-toggle" class="menu-toggle" aria-label="Open menu">MENU</button>
+    <nav id="nav">
+      <a href="#about">ABOUT</a>
+      <a href="#skills">SKILLS</a>
+      <a href="#journey">JOURNEY</a>
+      <a href="#projects">PROJECTS</a>
+      <a href="#contact">CONTACT</a>
+    </nav>
+  </header>
 
-<div id="loader">
-
-    <div class="loader-content">
-
-        <h1 class="loader-title">
-            PROJECT : ECLIPSE
-        </h1>
-
-        <p id="loading-text">
-            Initializing...
+  <main>
+    <section id="home" class="hero section">
+      <div class="hero-orbit orbit-one"></div>
+      <div class="hero-orbit orbit-two"></div>
+      <div class="hero-content reveal">
+        <p class="eyebrow"><span class="status-dot"></span> SYSTEM ONLINE // INDIA</p>
+        <p class="boot-text">INITIALIZING USER PROFILE...</p>
+        <h1>SAMANYU<br><span>DHANGAR</span></h1>
+        <p class="hero-role">CYBERSECURITY <i>×</i> CLOUD SECURITY</p>
+        <p class="hero-description">
+          Building a foundation in networking, Linux and cloud security —
+          one system, one packet and one project at a time.
         </p>
+        <div class="hero-actions">
+          <a href="#projects" class="btn btn-primary">ENTER SYSTEM <span>↗</span></a>
+          <a href="#contact" class="btn btn-ghost">CONNECT</a>
+        </div>
+      </div>
 
-    </div>
+      <div class="hero-terminal reveal">
+        <div class="terminal-window">
+          <div class="terminal-bar">
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-title">samanyu@eclipse:~</span>
+          </div>
+          <div class="terminal-body">
+            <p><span class="prompt">samanyu@eclipse:~$</span> whoami</p>
+            <p class="terminal-output">Samanyu</p>
+            <p><span class="prompt">samanyu@eclipse:~$</span> cat focus.txt</p>
+            <p class="terminal-output">networking<br>linux<br>cybersecurity<br>cloud security</p>
+            <p><span class="prompt">samanyu@eclipse:~$</span> <span class="typing">./build_future.sh</span><span class="cursor">█</span></p>
+          </div>
+        </div>
+      </div>
 
-</div>
+      <div class="scroll-cue">SCROLL TO EXPLORE <span>↓</span></div>
+    </section>
 
-<!-- ===========================
-     NAVBAR
-============================ -->
-
-<nav class="navbar">
-
-    <div class="logo">
-        PROJECT : ECLIPSE
-    </div>
-
-    <ul>
-
-        <li><a href="#home">HOME</a></li>
-
-        <li><a href="#about">ABOUT</a></li>
-
-        <li><a href="#skills">SKILLS</a></li>
-
-        <li><a href="#projects">PROJECTS</a></li>
-
-        <li><a href="#contact">CONTACT</a></li>
-
-    </ul>
-
-</nav>
-
-<!-- ===========================
-     HERO
-============================ -->
-
-<section id="home" class="hero">
-
-    <div class="hero-overlay"></div>
-
-    <div class="hero-content">
-
-        <p class="project">
-
-            PROJECT : ECLIPSE
-
-        </p>
-
-        <h1>
-
-            Samanyu
-
-            <span>Dhangar</span>
-
-        </h1>
-
-        <h2 id="typing"></h2>
-
-        <p class="subtitle">
-
-            Aspiring Cloud Security Engineer
-
-            <br><br>
-
-            Learning Linux • Networking • Cloud • Cybersecurity
-
-        </p>
-
-        <div class="hero-buttons">
-
-            <button id="enterBtn">
-
-                ENTER SYSTEM
-
-            </button>
-
-            <button id="exploreBtn" class="ghost">
-
-                EXPLORE
-
-            </button>
-
+    <section id="about" class="section content-section">
+      <div class="section-heading reveal">
+        <span>01</span>
+        <h2>ABOUT <em>// PROFILE</em></h2>
+      </div>
+      <div class="about-grid">
+        <div class="panel terminal-panel reveal">
+          <div class="panel-header"><span>USER_PROFILE.sys</span><span>● ACTIVE</span></div>
+          <div class="profile-lines">
+            <div><span>USER</span><strong>SAMANYU</strong></div>
+            <div><span>FOCUS</span><strong>CLOUD SECURITY</strong></div>
+            <div><span>FOUNDATION</span><strong>NETWORKING / LINUX</strong></div>
+            <div><span>BUILDING</span><strong>SECURITY PROJECTS</strong></div>
+            <div><span>STATUS</span><strong class="green">LEARNING // BUILDING</strong></div>
+          </div>
         </div>
 
-    </div>
+        <div class="about-copy reveal">
+          <p class="kicker">> WHOAMI</p>
+          <h3>Curious about how systems work — and how they can be secured.</h3>
+          <p>
+            I'm building my cybersecurity foundation through hands-on learning,
+            labs and small projects. My current path centers on networking,
+            Linux, traffic analysis and cloud security.
+          </p>
+          <p>
+            This site documents the journey rather than pretending the journey
+            is finished.
+          </p>
+          <div class="mini-stats">
+            <div><strong>01</strong><span>Curiosity</span></div>
+            <div><strong>02</strong><span>Hands-on labs</span></div>
+            <div><strong>03</strong><span>Continuous learning</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <div class="scroll-indicator">
+    <section id="skills" class="section content-section">
+      <div class="section-heading reveal">
+        <span>02</span>
+        <h2>SKILLS <em>// TOOLCHAIN</em></h2>
+      </div>
 
-        SCROLL ↓
-
-    </div>
-
-</section>
-
-<!-- ===========================
-     EVERYTHING BELOW IS HIDDEN
-============================ -->
-
-<div id="portfolioContent" class="hidden">
-    <!-- ===========================
-     ABOUT
-=========================== -->
-
-<section id="about" class="about">
-
-    <div class="container">
-
-        <h2 class="section-title">
-
-            ABOUT ME
-
-        </h2>
-
-        <div class="terminal">
-
-            <div class="terminal-header">
-
-                <span class="red"></span>
-
-                <span class="yellow"></span>
-
-                <span class="green"></span>
-
-            </div>
-
-            <div class="terminal-body">
-
-<pre id="terminal-text">
-$ whoami
-
-Samanyu Dhangar
-
-$ role
-
-Aspiring Cloud Security Engineer
-
-$ education
-
-B.Tech Computer Science Engineering
-
-$ currently_learning
-
-Linux
-CCNA
-TryHackMe
-Git
-GitHub
-Python
-AWS
-
-$ goal
-
-Become a Professional Cloud Security Engineer
-
-$ status
-
-Building Project Eclipse...
-</pre>
-
-            </div>
-
+      <div class="skills-layout">
+        <div class="skill-command reveal">
+          <p><span class="prompt">samanyu@eclipse:~$</span> ls -la ./skills</p>
+          <div class="command-list">
+            <span>networking</span>
+            <span>linux</span>
+            <span>wireshark</span>
+            <span>python</span>
+            <span>c</span>
+            <span>git</span>
+            <span>cloud</span>
+            <span>security</span>
+          </div>
         </div>
 
-    </div>
-
-</section>
-
-<!-- ===========================
-     SKILLS
-=========================== -->
-
-<section id="skills" class="skills">
-
-    <div class="container">
-
-        <h2 class="section-title">
-
-            SKILLS
-
-        </h2>
-
-        <div class="skills-grid">
-
-            <div class="skill-card">
-
-                <h3>🐧 Linux</h3>
-
-                <p>
-
-                    Bash, File System,
-                    Permissions,
-                    Terminal
-
-                </p>
-
-            </div>
-
-            <div class="skill-card">
-
-                <h3>🌐 Networking</h3>
-
-                <p>
-
-                    CCNA,
-                    TCP/IP,
-                    Routing,
-                    Switching
-
-                </p>
-
-            </div>
-
-            <div class="skill-card">
-
-                <h3>🛡 Cybersecurity</h3>
-
-                <p>
-
-                    TryHackMe,
-                    Web Security,
-                    Linux Security
-
-                </p>
-
-            </div>
-
-            <div class="skill-card">
-
-                <h3>💻 Programming</h3>
-
-                <p>
-
-                    C++
-                    HTML
-                    CSS
-                    JavaScript
-                    Python
-
-                </p>
-
-            </div>
-
-            <div class="skill-card">
-
-                <h3>☁ Cloud</h3>
-
-                <p>
-
-                    AWS
-                    IAM
-                    EC2
-                    Cloud Security
-
-                </p>
-
-            </div>
-
-            <div class="skill-card">
-
-                <h3>🧰 Tools</h3>
-
-                <p>
-
-                    Git
-                    GitHub
-                    VS Code
-                    Wireshark
-                    Packet Tracer
-
-                </p>
-
-            </div>
-
+        <div class="skill-cards">
+          <article class="skill-card reveal">
+            <span class="skill-number">01</span>
+            <h3>NETWORKING</h3>
+            <p>TCP/IP · HTTP(S) · DNS · ARP · ICMP · Routing · VPN fundamentals</p>
+          </article>
+          <article class="skill-card reveal">
+            <span class="skill-number">02</span>
+            <h3>LINUX</h3>
+            <p>CLI · permissions · processes · filesystems · shell fundamentals</p>
+          </article>
+          <article class="skill-card reveal">
+            <span class="skill-number">03</span>
+            <h3>SECURITY</h3>
+            <p>Wireshark · traffic analysis · security labs · reconnaissance concepts</p>
+          </article>
+          <article class="skill-card reveal">
+            <span class="skill-number">04</span>
+            <h3>DEVELOPMENT</h3>
+            <p>C · Python fundamentals · HTML · CSS · JavaScript · Git</p>
+          </article>
         </div>
+      </div>
+    </section>
 
-    </div>
+    <section id="journey" class="section content-section">
+      <div class="section-heading reveal">
+        <span>03</span>
+        <h2>JOURNEY <em>// LOG</em></h2>
+      </div>
 
-</section>
-<!-- ===========================
-     PROJECTS
-=========================== -->
-
-<section id="projects" class="projects">
-
-    <div class="container">
-
-        <h2 class="section-title">
-            PROJECTS
-        </h2>
-
-        <div class="project-grid">
-
-            <div class="project-card">
-
-                <h3>PROJECT ECLIPSE</h3>
-
-                <p>
-                    My personal cybersecurity portfolio built with
-                    HTML, CSS and JavaScript.
-                </p>
-
-                <a href="#" class="project-btn">
-                    View Project
-                </a>
-
-            </div>
-
-            <div class="project-card">
-
-                <h3>C++ CALCULATOR</h3>
-
-                <p>
-                    Beginner calculator application written in C++.
-                </p>
-
-                <a href="#" class="project-btn">
-                    GitHub
-                </a>
-
-            </div>
-
-            <div class="project-card">
-
-                <h3>LINUX LABS</h3>
-
-                <p>
-                    Linux commands and Bash practice from TryHackMe.
-                </p>
-
-                <a href="#" class="project-btn">
-                    Coming Soon
-                </a>
-
-            </div>
-
-            <div class="project-card">
-
-                <h3>AWS SECURITY</h3>
-
-                <p>
-                    Future cloud security projects will appear here.
-                </p>
-
-                <a href="#" class="project-btn">
-                    Coming Soon
-                </a>
-
-            </div>
-
+      <div class="journey-layout">
+        <div class="journey-intro reveal">
+          <p class="kicker">> SECURITY_LOG --follow</p>
+          <h3>Learning by doing.</h3>
+          <p>Selected milestones from the current cybersecurity journey.</p>
         </div>
-
-    </div>
-
-</section>
-
-<!-- ===========================
-     ROADMAP
-=========================== -->
-
-<section id="roadmap" class="roadmap">
-
-    <div class="container">
-
-        <h2 class="section-title">
-            MY ROADMAP
-        </h2>
 
         <div class="timeline">
-
-            <div class="timeline-item done">
-                ✅ HTML / CSS
+          <article class="timeline-item reveal">
+            <span class="timeline-index">01</span>
+            <div>
+              <p class="timeline-date">FOUNDATION</p>
+              <h3>Networking + Linux</h3>
+              <p>Building the fundamentals behind how systems communicate and operate.</p>
             </div>
-
-            <div class="timeline-item done">
-                ✅ Git & GitHub
+          </article>
+          <article class="timeline-item reveal">
+            <span class="timeline-index">02</span>
+            <div>
+              <p class="timeline-date">TRYHACKME</p>
+              <h3>Pre Security Path</h3>
+              <p>Hands-on rooms covering core security and computing concepts.</p>
             </div>
-
-            <div class="timeline-item">
-                🔄 Linux
+          </article>
+          <article class="timeline-item reveal">
+            <span class="timeline-index">03</span>
+            <div>
+              <p class="timeline-date">TRAFFIC ANALYSIS</p>
+              <h3>Wireshark Basics</h3>
+              <p>Learning to inspect packets and understand network conversations.</p>
             </div>
-
-            <div class="timeline-item">
-                🔄 CCNA
+          </article>
+          <article class="timeline-item reveal">
+            <span class="timeline-index">04</span>
+            <div>
+              <p class="timeline-date">NEXT TARGET</p>
+              <h3>Cloud Security</h3>
+              <p>Moving from foundations toward secure cloud infrastructure and practical labs.</p>
             </div>
-
-            <div class="timeline-item">
-                ⏳ Python
-            </div>
-
-            <div class="timeline-item">
-                ⏳ AWS
-            </div>
-
-            <div class="timeline-item">
-                ⏳ Cloud Security
-            </div>
-
+          </article>
         </div>
+      </div>
+    </section>
 
-    </div>
+    <section id="projects" class="section content-section">
+      <div class="section-heading reveal">
+        <span>04</span>
+        <h2>PROJECTS <em>// LAB</em></h2>
+      </div>
 
-</section>
+      <div class="projects-grid">
+        <article class="project-card featured reveal">
+          <div class="project-top"><span>PROJECT_01</span><span>LAB // ACTIVE</span></div>
+          <div class="project-icon">⌘</div>
+          <h3>NETWORK TRAFFIC LAB</h3>
+          <p>Hands-on exploration of packets, protocols and traffic patterns using Wireshark.</p>
+          <div class="tags"><span>WIRESHARK</span><span>TCP/IP</span><span>NETWORKING</span></div>
+          <a href="#" class="project-link" data-placeholder="Replace this link with your project URL.">VIEW PROJECT ↗</a>
+        </article>
 
-<!-- ===========================
-     CONTACT
-=========================== -->
+        <article class="project-card reveal">
+          <div class="project-top"><span>PROJECT_02</span><span>BUILD // LOCAL</span></div>
+          <div class="project-icon">◈</div>
+          <h3>LINUX SECURITY LAB</h3>
+          <p>Linux command-line practice, system exploration and security-focused experiments.</p>
+          <div class="tags"><span>LINUX</span><span>BASH</span><span>CLI</span></div>
+          <a href="#" class="project-link" data-placeholder="Replace this link with your project URL.">VIEW PROJECT ↗</a>
+        </article>
 
-<section id="contact" class="contact">
+        <article class="project-card reveal">
+          <div class="project-top"><span>PROJECT_03</span><span>BUILD // NEXT</span></div>
+          <div class="project-icon">⬡</div>
+          <h3>CLOUD SECURITY LAB</h3>
+          <p>A future lab for exploring cloud identity, networking, monitoring and defensive controls.</p>
+          <div class="tags"><span>CLOUD</span><span>IAM</span><span>SECURITY</span></div>
+          <a href="#" class="project-link" data-placeholder="Add your cloud project when it is ready.">COMING SOON ↗</a>
+        </article>
+      </div>
+    </section>
 
-    <div class="container">
+    <section id="certifications" class="section content-section">
+      <div class="section-heading reveal">
+        <span>05</span>
+        <h2>CREDENTIALS <em>// VERIFIED</em></h2>
+      </div>
 
-        <h2 class="section-title">
-            CONTACT
-        </h2>
-
-        <div class="contact-box">
-
-            <p>
-
-                📧 Email
-
-                <br><br>
-
-                your@email.com
-
-            </p>
-
-            <p>
-
-                💻 GitHub
-
-                <br><br>
-
-                github.com/SamanyuDhangar
-
-            </p>
-
-            <p>
-
-                🛡 TryHackMe
-
-                <br><br>
-
-                Coming Soon
-
-            </p>
-
+      <div class="credential-panel reveal">
+        <div class="credential-item">
+          <span class="credential-status">VERIFIED</span>
+          <div>
+            <p>TRYHACKME</p>
+            <h3>Pre Security Path</h3>
+            <span>Hands-on cybersecurity fundamentals</span>
+          </div>
+          <span class="credential-code">THM // PRE-SEC</span>
         </div>
+        <div class="credential-item">
+          <span class="credential-status">VERIFIED</span>
+          <div>
+            <p>TRYHACKME</p>
+            <h3>SEC0</h3>
+            <span>Security fundamentals assessment</span>
+          </div>
+          <span class="credential-code">THM // SEC0</span>
+        </div>
+        <div class="credential-item">
+          <span class="credential-status">COMPLETED</span>
+          <div>
+            <p>TRYHACKME</p>
+            <h3>Wireshark Basics</h3>
+            <span>Packet analysis fundamentals</span>
+          </div>
+          <span class="credential-code">THM // WIRESHARK</span>
+        </div>
+      </div>
+    </section>
 
-    </div>
+    <section id="contact" class="section contact-section">
+      <div class="contact-box reveal">
+        <p class="kicker">> CONNECTION_REQUEST</p>
+        <h2>LET'S BUILD<br><span>SOMETHING SECURE.</span></h2>
+        <p>Interested in cybersecurity, cloud security, projects or learning together?</p>
+        <div class="contact-actions">
+          <a class="btn btn-primary" href="https://github.com/SamanyuDhangar" target="_blank" rel="noopener">GITHUB ↗</a>
+          <a class="btn btn-ghost" href="https://www.linkedin.com/" target="_blank" rel="noopener">LINKEDIN ↗</a>
+        </div>
+        <p class="contact-note">Replace the LinkedIn URL above with your profile URL.</p>
+      </div>
+    </section>
+  </main>
 
-</section>
+  <footer>
+    <span>PROJECT : ECLIPSE</span>
+    <span>© <span id="year"></span> SAMANYU DHANGAR</span>
+    <span>BUILT WITH HTML / CSS / JS</span>
+  </footer>
 
-<!-- ===========================
-     FOOTER
-=========================== -->
-
-<footer>
-
-    <p>
-
-        © 2026 Samanyu Dhangar
-
-        <br>
-
-        PROJECT : ECLIPSE
-
-    </p>
-
-</footer>
-
-</div>
-
-<script src="script.js"></script>
-
+  <div id="toast" class="toast"></div>
+  <script src="script.js"></script>
 </body>
-
 </html>
