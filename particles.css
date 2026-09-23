@@ -1,10 +1,31 @@
+/* The background canvas */
 #cyber-particles {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -999;       /* Pushes the particles behind everything else */
-    pointer-events: none; /* Allows you to click your original buttons */
-    background-color: transparent; 
+    z-index: -999;
+    pointer-events: none;
+    background-color: #050d08; /* Deep terminal green tint */
+}
+
+/* Hacker CRT Monitor Effect Overlay */
+#cyber-particles::before {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 9999; /* Sits subtly in front of everything */
+    background-size: 100% 4px, 6px 100%;
+    pointer-events: none;
+    opacity: 0.4;
+}
+
+/* Glitching terminal text glow for any text elements you want to stand out */
+.hacker-glow {
+    color: #00ffaa !important;
+    text-shadow: 0 0 10px #00ffaa, 0 0 20px rgba(0, 255, 170, 0.5);
+    font-family: 'Courier New', Courier, monospace;
 }
