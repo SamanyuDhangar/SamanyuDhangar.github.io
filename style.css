@@ -486,6 +486,7 @@ body, html {
     width: 100%;
     height: 100%;
     z-index: -1; /* Pushes particles behind everything else */
+    pointer-events: none;
 }
 
 /* Style for text or elements on top of your background */
