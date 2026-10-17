@@ -4,7 +4,7 @@ class QuantumField {
         this.canvas = document.getElementById('particles-canvas') || this.createCanvas();
         this.ctx = this.canvas.getContext('2d');
         this.particles = [];
-        this.particleCount = window.innerWidth < 768 ? 60 : 150;
+        this.particleCount = window.innerWidth < 768 ? 30 : 70;
         this.mouse = { x: null, y: null, radius: 180, isPressed: false };
         
         this.init();
