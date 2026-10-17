@@ -1,172 +1,204 @@
-const $ = (selector, parent = document) => parent.querySelector(selector);
-const $$ = (selector, parent = document) => [...parent.querySelectorAll(selector)];
+/* PROJECT : ECLIPSE — site interactions
+   One script, one listener per event type, all work batched with rAF. */
+(() => {
+  "use strict";
 
-document.addEventListener("DOMContentLoaded", () => {
-  const boot = $("#boot-screen");
-  const log = $("#boot-log");
-  const bar = $("#boot-progress-bar");
-  const percent = $("#boot-percent");
+  const $ = (selector, parent = document) => parent.querySelector(selector);
+  const $$ = (selector, parent = document) => [...parent.querySelectorAll(selector)];
 
-  const messages = [
-    "loading kernel modules...",
-    "checking network stack...",
-    "mounting security protocols...",
-    "loading user profile...",
-    "eclipse interface ready."
-  ];
+  const canHover = matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-  let progress = 0;
-  let messageIndex = 0;
+  /* ---------- Boot screen ---------- */
+  function initBoot() {
+    const boot = $("#boot-screen");
+    const log = $("#boot-log");
+    const bar = $("#boot-progress-bar");
+    const percent = $("#boot-percent");
 
-  const bootTimer = setInterval(() => {
-    progress += Math.floor(Math.random() * 12) + 5;
-    if (progress > 100) progress = 100;
+    const messages = [
+      "loading kernel modules...",
+      "checking network stack...",
+      "mounting security protocols...",
+      "loading user profile...",
+      "eclipse interface ready."
+    ];
 
-    bar.style.width = `${progress}%`;
-    percent.textContent = progress;
+    let progress = 0;
+    let messageIndex = 0;
 
-    if (messageIndex < messages.length && progress >= (messageIndex + 1) * 18) {
-      const line = document.createElement("div");
-      line.textContent = `[ OK ] ${messages[messageIndex]}`;
-      log.appendChild(line);
-      messageIndex++;
-    }
+    const timer = setInterval(() => {
+      progress = Math.min(100, progress + Math.floor(Math.random() * 12) + 5);
 
-    if (progress === 100) {
-      clearInterval(bootTimer);
-      setTimeout(() => {
-        boot.classList.add("done");
-        $$(".reveal").slice(0, 2).forEach(el => el.classList.add("visible"));
-      }, 450);
-    }
-  }, 120);
+      bar.style.width = `${progress}%`;
+      percent.textContent = progress;
 
-  // Mouse-following glow
-  const glow = $(".cursor-glow");
-  window.addEventListener("pointermove", (event) => {
-    glow.style.left = `${event.clientX}px`;
-    glow.style.top = `${event.clientY}px`;
-  });
-
-  // Navbar background + active section
-  const topbar = $(".topbar");
-  const sections = $$("main section[id]");
-  const navLinks = $$("nav a");
-
-  const updateNav = () => {
-    topbar.classList.toggle("scrolled", window.scrollY > 30);
-
-    let current = "home";
-    sections.forEach(section => {
-      const top = section.offsetTop - 160;
-      if (window.scrollY >= top) current = section.id;
-    });
-
-    navLinks.forEach(link => {
-      link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
-    });
-  };
-
-  window.addEventListener("scroll", updateNav, { passive: true });
-  updateNav();
-
-  // Mobile menu
-  const menu = $("#menu-toggle");
-  const nav = $("#nav");
-
-  menu.addEventListener("click", () => {
-    nav.classList.toggle("open");
-    menu.textContent = nav.classList.contains("open") ? "CLOSE" : "MENU";
-  });
-
-  navLinks.forEach(link => {
-    link.addEventListener("click", () => {
-      nav.classList.remove("open");
-      menu.textContent = "MENU";
-    });
-  });
-
-  // Reveal on scroll
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
-        observer.unobserve(entry.target);
+      if (messageIndex < messages.length && progress >= (messageIndex + 1) * 18) {
+        const line = document.createElement("div");
+        line.textContent = `[ OK ] ${messages[messageIndex++]}`;
+        log.appendChild(line);
       }
+
+      if (progress === 100) {
+        clearInterval(timer);
+        setTimeout(() => {
+          boot.classList.add("done");
+          $$(".reveal").slice(0, 2).forEach((el) => el.classList.add("visible"));
+        }, 450);
+      }
+    }, 120);
+  }
+
+  /* ---------- Header: background, hide on scroll, mobile menu ---------- */
+  function initHeader() {
+    const topbar = $(".topbar");
+    const menu = $("#menu-toggle");
+    const nav = $("#nav");
+    const navLinks = $$("#nav a");
+
+    let lastY = 0;
+    let ticking = false;
+
+    const onScroll = () => {
+      const y = window.scrollY;
+      topbar.classList.toggle("scrolled", y > 30);
+      // hide while scrolling down, show while scrolling up (never while menu is open)
+      topbar.classList.toggle("hide", y > lastY && y > 160 && !nav.classList.contains("open"));
+      lastY = Math.max(y, 0);
+      ticking = false;
+    };
+
+    window.addEventListener("scroll", () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(onScroll);
+      }
+    }, { passive: true });
+    onScroll();
+
+    const setMenu = (open) => {
+      nav.classList.toggle("open", open);
+      menu.textContent = open ? "CLOSE" : "MENU";
+      menu.setAttribute("aria-expanded", String(open));
+    };
+
+    menu.addEventListener("click", () => setMenu(!nav.classList.contains("open")));
+    navLinks.forEach((link) => link.addEventListener("click", () => setMenu(false)));
+
+    // Active link — IntersectionObserver instead of measuring offsets on every scroll
+    const setActive = (id) => {
+      navLinks.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("href") === `#${id}`);
+      });
+    };
+    const sectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => entry.isIntersecting && setActive(entry.target.id));
+    }, { rootMargin: "-35% 0px -60% 0px" });
+
+    $$("main section[id]").forEach((section) => sectionObserver.observe(section));
+  }
+
+  /* ---------- Reveal on scroll ---------- */
+  function initReveal() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    $$(".reveal").forEach((el) => observer.observe(el));
+  }
+
+  /* ---------- Pointer effects (cursor glow + terminal parallax) ---------- */
+  function initPointerEffects() {
+    if (!canHover) return;
+
+    const glow = $(".cursor-glow");
+    const terminal = $(".terminal-window");
+
+    let x = 0;
+    let y = 0;
+    let ticking = false;
+
+    const update = () => {
+      glow.style.transform = `translate3d(${x - 180}px, ${y - 180}px, 0)`;
+
+      if (window.innerWidth >= 900) {
+        const nx = (x / window.innerWidth - 0.5) * 2;
+        const ny = (y / window.innerHeight - 0.5) * 2;
+        terminal.style.transform =
+          `perspective(1000px) rotateY(${-4 + nx * 1.5}deg) rotateX(${2 - ny * 1.2}deg)`;
+      }
+      ticking = false;
+    };
+
+    window.addEventListener("pointermove", (event) => {
+      x = event.clientX;
+      y = event.clientY;
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    }, { passive: true });
+  }
+
+  /* ---------- Project card tilt ---------- */
+  function initCardTilt() {
+    if (!canHover) return;
+
+    $$(".project-card").forEach((card) => {
+      let ticking = false;
+      let event;
+
+      const update = () => {
+        const rect = card.getBoundingClientRect();
+        const dx = (event.clientX - rect.left) / rect.width - 0.5;
+        const dy = (event.clientY - rect.top) / rect.height - 0.5;
+        card.style.setProperty("--ry", `${dx * 14}deg`);
+        card.style.setProperty("--rx", `${-dy * 14}deg`);
+        ticking = false;
+      };
+
+      card.addEventListener("pointermove", (e) => {
+        event = e;
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      }, { passive: true });
+
+      card.addEventListener("pointerleave", () => {
+        card.style.removeProperty("--rx");
+        card.style.removeProperty("--ry");
+      });
     });
-  }, { threshold: 0.12 });
+  }
 
-  $$(".reveal").forEach(el => observer.observe(el));
+  /* ---------- Placeholder project links ---------- */
+  function initPlaceholderLinks() {
+    const toast = $("#toast");
+    let hideTimer;
 
-  // Small parallax on the hero terminal
-  const terminal = $(".terminal-window");
-  window.addEventListener("pointermove", (event) => {
-    if (window.innerWidth < 900) return;
-    const x = (event.clientX / window.innerWidth - 0.5) * 2;
-    const y = (event.clientY / window.innerHeight - 0.5) * 2;
-    terminal.style.transform =
-      `perspective(1000px) rotateY(${-4 + x * 1.5}deg) rotateX(${2 - y * 1.2}deg)`;
-  });
-
-  // Placeholder project links
-  const toast = $("#toast");
-  $$(".project-link[data-placeholder]").forEach(link => {
-    link.addEventListener("click", (event) => {
-      if (link.getAttribute("href") === "#") {
+    $$(".project-link[data-placeholder]").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        if (link.getAttribute("href") !== "#") return;
         event.preventDefault();
         toast.textContent = `// ${link.dataset.placeholder}`;
         toast.classList.add("show");
-        setTimeout(() => toast.classList.remove("show"), 2600);
-      }
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+      });
     });
-  });
+  }
 
-  // Footer year
+  /* ---------- Init ---------- */
+  initBoot();
+  initHeader();
+  initReveal();
+  initPointerEffects();
+  initCardTilt();
+  initPlaceholderLinks();
   $("#year").textContent = new Date().getFullYear();
-});
-// script.js - Hardware-Accelerated Smooth Scroll & Micro-Interactions
-document.addEventListener('DOMContentLoaded', () => {
-    // Performance check & passive listeners optimization
-    let lastScrollTop = 0;
-    const header = document.querySelector('header');
-
-    window.addEventListener('scroll', () => {
-        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        if (header) {
-            if (scrollTop > lastScrollTop) {
-                header.style.transform = 'translateY(-100%)';
-            } else {
-                header.style.transform = 'translateY(0)';
-            }
-        }
-        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-    }, { passive: true });
-
-    // Interactive card tilt physics for portfolio projects
-    const cards = document.querySelectorAll('.project-card, .glass-panel');
-    cards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const xc = rect.width / 2;
-            const yc = rect.height / 2;
-            
-            const dx = (x - xc) / xc;
-            const dy = (y - yc) / yc;
-
-            card.style.transform = `perspective(1000px) rotateY(${dx * 10}deg) rotateX(${-dy * 10}deg) translateY(-5px)`;
-        });
-
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg) translateY(0px)';
-            card.style.transition = 'transform 0.5s ease-out';
-        });
-
-        card.addEventListener('mouseenter', () => {
-            card.style.transition = 'none';
-        });
-    });
-});
+})();
