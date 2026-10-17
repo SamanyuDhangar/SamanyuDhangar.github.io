@@ -6,19 +6,27 @@
   <meta name="description" content="Samanyu Dhangar — Project Eclipse cybersecurity and cloud security portfolio.">
   <meta name="theme-color" content="#05070a">
   <title>PROJECT : ECLIPSE | Samanyu Dhangar</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="particles.css"> 
+  <link rel="stylesheet" href="particles.css">
+
+  <noscript>
+    <style>
+      .reveal { opacity: 1; translate: none; }
+      .boot-screen { display: none; }
+    </style>
+  </noscript>
 </head>
 <body>
-  <canvas id="cyber-particles"></canvas>
-  <div class="noise"></div>
-  <div class="grid"></div>
-  <div class="cursor-glow"></div>
+  <canvas id="cyber-particles" aria-hidden="true"></canvas>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="grid" aria-hidden="true"></div>
+  <div class="cursor-glow" aria-hidden="true"></div>
 
-  <div id="boot-screen" class="boot-screen">
+  <div id="boot-screen" class="boot-screen" aria-hidden="true">
     <div class="boot-box">
       <div class="boot-label">PROJECT : ECLIPSE // INITIALIZING</div>
       <div id="boot-log" class="boot-log"></div>
@@ -32,7 +40,7 @@
       <span class="brand-mark">⌁</span>
       <span>PROJECT : ECLIPSE</span>
     </a>
-    <button id="menu-toggle" class="menu-toggle" aria-label="Open menu">MENU</button>
+    <button id="menu-toggle" class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav">MENU</button>
     <nav id="nav">
       <a href="#about">ABOUT</a>
       <a href="#skills">SKILLS</a>
@@ -43,9 +51,11 @@
   </header>
 
   <main>
+    <!-- HOME -->
     <section id="home" class="hero section">
-      <div class="hero-orbit orbit-one"></div>
-      <div class="hero-orbit orbit-two"></div>
+      <div class="hero-orbit orbit-one" aria-hidden="true"></div>
+      <div class="hero-orbit orbit-two" aria-hidden="true"></div>
+
       <div class="hero-content reveal">
         <p class="eyebrow"><span class="status-dot"></span> SYSTEM ONLINE // INDIA</p>
         <p class="boot-text">INITIALIZING USER PROFILE...</p>
@@ -82,11 +92,13 @@
       <div class="scroll-cue">SCROLL TO EXPLORE <span>↓</span></div>
     </section>
 
+    <!-- ABOUT -->
     <section id="about" class="section content-section">
       <div class="section-heading reveal">
         <span>01</span>
         <h2>ABOUT <em>// PROFILE</em></h2>
       </div>
+
       <div class="about-grid">
         <div class="panel terminal-panel reveal">
           <div class="panel-header"><span>USER_PROFILE.sys</span><span>● ACTIVE</span></div>
@@ -100,7 +112,7 @@
         </div>
 
         <div class="about-copy reveal">
-          <p class="kicker">> WHOAMI</p>
+          <p class="kicker">&gt; WHOAMI</p>
           <h3>Curious about how systems work — and how they can be secured.</h3>
           <p>
             I'm building my cybersecurity foundation through hands-on learning,
@@ -120,6 +132,7 @@
       </div>
     </section>
 
+    <!-- SKILLS -->
     <section id="skills" class="section content-section">
       <div class="section-heading reveal">
         <span>02</span>
@@ -166,6 +179,7 @@
       </div>
     </section>
 
+    <!-- JOURNEY -->
     <section id="journey" class="section content-section">
       <div class="section-heading reveal">
         <span>03</span>
@@ -174,7 +188,7 @@
 
       <div class="journey-layout">
         <div class="journey-intro reveal">
-          <p class="kicker">> SECURITY_LOG --follow</p>
+          <p class="kicker">&gt; SECURITY_LOG --follow</p>
           <h3>Learning by doing.</h3>
           <p>Selected milestones from the current cybersecurity journey.</p>
         </div>
@@ -216,6 +230,7 @@
       </div>
     </section>
 
+    <!-- PROJECTS -->
     <section id="projects" class="section content-section">
       <div class="section-heading reveal">
         <span>04</span>
@@ -252,6 +267,7 @@
       </div>
     </section>
 
+    <!-- CREDENTIALS -->
     <section id="certifications" class="section content-section">
       <div class="section-heading reveal">
         <span>05</span>
@@ -266,13 +282,11 @@
             <h3>Pre Security Path</h3>
             <span>Hands-on cybersecurity fundamentals</span>
           </div>
-         <a class="credential-code"
-   href="https://tryhackme-certificates.s3-eu-west-1.amazonaws.com/THM-Z8NA9FIYDI.pdf"
-   target="_blank"
-   rel="noopener">
-   VIEW CERTIFICATE ↗
-</a>
+          <a class="credential-code"
+             href="https://tryhackme-certificates.s3-eu-west-1.amazonaws.com/THM-Z8NA9FIYDI.pdf"
+             target="_blank" rel="noopener">VIEW CERTIFICATE ↗</a>
         </div>
+
         <div class="credential-item">
           <span class="credential-status">VERIFIED</span>
           <div>
@@ -280,13 +294,11 @@
             <h3>SEC0</h3>
             <span>Security fundamentals assessment</span>
           </div>
-        <a class="credential-code"
-   href="https://assets.tryhackme.com/certification-certificate/6a5f428c6161de0fadc8ae25.pdf"
-   target="_blank"
-   rel="noopener">
-   VIEW CERTIFICATE ↗
-           </div>
-</a>
+          <a class="credential-code"
+             href="https://assets.tryhackme.com/certification-certificate/6a5f428c6161de0fadc8ae25.pdf"
+             target="_blank" rel="noopener">VIEW CERTIFICATE ↗</a>
+        </div>
+
         <div class="credential-item">
           <span class="credential-status">COMPLETED</span>
           <div>
@@ -299,9 +311,10 @@
       </div>
     </section>
 
+    <!-- CONTACT -->
     <section id="contact" class="section contact-section">
       <div class="contact-box reveal">
-        <p class="kicker">> CONNECTION_REQUEST</p>
+        <p class="kicker">&gt; CONNECTION_REQUEST</p>
         <h2>LET'S BUILD<br><span>SOMETHING SECURE.</span></h2>
         <p>Interested in cybersecurity, cloud security, projects or learning together?</p>
         <div class="contact-actions">
@@ -319,13 +332,10 @@
     <span>BUILT WITH HTML / CSS / JS</span>
   </footer>
 
-  <div id="toast" class="toast"></div>
-  <script src="script.js"></script>
-  <script src="script.js"></script>
-<script src="particles.js"></script> 
-  <script src="blackhole.js"></script>
-  <script src="quantum-grid.js"></script>
-</body>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
+  <script src="script.js" defer></script>
+  <script src="particles.js" defer></script>
+  <script src="blackhole.js" defer></script>
 </body>
 </html>
