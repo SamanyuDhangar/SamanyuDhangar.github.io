@@ -1,4 +1,4 @@
-/* Background particle canvas (drawn by particles.js) */
+/* Physics canvas (drawn by particles.js) — relativistic space background */
 #cyber-particles {
   position: fixed;
   inset: 0;
@@ -6,7 +6,29 @@
   height: 100%;
   z-index: -999;
   pointer-events: none;
-  background-color: #050d08; /* deep terminal green tint */
+  background-color: #02030a; /* deep space */
+}
+
+/* Live telemetry readout (created by particles.js, desktop only) */
+.phys-hud {
+  position: fixed;
+  right: 18px;
+  bottom: 14px;
+  text-align: right;
+  z-index: 30;
+  pointer-events: none;
+  white-space: pre;
+  font: 500 9.5px/1.6 "JetBrains Mono", monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(160, 200, 190, 0.6);
+  transition: opacity 0.3s;
+}
+.phys-hud b { color: #6dffb3; font-weight: 600; }
+.phys-hud sub { font-size: 0.8em; }
+
+@media (max-width: 900px) {
+  .phys-hud { display: none; }
 }
 
 /* Optional helper: glowing terminal text */
