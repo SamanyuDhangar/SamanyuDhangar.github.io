@@ -1,78 +1,112 @@
-// blackhole.js - Relativistic Event Horizon Simulator
-class BlackHoleEngine {
-    constructor(containerId) {
-        this.container = document.getElementById(containerId) || document.body;
-        this.canvas = document.createElement('canvas');
-        this.ctx = this.canvas.getContext('2d');
-        
-        this.canvas.style.position = 'absolute';
-        this.canvas.style.pointerEvents = 'none';
-        this.canvas.style.zIndex = '0';
-        this.container.appendChild(this.canvas);
+/* Black-hole accent drawn behind the hero.
+   Lightweight: gradients are created once, no shadowBlur, 30fps cap,
+   and it only animates while the hero is on screen. */
+(() => {
+  "use strict";
 
-        this.size = 350;
-        this.canvas.width = this.size;
-        this.canvas.height = this.size;
-        
-        this.angle = 0;
-        this.init();
+  const container = document.querySelector(".blackhole-container") || document.querySelector(".hero");
+  if (!container) return;
+
+  const SIZE = 350;
+  const FRAME_MS = 1000 / 30;
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = SIZE;
+  canvas.className = "blackhole";
+  canvas.setAttribute("aria-hidden", "true");
+  Object.assign(canvas.style, {
+    position: "absolute",
+    right: "6vw",
+    top: "12%",
+    width: `${SIZE}px`,
+    height: `${SIZE}px`,
+    opacity: "0.35",
+    pointerEvents: "none",
+    zIndex: "0"
+  });
+  container.appendChild(canvas);
+
+  const ctx = canvas.getContext("2d");
+  const c = SIZE / 2;
+
+  // Gradients created once and reused every frame
+  const halo = ctx.createRadialGradient(c, c, 30, c, c, 140);
+  halo.addColorStop(0, "rgba(0, 0, 0, 1)");
+  halo.addColorStop(0.3, "rgba(0, 255, 120, 0.8)");
+  halo.addColorStop(0.6, "rgba(0, 180, 255, 0.2)");
+  halo.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+  const disk = ctx.createLinearGradient(-100, 0, 100, 0);
+  disk.addColorStop(0, "rgba(0, 255, 100, 0)");
+  disk.addColorStop(0.5, "rgba(200, 255, 240, 0.9)");
+  disk.addColorStop(1, "rgba(0, 150, 255, 0)");
+
+  const glow = ctx.createRadialGradient(c, c, 30, c, c, 64);
+  glow.addColorStop(0, "rgba(0, 255, 136, 0.55)");
+  glow.addColorStop(1, "rgba(0, 255, 136, 0)");
+
+  let angle = 0;
+  let last = 0;
+  let rafId = 0;
+  let heroVisible = true;
+
+  function draw() {
+    ctx.clearRect(0, 0, SIZE, SIZE);
+
+    // 1. Lensing halo
+    ctx.fillStyle = halo;
+    ctx.fillRect(0, 0, SIZE, SIZE);
+
+    // 2. Accretion disk
+    ctx.save();
+    ctx.translate(c, c);
+    ctx.rotate(angle);
+    ctx.strokeStyle = disk;
+    ctx.lineWidth = 4;
+    for (let i = 0; i < 6; i++) {
+      ctx.rotate(Math.PI / 3);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 120, 45, Math.PI / 6, 0, Math.PI * 2);
+      ctx.stroke();
     }
+    ctx.restore();
 
-    init() {
-        this.animate();
-    }
+    // 3. Event horizon
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(c, c, 64, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#000";
+    ctx.beginPath();
+    ctx.arc(c, c, 32, 0, Math.PI * 2);
+    ctx.fill();
+  }
 
-    animate() {
-        this.ctx.clearRect(0, 0, this.size, this.size);
-        let cx = this.size / 2;
-        let cy = this.size / 2;
+  function loop(now) {
+    rafId = requestAnimationFrame(loop);
+    if (now - last < FRAME_MS) return;
+    last = now;
+    angle += 0.06; // 0.03 per frame at 60fps, doubled for 30fps
+    draw();
+  }
 
-        this.angle += 0.03;
+  const start = () => { if (!rafId && heroVisible && !document.hidden && !reduceMotion) rafId = requestAnimationFrame(loop); };
+  const stop = () => { cancelAnimationFrame(rafId); rafId = 0; };
 
-        // 1. Gravitational Lensing Halo (Outer Glow)
-        let gradient = this.ctx.createRadialGradient(cx, cy, 30, cx, cy, 140);
-        gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
-        gradient.addColorStop(0.3, 'rgba(0, 255, 120, 0.8)');
-        gradient.addColorStop(0.6, 'rgba(0, 180, 255, 0.2)');
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  new IntersectionObserver(([entry]) => {
+    heroVisible = entry.isIntersecting;
+    heroVisible ? start() : stop();
+  }).observe(container);
 
-        this.ctx.fillStyle = gradient;
-        this.ctx.fillRect(0, 0, this.size, this.size);
+  document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
 
-        // 2. Accretion Disk (Rotating Matter Stream)
-        this.ctx.save();
-        this.ctx.translate(cx, cy);
-        this.ctx.rotate(this.angle);
+  // Hide on small screens (saves battery, hero is crowded there)
+  const mq = matchMedia("(max-width: 900px)");
+  const applyMq = () => { canvas.style.display = mq.matches ? "none" : "block"; };
+  mq.addEventListener("change", applyMq);
+  applyMq();
 
-        for (let i = 0; i < 6; i++) {
-            this.ctx.rotate(Math.PI / 3);
-            let diskGrad = this.ctx.createLinearGradient(-100, 0, 100, 0);
-            diskGrad.addColorStop(0, 'rgba(0, 255, 100, 0)');
-            diskGrad.addColorStop(0.5, 'rgba(200, 255, 240, 0.9)');
-            diskGrad.addColorStop(1, 'rgba(0, 150, 255, 0)');
-
-            this.ctx.strokeStyle = diskGrad;
-            this.ctx.lineWidth = 4;
-            this.ctx.beginPath();
-            this.ctx.ellipse(0, 0, 120, 45, Math.PI / 6, 0, Math.PI * 2);
-            this.ctx.stroke();
-        }
-        this.ctx.restore();
-
-        // 3. Event Horizon (The Absolute Black Core)
-        this.ctx.beginPath();
-        this.ctx.arc(cx, cy, 32, 0, Math.PI * 2);
-        this.ctx.fillStyle = '#000000';
-        this.ctx.shadowBlur = 30;
-        this.ctx.shadowColor = '#00ff88';
-        this.ctx.fill();
-
-        requestAnimationFrame(() => this.animate());
-    }
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-    // Attach to a specific wrapper element if available, or initialize globally
-    const target = document.querySelector('.blackhole-container') || document.body;
-    if(target) new BlackHoleEngine(target.id || 'blackhole-container');
-});
+  draw();
+  start();
+})();
