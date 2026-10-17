@@ -467,3 +467,15 @@ footer {
   .contact-box { padding: 35px 25px; }
   .contact-box h2 { font-size: 3.3rem; }
 }
+/* GPU Layer Acceleration for Zero-Lag Rendering */
+.project-card, .glass-panel, header, canvas {
+    transform: translateZ(0);
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+}
+
+/* Smooth transition defaults */
+*, *::before, *::after {
+    box-sizing: border-box;
+    transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
