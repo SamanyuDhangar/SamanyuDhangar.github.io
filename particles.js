@@ -10,7 +10,7 @@
   const ctx = canvas.getContext("2d");
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  const COUNT = window.innerWidth < 768 ? 28 : 60;
+  const COUNT = window.innerWidth < 768 ? 40 : 70;
   const LINK_DIST = 100;
   const LINK_DIST_SQ = LINK_DIST * LINK_DIST;
   const MOUSE_RADIUS = 180;
