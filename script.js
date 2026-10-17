@@ -124,3 +124,49 @@ document.addEventListener("DOMContentLoaded", () => {
   // Footer year
   $("#year").textContent = new Date().getFullYear();
 });
+// script.js - Hardware-Accelerated Smooth Scroll & Micro-Interactions
+document.addEventListener('DOMContentLoaded', () => {
+    // Performance check & passive listeners optimization
+    let lastScrollTop = 0;
+    const header = document.querySelector('header');
+
+    window.addEventListener('scroll', () => {
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (header) {
+            if (scrollTop > lastScrollTop) {
+                header.style.transform = 'translateY(-100%)';
+            } else {
+                header.style.transform = 'translateY(0)';
+            }
+        }
+        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+    }, { passive: true });
+
+    // Interactive card tilt physics for portfolio projects
+    const cards = document.querySelectorAll('.project-card, .glass-panel');
+    cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const xc = rect.width / 2;
+            const yc = rect.height / 2;
+            
+            const dx = (x - xc) / xc;
+            const dy = (y - yc) / yc;
+
+            card.style.transform = `perspective(1000px) rotateY(${dx * 10}deg) rotateX(${-dy * 10}deg) translateY(-5px)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg) translateY(0px)';
+            card.style.transition = 'transform 0.5s ease-out';
+        });
+
+        card.addEventListener('mouseenter', () => {
+            card.style.transition = 'none';
+        });
+    });
+});
