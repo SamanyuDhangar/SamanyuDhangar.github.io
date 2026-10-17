@@ -1,149 +1,129 @@
-const canvas = document.getElementById('cyber-particles');
-const ctx = canvas.getContext('2d');
-
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    initParticles();
-}
-window.addEventListener('resize', resizeCanvas);
-
-// Configuration Settings
-const particleCount = 100;       
-const connectionDistance = 140;  
-let particles = [];
-
-// Mouse tracking context for interactive hacking element
-const mouse = {
-    x: null,
-    y: null,
-    radius: 150 // Distance where mouse pushes particles away
-};
-
-window.addEventListener('mousemove', (event) => {
-    mouse.x = event.x;
-    mouse.y = event.y;
-});
-
-window.addEventListener('mouseout', () => {
-    mouse.x = null;
-    mouse.y = null;
-});
-
-class Particle {
+// particles.js - Advanced Quantum Gravitational Field Simulation
+class QuantumField {
     constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2.5 + 1; 
-        this.speedX = Math.random() * 1 - 0.5;
-        this.speedY = Math.random() * 1 - 0.5;
-        this.baseX = this.x;
-        this.baseY = this.y;
+        this.canvas = document.getElementById('particles-canvas') || this.createCanvas();
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.particleCount = window.innerWidth < 768 ? 60 : 150;
+        this.mouse = { x: null, y: null, radius: 180, isPressed: false };
         
-        // Dynamic binary-stream tag attachment
-        this.isBinaryNode = Math.random() > 0.85;
-        this.binaryChar = Math.random() > 0.5 ? "1" : "0";
-        this.charTimer = 0;
+        this.init();
+        this.setupListeners();
+        this.animate();
     }
 
-    update() {
-        // Interactive Mouse Repel Force
-        if (mouse.x != null && mouse.y != null) {
-            let dx = mouse.x - this.x;
-            let dy = mouse.y - this.y;
-            let distance = Math.sqrt(dx * dx + dy * dy);
-            
-            if (distance < mouse.radius) {
-                let forceDirectionX = dx / distance;
-                let forceDirectionY = dy / distance;
-                let maxForce = (mouse.radius - distance) / mouse.radius;
-                let force = maxForce * 3; // Push speed multiplier
-                
-                this.x -= forceDirectionX * force;
-                this.y -= forceDirectionY * force;
-            } else {
-                // Return gracefully to trajectory
-                this.x += this.speedX;
-                this.y += this.speedY;
+    createCanvas() {
+        const canvas = document.createElement('canvas');
+        canvas.id = 'particles-canvas';
+        canvas.style.position = 'fixed';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        canvas.style.width = '100vw';
+        canvas.style.height = '100vh';
+        canvas.style.zIndex = '-1';
+        canvas.style.pointerEvents = 'none';
+        document.body.prepend(canvas);
+        return canvas;
+    }
+
+    init() {
+        this.resize();
+        this.particles = [];
+        for (let i = 0; i < this.particleCount; i++) {
+            this.particles.push({
+                x: Math.random() * this.canvas.width,
+                y: Math.random() * this.canvas.height,
+                vx: (Math.random() - 0.5) * 1.2,
+                vy: (Math.random() - 0.5) * 1.2,
+                size: Math.random() * 2 + 1,
+                baseAlpha: Math.random() * 0.7 + 0.3
+            });
+        }
+    }
+
+    resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    }
+
+    setupListeners() {
+        window.addEventListener('resize', () => this.resize());
+        window.addEventListener('mousemove', (e) => {
+            this.mouse.x = e.clientX;
+            this.mouse.y = e.clientY;
+        });
+        window.addEventListener('mouseout', () => {
+            this.mouse.x = null;
+            this.mouse.y = null;
+        });
+    }
+
+    animate() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Update and draw particles
+        for (let i = 0; i < this.particles.length; i++) {
+            let p = this.particles[i];
+
+            // Physics: Mouse gravitational pull / swirling vortex
+            if (this.mouse.x !== null && this.mouse.y !== null) {
+                let dx = this.mouse.x - p.x;
+                let dy = this.mouse.y - p.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < this.mouse.radius && dist > 5) {
+                    let force = (this.mouse.radius - dist) / this.mouse.radius;
+                    // Gravitational acceleration + perpendicular tangential vortex force
+                    p.vx += (dx / dist) * force * 0.4 - (dy / dist) * force * 0.2;
+                    p.vy += (dy / dist) * force * 0.4 + (dx / dist) * force * 0.2;
+                }
             }
-        } else {
-            this.x += this.speedX;
-            this.y += this.speedY;
-        }
 
-        // Screen wrap around bounds check
-        if (this.x < 0) this.x = canvas.width;
-        if (this.x > canvas.width) this.x = 0;
-        if (this.y < 0) this.y = canvas.height;
-        if (this.y > canvas.height) this.y = 0;
+            // Damping to prevent infinite acceleration
+            p.vx *= 0.96;
+            p.vy *= 0.96;
 
-        // Animate digital values on nodes
-        if (this.isBinaryNode) {
-            this.charTimer++;
-            if (this.charTimer > 40) {
-                this.binaryChar = Math.random() > 0.5 ? "1" : "0";
-                this.charTimer = 0;
+            p.x += p.vx;
+            p.y += p.vy;
+
+            // Screen boundary wrapping
+            if (p.x < 0) p.x = this.canvas.width;
+            if (p.x > this.canvas.width) p.x = 0;
+            if (p.y < 0) p.y = this.canvas.height;
+            if (p.y > this.canvas.height) p.y = 0;
+
+            // Draw particle
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            this.ctx.fillStyle = `rgba(0, 255, 128, ${p.baseAlpha})`;
+            this.ctx.shadowBlur = 12;
+            this.ctx.shadowColor = '#00ff80';
+            this.ctx.fill();
+
+            // Quantum Entanglement Web Lines
+            for (let j = i + 1; j < this.particles.length; j++) {
+                let p2 = this.particles[j];
+                let ndx = p.x - p2.x;
+                let ndy = p.y - p2.y;
+                let nDist = Math.sqrt(ndx * ndx + ndy * ndy);
+
+                if (nDist < 100) {
+                    let alpha = (1 - (nDist / 100)) * 0.25;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(p.x, p.y);
+                    this.ctx.lineTo(p2.x, p2.y);
+                    this.ctx.strokeStyle = `rgba(0, 255, 150, ${alpha})`;
+                    this.ctx.lineWidth = 0.6;
+                    this.ctx.stroke();
+                }
             }
         }
-    }
 
-    draw() {
-        ctx.fillStyle = 'rgba(0, 255, 136, 0.8)';
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = '#00ff88';
-        
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-
-        // If it's a binary stream node, overlay code numbers onto it
-        if (this.isBinaryNode) {
-            ctx.fillStyle = 'rgba(0, 255, 136, 0.6)';
-            ctx.font = '10px monospace';
-            ctx.fillText(this.binaryChar, this.x + 6, this.y + 4);
-        }
-        ctx.shadowBlur = 0; // Clear blur layer
+        requestAnimationFrame(() => this.animate());
     }
 }
 
-function initParticles() {
-    particles = [];
-    for (let i = 0; i < particleCount; i++) {
-        particles.push(new Particle());
-    }
-}
-
-function drawLines() {
-    for (let a = 0; a < particles.length; a++) {
-        for (let b = a + 1; b < particles.length; b++) {
-            const dx = particles[a].x - particles[b].x;
-            const dy = particles[a].y - particles[b].y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-
-            if (distance < connectionDistance) {
-                const opacity = 1 - (distance / connectionDistance);
-                
-                // Draw digital matrix grid green wires
-                ctx.strokeStyle = `rgba(0, 255, 136, ${opacity * 0.35})`;
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(particles[a].x, particles[a].y);
-                ctx.lineTo(particles[b].x, particles[b].y);
-                ctx.stroke();
-            }
-        }
-    }
-}
-
-function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles.forEach(particle => {
-        particle.update();
-        particle.draw();
-    });
-    drawLines();
-    requestAnimationFrame(animate);
-}
-
-resizeCanvas();
-animate();
+// Initialize on load
+window.addEventListener('DOMContentLoaded', () => {
+    new QuantumField();
+});
