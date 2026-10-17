@@ -247,15 +247,6 @@ nav a:hover, nav a.active { color: var(--accent); }
 }
 .scroll-cue span { color: var(--accent); margin-left: 8px; }
 
-.hero-orbit {
-  position: absolute;
-  border: 1px solid rgba(123,199,255,.08);
-  border-radius: 50%;
-  pointer-events: none;
-}
-.orbit-one { width: 700px; height: 700px; right: -300px; top: 5%; }
-.orbit-two { width: 500px; height: 500px; right: -200px; top: 18%; }
-
 /* ---------- Section layout ---------- */
 .content-section {
   width: min(var(--max), 86vw);
