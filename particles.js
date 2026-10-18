@@ -50,6 +50,8 @@
   const N_HALO = isSmall ? 80 : 240;
   const N_JET = isSmall ? 0 : 90;
   const STAR_CAP = isSmall ? 420 : 1500;
+  const N_DRIFT = isSmall ? 90 : 260;    // extra free-roaming stars (random motion + pull from the hole)
+  const DRIFT_K = 6e5;                   // pull strength, px³/s² (scaled with view below)
 
   // viscous torque: γ = α·(H/r)²·Ω × time-lapse
   const ALPHA_H2 = 2.5e-4;
@@ -290,6 +292,9 @@
   let incl = (80 * Math.PI) / 180, ci = Math.cos(incl), si = Math.sin(incl);
   let master = 1, scrollSc = 0;
   let starAngle = 0, simClock = 0, swallowed = 0;
+  let intro = 0, introStart = -1;
+  const DPR_CAP = 1.5;
+  let dprMax = DPR_CAP;
   const mouse = { x: 0, y: 0, active: false };
 
   /* ============================== STARS ============================== */
@@ -297,6 +302,40 @@
   const STAR_T = [11000, 7000, 5200, 3600];
   const STAR_CSS = STAR_T.map((T) => { const c = kelvinToRGB(T); return `rgb(${c[0]},${c[1]},${c[2]})`; });
   let starStart = [0, 0, 0, 0, 0];
+  let drifters = [], Rfield = 600;
+
+  // free stars: random initial velocity + random-walk jitter, pulled toward the hole
+  function spawnDrifter(d, initial) {
+    let rr, a = rand(0, TAU);
+    if (initial) rr = Math.max(70, Rfield * Math.sqrt(Math.random()));
+    else rr = Rfield * rand(0.7, 1.02);
+    d.dx = rr * Math.cos(a); d.dy = rr * Math.sin(a);
+    const va = rand(0, TAU), vs = rand(5, 26);
+    d.vx = vs * Math.cos(va); d.vy = vs * Math.sin(va);
+    const q = Math.random();
+    d.cls = q < 0.15 ? 0 : q < 0.5 ? 1 : q < 0.8 ? 2 : 3;
+    const m = Math.random();
+    d.al = 0.25 + 0.7 * m * m; d.sz = 0.9 + 1.6 * m * m;
+    d.ph = rand(0, TAU); d.tw = rand(0.6, 2.4);
+  }
+
+  function updateDrifters(real) {
+    if (real <= 0) return;
+    const K = DRIFT_K * (S / 8);
+    const rSwallow = R_SHADOW * S * 0.85, rMax = Rfield * 1.15;
+    const jit = 40 * real;
+    for (let i = 0; i < drifters.length; i++) {
+      const d = drifters[i];
+      const r2 = d.dx * d.dx + d.dy * d.dy, r = Math.sqrt(r2) || 1;
+      const a = (K / Math.max(r2, 3600)) * real;       // softened 1/r² attraction
+      d.vx += -(d.dx / r) * a + (Math.random() - 0.5) * jit;
+      d.vy += -(d.dy / r) * a + (Math.random() - 0.5) * jit;
+      const sp = Math.hypot(d.vx, d.vy);
+      if (sp > 200) { d.vx *= 200 / sp; d.vy *= 200 / sp; }
+      d.dx += d.vx * real; d.dy += d.vy * real;
+      if (r < rSwallow || r > rMax) spawnDrifter(d, false);
+    }
+  }
 
   function buildStars() {
     const Rf = Math.hypot(Math.max(cx, w - cx), Math.max(cy, h - cy)) + 40;
@@ -312,6 +351,9 @@
         al: 0.14 + 0.8 * m * m * m, sz: 0.9 + 1.5 * m * m
       });
     }
+    Rfield = Rf;
+    drifters = [];
+    for (let i = 0; i < N_DRIFT; i++) { const d = {}; spawnDrifter(d, true); drifters.push(d); }
     list.sort((p, q) => p.cls - q.cls);
     starStart = [0, 0, 0, 0, list.length];
     for (let c = 1; c < 4; c++) starStart[c] = list.findIndex((s) => s.cls >= c) < 0 ? list.length : list.findIndex((s) => s.cls >= c);
@@ -319,12 +361,16 @@
   }
 
   /* ============================ RESIZE =============================== */
-  function resize() {
-    w = window.innerWidth; h = window.innerHeight;
-    dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  function applyDpr() {
+    dpr = Math.min(window.devicePixelRatio || 1, dprMax);
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function resize() {
+    w = window.innerWidth; h = window.innerHeight;
+    applyDpr();
     const mobile = w < 768;
     S = mobile ? clamp(w / 72, 4.5, 6) : clamp(Math.min(w, h * 1.5) / 170, 5, 9.5);
     baseCx = mobile ? w * 0.5 : w * 0.72;
@@ -450,11 +496,67 @@
       }
       project(b);
     }
+    updateDrifters(real);
     simClock += dt;
     starAngle += real * 0.008;
   }
 
   /* ============================== RENDER ============================= */
+  function drawStarAt(st, X0, Y0, al, RE, RE2) {
+    const bb = Math.hypot(X0, Y0) / S;
+    if (bb > 10 * RE) {
+      const x = cx + X0, y = cy + Y0;
+      if (x < -4 || x > w + 4 || y < -4 || y > h + 4) return;
+      ctx.globalAlpha = al * master;
+      ctx.fillRect(x, y, st.sz, st.sz);
+      return;
+    }
+    const b0 = Math.max(bb, 0.02);
+    const bx = X0 / S, by = Y0 / S;
+    const sq = Math.sqrt(b0 * b0 + 4 * RE2);
+    const Rp = 0.5 * (b0 + sq);
+    const kp = Rp / b0;
+    const x = cx + bx * kp * S, y = cy + by * kp * S;
+    const near = b0 < 3.2 * RE;
+    if (!near) {
+      if (x < -4 || x > w + 4 || y < -4 || y > h + 4) return;
+      ctx.globalAlpha = al * master;
+      ctx.fillRect(x, y, st.sz, st.sz);
+      return;
+    }
+    const u = b0 / RE;
+    const mg = (u * u + 2) / (2 * u * Math.sqrt(u * u + 4));
+    // primary image — tangentially stretched by Rp/β, radially by 1/|1−(θE/θ)⁴|
+    if (x > -80 && x < w + 80 && y > -80 && y < h + 80) {
+      const mt = Rp / b0;
+      const mr = 1 / Math.abs(1 - Math.pow(RE / Rp, 4));
+      const len = clamp(st.sz * mt, st.sz, 70);
+      const wid = clamp(st.sz * mr, 0.8, 3);
+      const px = bx * kp, py = by * kp, pm = Math.hypot(px, py) || 1;
+      const tx = (-py / pm) * len * 0.5, ty = (px / pm) * len * 0.5;
+      ctx.globalAlpha = Math.min(1, al * (0.6 + 0.4 * (mg + 0.5))) * master;
+      ctx.lineWidth = wid;
+      ctx.beginPath(); ctx.moveTo(x - tx, y - ty); ctx.lineTo(x + tx, y + ty); ctx.stroke();
+    }
+    // secondary image on the opposite side of the lens
+    const mu2 = mg - 0.5;
+    if (mu2 > 0.012) {
+      const Rm = 0.5 * (sq - b0), k2 = -Rm / b0;
+      const x2 = cx + bx * k2 * S, y2 = cy + by * k2 * S;
+      if (x2 > -80 && x2 < w + 80 && y2 > -80 && y2 < h + 80) {
+        const mt = Rm / b0;
+        const mr = 1 / Math.abs(1 - Math.pow(RE / Rm, 4));
+        const len = clamp(st.sz * mt, st.sz, 70);
+        const wid = clamp(st.sz * mr, 0.8, 3);
+        const px = bx * k2, py = by * k2, pm = Math.hypot(px, py) || 1;
+        const tx = (-py / pm) * len * 0.5, ty = (px / pm) * len * 0.5;
+        ctx.globalAlpha = Math.min(1, al * (0.5 + mu2 * 2)) * master;
+        ctx.lineWidth = wid;
+        ctx.beginPath(); ctx.moveTo(x2 - tx, y2 - ty); ctx.lineTo(x2 + tx, y2 + ty); ctx.stroke();
+      }
+    }
+  }
+
   function drawStars() {
     const cr = Math.cos(starAngle), sr = Math.sin(starAngle);
     const RE = RE_INF, RE2 = RE * RE;
@@ -464,60 +566,16 @@
       ctx.strokeStyle = STAR_CSS[c];
       for (let i = starStart[c], e = starStart[c + 1]; i < e; i++) {
         const st = stars[i];
-        const X0 = st.dx * cr - st.dy * sr, Y0 = st.dx * sr + st.dy * cr;
-        const bb = Math.hypot(X0, Y0) / S;
-        if (bb > 10 * RE) {
-          const x = cx + X0, y = cy + Y0;
-          if (x < -4 || x > w + 4 || y < -4 || y > h + 4) continue;
-          ctx.globalAlpha = st.al * master;
-          ctx.fillRect(x, y, st.sz, st.sz);
-          continue;
-        }
-        const b0 = Math.max(bb, 0.02);
-        const bx = X0 / S, by = Y0 / S;
-        const sq = Math.sqrt(b0 * b0 + 4 * RE2);
-        const Rp = 0.5 * (b0 + sq);
-        const kp = Rp / b0;
-        const x = cx + bx * kp * S, y = cy + by * kp * S;
-        const near = b0 < 3.2 * RE;
-        if (!near) {
-          if (x < -4 || x > w + 4 || y < -4 || y > h + 4) continue;
-          ctx.globalAlpha = st.al * master;
-          ctx.fillRect(x, y, st.sz, st.sz);
-          continue;
-        }
-        const u = b0 / RE;
-        const mg = (u * u + 2) / (2 * u * Math.sqrt(u * u + 4));
-        // primary image — tangentially stretched by Rp/β, radially by 1/|1−(θE/θ)⁴|
-        if (x > -80 && x < w + 80 && y > -80 && y < h + 80) {
-          const mt = Rp / b0;
-          const mr = 1 / Math.abs(1 - Math.pow(RE / Rp, 4));
-          const len = clamp(st.sz * mt, st.sz, 70);
-          const wid = clamp(st.sz * mr, 0.8, 3);
-          const px = bx * kp, py = by * kp, pm = Math.hypot(px, py) || 1;
-          const tx = (-py / pm) * len * 0.5, ty = (px / pm) * len * 0.5;
-          ctx.globalAlpha = Math.min(1, st.al * (0.6 + 0.4 * (mg + 0.5))) * master;
-          ctx.lineWidth = wid;
-          ctx.beginPath(); ctx.moveTo(x - tx, y - ty); ctx.lineTo(x + tx, y + ty); ctx.stroke();
-        }
-        // secondary image on the opposite side of the lens
-        const mu2 = mg - 0.5;
-        if (mu2 > 0.012) {
-          const Rm = 0.5 * (sq - b0), k2 = -Rm / b0;
-          const x2 = cx + bx * k2 * S, y2 = cy + by * k2 * S;
-          if (x2 > -80 && x2 < w + 80 && y2 > -80 && y2 < h + 80) {
-            const mt = Rm / b0;
-            const mr = 1 / Math.abs(1 - Math.pow(RE / Rm, 4));
-            const len = clamp(st.sz * mt, st.sz, 70);
-            const wid = clamp(st.sz * mr, 0.8, 3);
-            const px = bx * k2, py = by * k2, pm = Math.hypot(px, py) || 1;
-            const tx = (-py / pm) * len * 0.5, ty = (px / pm) * len * 0.5;
-            ctx.globalAlpha = Math.min(1, st.al * (0.5 + mu2 * 2)) * master;
-            ctx.lineWidth = wid;
-            ctx.beginPath(); ctx.moveTo(x2 - tx, y2 - ty); ctx.lineTo(x2 + tx, y2 + ty); ctx.stroke();
-          }
-        }
+        drawStarAt(st, st.dx * cr - st.dy * sr, st.dx * sr + st.dy * cr, st.al, RE, RE2);
       }
+    }
+    // free-roaming stars (twinkle, same lensing as the fixed field)
+    for (let i = 0; i < drifters.length; i++) {
+      const d = drifters[i];
+      ctx.fillStyle = STAR_CSS[d.cls];
+      ctx.strokeStyle = STAR_CSS[d.cls];
+      const tw = 0.7 + 0.3 * Math.sin(simClock * 0.05 * d.tw + d.ph);
+      drawStarAt(d, d.dx * cr - d.dy * sr, d.dx * sr + d.dy * cr, d.al * tw, RE, RE2);
     }
   }
 
@@ -598,34 +656,6 @@
     ctx.globalCompositeOperation = "source-over";
   }
 
-  /* ============================== HUD ================================ */
-  let hud = null;
-  if (!isSmall) {
-    hud = document.createElement("div");
-    hud.className = "phys-hud";
-    hud.setAttribute("aria-hidden", "true");
-    document.body.appendChild(hud);
-  }
-  const rsAU = (2 * 1476.625 * 4.3e6) / 1.495978707e11;
-  const isco_min = (TAU * Math.pow(6, 1.5) * T_UNIT_S) / 60;
-  let hudTimer = 0;
-  function updateHud(now) {
-    if (!hud || now - hudTimer < 400) return;
-    hudTimer = now;
-    const t = Math.floor(simClock * T_UNIT_S);
-    const hh = String(Math.floor(t / 3600)).padStart(2, "0");
-    const mm = String(Math.floor((t % 3600) / 60)).padStart(2, "0");
-    const ss = String(t % 60).padStart(2, "0");
-    hud.innerHTML =
-      `<b>ECLIPSE // PHYSICS</b>  schwarzschild · a=0\n` +
-      `M 4.3e6 M☉ · r<sub>s</sub> ${rsAU.toFixed(3)} AU\n` +
-      `ISCO 6 Rg · T ${isco_min.toFixed(1)} min\n` +
-      `shadow ${R_SHADOW.toFixed(3)} Rg · incl ${((incl * 180) / Math.PI).toFixed(1)}°\n` +
-      `bodies ${bodies.length} · swallowed ${swallowed}\n` +
-      `t<sub>sim</sub> ${hh}:${mm}:${ss} (×${Math.round(TIME_SCALE * T_UNIT_S)})`;
-    hud.style.opacity = String(clamp(1 - window.scrollY / (h * 0.45), 0, 1) * 0.9);
-  }
-
   /* ============================== LOOP =============================== */
   let rafId = 0, lastT = 0;
 
@@ -633,33 +663,56 @@
     rafId = requestAnimationFrame(frame);
     const real = Math.min((now - lastT) / 1000, 0.05);
     lastT = now;
-    updateScroll();
+    updateScroll(real);
+    stepIntro(now);
     simulate(real * TIME_SCALE, real);
     render();
-    updateHud(now);
+    adaptQuality(real * 1000, now);
   }
 
-  function updateScroll() {
-    scrollSc = clamp(window.scrollY / (h * 1.2), 0, 1);
+  // scroll position is eased, so wheel notches / touch flicks glide instead of snapping
+  function updateScroll(real) {
+    const tgt = clamp(window.scrollY / (h * 1.2), 0, 1);
+    scrollSc = real > 0 ? scrollSc + (tgt - scrollSc) * (1 - Math.exp(-real * 6)) : tgt;
     cx = baseCx;
     cy = baseCy - scrollSc * h * 0.14;
-    master = lerp(isSmall ? 0.75 : 0.95, isSmall ? 0.4 : 0.5, scrollSc);
+    master = lerp(isSmall ? 0.75 : 0.95, isSmall ? 0.4 : 0.5, scrollSc) * intro;
+  }
+
+  // black hole fades in once the loader's doors open (fallback timer if the event never fires)
+  function beginIntro() { if (introStart < 0) introStart = performance.now(); }
+  window.addEventListener("eclipse:ready", beginIntro);
+  setTimeout(beginIntro, 6000);
+  function stepIntro(now) {
+    if (introStart < 0 || intro >= 1) return;
+    const t = clamp((now - introStart) / 2600, 0, 1);
+    intro = 1 - Math.pow(1 - t, 3);
+  }
+
+  // keep frame time healthy: step the canvas resolution down when frames run long, back up when they don't
+  let emaMs = 16, qCool = 0;
+  function adaptQuality(ms, now) {
+    emaMs += (ms - emaMs) * 0.08;
+    if (now < qCool) return;
+    if (emaMs > 24 && dprMax > 0.75) { dprMax = Math.max(0.75, dprMax - 0.25); applyDpr(); qCool = now + 1500; }
+    else if (emaMs < 13 && dprMax < DPR_CAP) { dprMax = Math.min(DPR_CAP, dprMax + 0.25); applyDpr(); qCool = now + 4000; }
   }
 
   const start = () => { if (!rafId && !reduceMotion) { lastT = performance.now(); rafId = requestAnimationFrame(frame); } };
   const stop = () => { cancelAnimationFrame(rafId); rafId = 0; };
 
   function staticFrame() {
-    updateScroll();
+    intro = 1;
+    updateScroll(0);
     // let the disk settle for a moment so the still frame is already in motion-state
     for (let i = 0; i < 40; i++) simulate(10, 0.05);
     render();
-    updateHud(1e9);
   }
 
   /* ============================= EVENTS ============================== */
   let resizeTimer;
   window.addEventListener("resize", () => {
+    if (window.innerWidth === w && Math.abs(window.innerHeight - h) < 160) return;
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => { resize(); if (reduceMotion) staticFrame(); }, 150);
   });
