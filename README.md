@@ -1,6 +1,6 @@
 # PROJECT : ECLIPSE
 
-Cybersecurity / Cloud Security portfolio for Samanyu Dhangar.
+Cybersecurity / Cloud Security / AI security portfolio for Samanyu Dhangar.
 
 ## Run locally
 
