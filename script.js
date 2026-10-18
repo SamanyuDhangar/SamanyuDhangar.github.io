@@ -230,7 +230,7 @@
     if (!canHover) return;
 
     const glow = $(".cursor-glow");
-    const terminal = $(".terminal-window");
+    const terminal = null; // hero terminal replaced by the access badge (see experience.js)
 
     let x = 0;
     let y = 0;
@@ -239,7 +239,7 @@
     const update = () => {
       glow.style.transform = `translate3d(${x - 180}px, ${y - 180}px, 0)`;
 
-      if (window.innerWidth >= 900) {
+      if (terminal && window.innerWidth >= 900) {
         const nx = (x / window.innerWidth - 0.5) * 2;
         const ny = (y / window.innerHeight - 0.5) * 2;
         terminal.style.transform =
