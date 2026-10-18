@@ -1,3 +1,25 @@
+# 👁️ EyesOfTruth
+
+**EyesOfTruth** is a beginner-friendly cybersecurity tool designed to help users identify potential phishing threats, analyze suspicious URLs, and understand complex terms and conditions through simplified summaries.
+
+Built with Python, this project combines practical security checks with accessible, terminal-based workflows to make cybersecurity analysis easier to understand and use.
+
+### ✨ What It Does
+
+- **Email Phishing Scanner:** Examines email content for suspicious indicators that may suggest phishing.
+- **URL Analyzer:** Checks URLs for potential warning signs and supports threat-intelligence lookups where configured.
+- **Terms Summarizer:** Simplifies lengthy terms and conditions to help users identify important clauses and potential concerns.
+
+### 🎯 Project Goal
+
+The goal of EyesOfTruth is to make basic cybersecurity analysis more accessible while providing a practical learning project for exploring Python, security automation, and threat detection.
+
+### ⚠️ Disclaimer
+
+EyesOfTruth is an educational security tool, not a guarantee of safety. Its findings may be incomplete or inaccurate. Always verify important results independently and use it only for lawful, authorized purposes.
+
+---
+
 ## Installation and Setup
 
 EyesOfTruth runs locally using Python. Follow the instructions for your operating system.
