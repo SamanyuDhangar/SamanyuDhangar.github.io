@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Samanyu Dhangar — Project Eclipse cybersecurity, cloud security and AI security portfolio.">
+  <meta name="description" content="Samanyu Dhangar — aspiring AI and cloud cybersecurity engineer. Project Eclipse: cybersecurity, cloud security and AI security portfolio.">
   <meta name="theme-color" content="#05070a">
   <title>PROJECT : ECLIPSE | Samanyu Dhangar</title>
 
@@ -12,6 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="particles.css">
+  <link rel="stylesheet" href="experience.css">
 
   <noscript>
     <style>
@@ -25,6 +26,7 @@
   <div class="noise" aria-hidden="true"></div>
   <div class="grid" aria-hidden="true"></div>
   <div class="cursor-glow" aria-hidden="true"></div>
+  <div class="scroll-progress" aria-hidden="true"></div>
 
   <div id="boot-screen" class="boot-screen" aria-hidden="true">
     <div class="boot-door boot-door-left"></div>
@@ -48,45 +50,60 @@
     <button id="menu-toggle" class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav">MENU</button>
     <nav id="nav">
       <a href="#about">ABOUT</a>
+      <a href="#mission">MISSION</a>
       <a href="#skills">SKILLS</a>
       <a href="#journey">JOURNEY</a>
       <a href="#projects">PROJECTS</a>
+      <a href="#shell">SHELL</a>
       <a href="#contact">CONTACT</a>
     </nav>
   </header>
+
+  <nav class="rail" id="rail" aria-label="Section progress"></nav>
 
   <main>
     <!-- HOME -->
     <section id="home" class="hero section">
       <div class="hero-content reveal">
-        <p class="eyebrow"><span class="status-dot"></span> SYSTEM ONLINE // INDIA</p>
+        <p class="eyebrow"><span class="status-dot"></span> SYSTEM ONLINE // INDIA <span class="clock" id="clock"></span></p>
         <p class="boot-text">INITIALIZING USER PROFILE...</p>
-        <h1>SAMANYU<br><span>DHANGAR</span></h1>
-        <p class="hero-role">CYBERSECURITY <i>×</i> CLOUD <i>×</i> AI SECURITY</p>
+        <h1 class="name" id="name" aria-label="Samanyu Dhangar">
+          <span class="name-line" data-text="SAMANYU" aria-hidden="true">SAMANYU</span>
+          <span class="name-line outline" data-text="DHANGAR" aria-hidden="true">DHANGAR</span>
+        </h1>
+        <p class="hero-role">ASPIRING AI <i>+</i> CLOUD CYBERSECURITY ENGINEER</p>
+        <p class="hero-type">&gt; learning to secure <b id="typed">cloud infrastructure</b><span class="cursor">█</span></p>
         <p class="hero-description">
           Building a foundation in networking, Linux, cloud security and AI security —
           one system, one packet and one project at a time.
         </p>
         <div class="hero-actions">
-          <a href="#projects" class="btn btn-primary">ENTER SYSTEM <span>↗</span></a>
-          <a href="#contact" class="btn btn-ghost">CONNECT</a>
+          <a href="#projects" class="btn btn-primary mag">ENTER SYSTEM <span>↗</span></a>
+          <a href="#contact" class="btn btn-ghost mag">CONNECT</a>
         </div>
       </div>
 
-      <div class="hero-terminal reveal">
-        <div class="terminal-window">
-          <div class="terminal-bar">
-            <span class="terminal-dot"></span>
-            <span class="terminal-dot"></span>
-            <span class="terminal-dot"></span>
-            <span class="terminal-title">samanyu@eclipse:~</span>
-          </div>
-          <div class="terminal-body">
-            <p><span class="prompt">samanyu@eclipse:~$</span> whoami</p>
-            <p class="terminal-output">Samanyu</p>
-            <p><span class="prompt">samanyu@eclipse:~$</span> cat focus.txt</p>
-            <p class="terminal-output">networking<br>linux<br>cybersecurity<br>cloud security<br>ai security</p>
-            <p><span class="prompt">samanyu@eclipse:~$</span> <span class="typing">./build_future.sh</span><span class="cursor">█</span></p>
+      <div class="hero-badge reveal">
+        <div class="badge-float">
+          <div class="badge" id="badge">
+            <div class="badge-glare"></div>
+            <div class="badge-slot" aria-hidden="true"></div>
+            <div class="badge-head"><span>ECLIPSE // ACCESS BADGE</span><span class="green">● ACTIVE</span></div>
+            <div class="badge-id">
+              <div class="badge-ring"><span>SD</span></div>
+              <div>
+                <h3>SAMANYU DHANGAR</h3>
+                <p>ASPIRING AI &amp; CLOUD<br>CYBERSECURITY ENGINEER</p>
+              </div>
+            </div>
+            <dl class="badge-fields">
+              <div><dt>BASE</dt><dd>INDIA</dd></div>
+              <div><dt>FOCUS</dt><dd>CLOUD + AI SECURITY</dd></div>
+              <div><dt>FOUNDATION</dt><dd>NETWORKING / LINUX</dd></div>
+              <div><dt>STATUS</dt><dd class="green">LEARNING // BUILDING</dd></div>
+            </dl>
+            <div class="badge-domains">CYBERSECURITY <i>×</i> CLOUD <i>×</i> AI SECURITY</div>
+            <svg class="badge-barcode" id="barcode" aria-hidden="true" focusable="false"></svg>
           </div>
         </div>
       </div>
@@ -115,13 +132,13 @@
 
         <div class="about-copy reveal">
           <p class="kicker">&gt; WHOAMI</p>
-          <h3>Curious about how systems work — and how they can be secured.</h3>
-          <p>
+          <h3 class="scrub">Curious about how systems work — and how they can be secured.</h3>
+          <p class="scrub">
             I'm building my cybersecurity foundation through hands-on learning,
             labs and small projects. My current path centers on networking,
             Linux, traffic analysis, cloud security and AI security.
           </p>
-          <p>
+          <p class="scrub">
             This site documents the journey rather than pretending the journey
             is finished.
           </p>
@@ -134,16 +151,69 @@
       </div>
     </section>
 
+    <!-- MARQUEE (scroll-velocity driven) -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track" data-dir="-1"><span>NETWORKING</span><span>LINUX</span><span>WIRESHARK</span><span>CLOUD SECURITY</span><span>AI SECURITY</span><span>PYTHON</span><span>C</span><span>GIT</span></div>
+      <div class="marquee-track outline" data-dir="1"><span>TCP/IP</span><span>DNS</span><span>ARP</span><span>ICMP</span><span>ROUTING</span><span>VPN</span><span>HTTP(S)</span><span>TRAFFIC ANALYSIS</span></div>
+    </div>
+
+    <!-- MISSION -->
+    <section id="mission" class="section content-section">
+      <div class="section-heading reveal">
+        <span>02</span>
+        <h2>MISSION <em>// TARGET LOCK</em></h2>
+      </div>
+
+      <div class="mission-grid">
+        <div class="reticle-wrap reveal">
+          <svg class="reticle" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
+            <circle class="rt-ring" cx="200" cy="200" r="190"/>
+            <g class="rt-spin"><circle class="rt-dash" cx="200" cy="200" r="160"/><path class="rt-arc" d="M200 30 A170 170 0 0 1 370 200"/><path class="rt-arc" d="M200 370 A170 170 0 0 1 30 200"/></g>
+            <g class="rt-spin-rev"><circle class="rt-dash fine" cx="200" cy="200" r="125"/></g>
+            <path class="rt-cross" d="M200 0V70M200 330V400M0 200H70M330 200H400"/>
+          </svg>
+          <div class="reticle-label">
+            <small>TARGET</small>
+            <strong id="reticle-title">AI + CLOUD</strong>
+            <small>SECURITY ENGINEER</small>
+          </div>
+        </div>
+
+        <div class="mission-copy reveal">
+          <p class="kicker">&gt; OBJECTIVE --lock</p>
+          <h3>Aspiring AI &amp; Cloud Cybersecurity Engineer.</h3>
+          <p>
+            Cloud platforms and AI systems are quickly becoming some of the most important
+            things to secure. I'm building the foundations to understand them properly — and, in time, to defend them.
+          </p>
+          <div class="tabs" role="tablist" aria-label="Focus areas">
+            <button class="tab on" role="tab" aria-selected="true" data-tab="cloud">CLOUD SECURITY</button>
+            <button class="tab" role="tab" aria-selected="false" data-tab="ai">AI SECURITY</button>
+            <button class="tab" role="tab" aria-selected="false" data-tab="core">FOUNDATION</button>
+          </div>
+          <div class="tab-panel" id="tab-panel" role="tabpanel" aria-live="polite">
+            <p class="tab-status">STATUS // EXPLORING</p>
+            <p>Protecting the infrastructure, identities and data that live in the cloud.</p>
+            <div class="tags"><span>IDENTITY &amp; ACCESS</span><span>SECURE CONFIGURATION</span><span>NETWORK EXPOSURE</span><span>LOGGING &amp; MONITORING</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- SKILLS -->
     <section id="skills" class="section content-section">
       <div class="section-heading reveal">
-        <span>02</span>
-        <h2>SKILLS <em>// TOOLCHAIN</em></h2>
+        <span>03</span>
+        <h2>SKILLS <em>// ORBIT MAP</em></h2>
       </div>
 
       <div class="skills-layout">
         <div class="skill-command reveal">
-          <p><span class="prompt">samanyu@eclipse:~$</span> ls -la ./skills</p>
+          <div class="orbit-wrap" id="orbit-wrap">
+            <div class="orbit" id="orbit" aria-label="Skill orbit map"><div class="orbit-core">SD</div></div>
+          </div>
+          <p class="orbit-read" id="orbit-read">NODE // hover a skill</p>
+          <p class="cmd-line"><span class="prompt">samanyu@eclipse:~$</span> ls -la ./skills</p>
           <div class="command-list">
             <span>networking</span>
             <span>linux</span>
@@ -185,7 +255,7 @@
     <!-- JOURNEY -->
     <section id="journey" class="section content-section">
       <div class="section-heading reveal">
-        <span>03</span>
+        <span>04</span>
         <h2>JOURNEY <em>// LOG</em></h2>
       </div>
 
@@ -196,7 +266,8 @@
           <p>Selected milestones from the current cybersecurity journey.</p>
         </div>
 
-        <div class="timeline">
+        <div class="timeline" id="timeline">
+          <div class="timeline-track" aria-hidden="true"><i class="timeline-fill"></i><b class="timeline-packet"></b></div>
           <article class="timeline-item reveal">
             <span class="timeline-index">01</span>
             <div>
@@ -236,7 +307,7 @@
     <!-- PROJECTS -->
     <section id="projects" class="section content-section">
       <div class="section-heading reveal">
-        <span>04</span>
+        <span>05</span>
         <h2>PROJECTS <em>// LAB</em></h2>
       </div>
 
@@ -278,7 +349,7 @@
     <!-- CREDENTIALS -->
     <section id="certifications" class="section content-section">
       <div class="section-heading reveal">
-        <span>05</span>
+        <span>06</span>
         <h2>CREDENTIALS <em>// VERIFIED</em></h2>
       </div>
 
@@ -319,6 +390,32 @@
       </div>
     </section>
 
+    <!-- SHELL (interactive terminal) -->
+    <section id="shell" class="section content-section">
+      <div class="section-heading reveal">
+        <span>07</span>
+        <h2>SHELL <em>// TRY ME</em></h2>
+      </div>
+
+      <div class="shell-wrap reveal">
+        <div class="terminal-window shell">
+          <div class="terminal-bar">
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-dot"></span>
+            <span class="terminal-title">samanyu@eclipse:~</span>
+          </div>
+          <div class="terminal-body" id="shell-body">
+            <div id="shell-out"></div>
+            <label class="shell-line"><span class="prompt">samanyu@eclipse:~$</span>
+              <input id="shell-in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Terminal command" placeholder="type help">
+            </label>
+          </div>
+        </div>
+        <div class="shell-chips" id="shell-chips" aria-label="Quick commands"></div>
+      </div>
+    </section>
+
     <!-- CONTACT -->
     <section id="contact" class="section contact-section">
       <div class="contact-box reveal">
@@ -326,8 +423,8 @@
         <h2>LET'S BUILD<br><span>SOMETHING SECURE.</span></h2>
         <p>Interested in cybersecurity, cloud security, AI security, projects or learning together?</p>
         <div class="contact-actions">
-          <a class="btn btn-primary" href="https://github.com/SamanyuDhangar" target="_blank" rel="noopener">GITHUB ↗</a>
-          <a class="btn btn-ghost" href="https://www.linkedin.com/in/samanyu-dhangar-191529413/" target="_blank" rel="noopener">LINKEDIN ↗</a>
+          <a class="btn btn-primary mag" href="https://github.com/SamanyuDhangar" target="_blank" rel="noopener">GITHUB ↗</a>
+          <a class="btn btn-ghost mag" href="https://www.linkedin.com/in/samanyu-dhangar-191529413/" target="_blank" rel="noopener">LINKEDIN ↗</a>
         </div>
         <p class="contact-note">THANK YOU FOR VISITING.</p>
       </div>
@@ -344,5 +441,6 @@
 
   <script src="script.js" defer></script>
   <script src="particles.js" defer></script>
+  <script src="experience.js" defer></script>
 </body>
 </html>
