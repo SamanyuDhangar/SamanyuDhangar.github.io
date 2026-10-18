@@ -101,7 +101,4 @@ The simulation uses **geometric units, G = c = M = 1**. One length unit is the g
 - Code assistance and physics simulation: **Claude, by Anthropic**
 - Fonts: JetBrains Mono and Space Grotesk (Google Fonts)
 
-## Contact
 
-- GitHub: https://github.com/SamanyuDhangar
-- LinkedIn: https://www.linkedin.com/in/samanyu-dhangar-191529413/
