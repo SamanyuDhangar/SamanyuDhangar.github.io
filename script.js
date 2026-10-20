@@ -51,6 +51,11 @@
     // vault emblem inside both door halves
     $$(".boot-door", boot).forEach((door) => door.insertAdjacentHTML("beforeend", vaultSVG()));
 
+    // upgrade: energy glow behind the text, a shockwave ring, and an ACCESS GRANTED stamp
+    boot.insertAdjacentHTML("afterbegin", '<div class="boot-glow"></div>');
+    boot.insertAdjacentHTML("beforeend", '<div class="boot-ring"></div>');
+    $(".boot-percent", boot).insertAdjacentHTML("afterend", '<div class="boot-granted">ACCESS GRANTED</div>');
+
     /* ----- snake geometry: a sine wave weaving over/under a straight bar ----- */
     const NS = "http://www.w3.org/2000/svg";
     const W = 680, MID = 32, AMP = 15, LAMBDA = 120, HALF = LAMBDA / 2;
@@ -104,6 +109,7 @@
       "loading kernel modules...",
       "checking network stack...",
       "mounting security protocols...",
+      "calibrating aurora lattice...",
       "loading user profile...",
       "eclipse interface ready."
     ];
@@ -125,8 +131,9 @@
       head.setAttribute("opacity", shown > 0.3 ? "1" : "0");
       const pct = Math.round(shown);
       percent.textContent = pct;
+      boot.style.setProperty("--p", (shown / 100).toFixed(3));   // drives the vault glow
 
-      while (messageIndex < messages.length && pct >= (messageIndex + 1) * 18) {
+      while (messageIndex < messages.length && pct >= (messageIndex + 1) * (96 / messages.length)) {
         const line = document.createElement("div");
         line.textContent = `[ OK ] ${messages[messageIndex++]}`;
         log.appendChild(line);
@@ -153,7 +160,11 @@
       if (target >= 100 && shown > 99.6) shown = 100;
       paint();
       if (shown >= 100) {
-        if (!finished) { finished = true; setTimeout(open, 450); }
+        if (!finished) {
+          finished = true;
+          boot.classList.add("granted");                    // ACCESS GRANTED + shockwave
+          setTimeout(open, 900);
+        }
         return;
       }
       requestAnimationFrame(tick);
