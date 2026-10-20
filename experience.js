@@ -1,6 +1,6 @@
 /* PROJECT : ECLIPSE — experience layer
    Extra motion and interactive sections. The loader (script.js) and the
-   black-hole background (particles.js) are not touched by this file. */
+   Aurora Lattice background (cosmos.js) are not touched by this file. */
 (() => {
   "use strict";
 
@@ -194,11 +194,15 @@
       return { el, spans: $$(".w", el) };
     });
     if (reduce) { blocks.forEach((b) => b.spans.forEach((s) => s.classList.add("on"))); return; }
+    blocks.forEach((b) => { b.n = -1; });
     scrollFns.push(() => {
-      blocks.forEach(({ el, spans }) => {
+      blocks.forEach((b) => {
+        const { el, spans } = b;
         const r = el.getBoundingClientRect();
         const p = clamp((innerHeight * .88 - r.top) / (r.height + innerHeight * .28), 0, 1);
         const n = Math.round(p * spans.length);
+        if (n === b.n) return;                       // nothing changed → no DOM work while scrolling
+        b.n = n;
         spans.forEach((s, i) => s.classList.toggle("on", i < n));
       });
     });
@@ -312,7 +316,7 @@
       focus: () => lines(["networking", "linux", "cybersecurity", "cloud security", "ai security"]),
       about: () => lines(["Curious about how systems work — and how they can be secured.", "Building a cybersecurity foundation through hands-on learning, labs and small projects."]),
       skills: () => lines(["networking   TCP/IP · HTTP(S) · DNS · ARP · ICMP · Routing · VPN fundamentals", "linux        CLI · permissions · processes · filesystems · shell fundamentals", "security     Wireshark · traffic analysis · security labs · recon concepts · cloud & AI security", "development  C · Python fundamentals · HTML · CSS · JavaScript · Git"]),
-      projects: () => [...lines(["01  NETWORK TRAFFIC LAB   packets, protocols and traffic patterns with Wireshark", "02  LINUX SECURITY LAB    command-line practice and security experiments", "03  TOOLS                 a growing toolkit of security utilities"]), link("    → EyesOfTruth", "https://github.com/SamanyuDhangar/EyesOfTruth")],
+      projects: () => [...lines(["01  NETWORK TRAFFIC LAB   packets, protocols and traffic patterns with Wireshark", "02  LINUX SECURITY LAB    command-line practice and security experiments", "03  TOOLS                 a growing toolkit of security utilities"]), link("    → EyesOfTruth", "https://eyesoftruth.onrender.com/")],
       journey: () => lines(["01  Networking + Linux     foundation", "02  Pre Security Path      TryHackMe", "03  Wireshark Basics      traffic analysis", "04  Cloud + AI Security   next target"]),
       credentials: () => lines(["[VERIFIED]   TryHackMe — Pre Security Path", "[VERIFIED]   TryHackMe — SEC0", "[COMPLETED]  TryHackMe — Wireshark Basics"]),
       contact: () => [link("github    → github.com/SamanyuDhangar", "https://github.com/SamanyuDhangar"), link("linkedin  → linkedin.com/in/samanyu-dhangar-191529413", "https://www.linkedin.com/in/samanyu-dhangar-191529413/")],
