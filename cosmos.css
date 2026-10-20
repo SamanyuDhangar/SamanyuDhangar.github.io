@@ -1,0 +1,110 @@
+/* PROJECT : ECLIPSE — AURORA LATTICE background
+   A fixed, always-live backdrop. It never reads the scroll position, so scrolling
+   cannot change it or slow it down. Every moving CSS layer animates `transform`
+   only (GPU-composited); the two canvases are drawn by cosmos.js.
+
+   Layers, back to front:
+     1. polar-aurora curtains + vertical light rays   (CSS)
+     2. synthwave floor racing toward the viewer       (CSS)
+     3. magnetic flow-field ribbons                    (canvas)
+     4. star field, data-glyph rain, packet network    (canvas)
+     5. edge vignette that keeps text readable         (CSS)                      */
+
+#cosmos {
+  position: fixed;
+  inset: 0;
+  z-index: -999;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 2.4s ease;
+  background: radial-gradient(120% 90% at 50% 0%, #0b1530 0%, #060a18 46%, #03050b 100%);
+  contain: strict;
+}
+#cosmos.live { opacity: 1; }
+#cosmos canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+#cosmos::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 42%, transparent 38%, rgba(2, 3, 8, .66) 100%);
+}
+
+/* ---------- aurora curtains ---------- */
+.aur { position: absolute; border-radius: 50%; will-change: transform; }
+.aur-1 {
+  width: 120vmax; height: 40vmax; left: -30vmax; top: -14vmax;
+  background: radial-gradient(closest-side, rgba(109, 255, 179, .30), rgba(109, 255, 179, .10) 46%, transparent 74%);
+  animation: aur-a 38s ease-in-out infinite alternate;
+}
+.aur-2 {
+  width: 100vmax; height: 34vmax; right: -38vmax; top: 4vmax;
+  background: radial-gradient(closest-side, rgba(123, 199, 255, .24), rgba(123, 199, 255, .08) 48%, transparent 74%);
+  animation: aur-b 46s ease-in-out infinite alternate;
+}
+.aur-3 {
+  width: 110vmax; height: 38vmax; left: -10vmax; bottom: -20vmax;
+  background: radial-gradient(closest-side, rgba(165, 139, 255, .26), rgba(165, 139, 255, .08) 48%, transparent 74%);
+  animation: aur-c 52s ease-in-out infinite alternate;
+}
+.aur-4 {
+  width: 56vmax; height: 24vmax; right: 6vmax; bottom: 8vmax;
+  background: radial-gradient(closest-side, rgba(255, 122, 184, .14), transparent 72%);
+  animation: aur-a 61s ease-in-out infinite alternate-reverse;
+}
+@keyframes aur-a {
+  from { transform: translate3d(0, 0, 0) rotate(-12deg) scale(1); }
+  to   { transform: translate3d(14vmax, 6vmax, 0) rotate(-3deg) scale(1.16); }
+}
+@keyframes aur-b {
+  from { transform: translate3d(0, 0, 0) rotate(14deg) scale(1.1); }
+  to   { transform: translate3d(-16vmax, 5vmax, 0) rotate(4deg) scale(.92); }
+}
+@keyframes aur-c {
+  from { transform: translate3d(0, 0, 0) rotate(8deg) scale(.95); }
+  to   { transform: translate3d(12vmax, -7vmax, 0) rotate(-6deg) scale(1.14); }
+}
+
+/* vertical light rays hanging inside the curtains (period == translate distance → seamless) */
+.aur-rays {
+  position: absolute; left: -20%; width: 140%; top: 0; height: 70%;
+  background: repeating-linear-gradient(90deg,
+    transparent 0 22px, rgba(109, 255, 179, .06) 30px, rgba(123, 199, 255, .05) 44px, transparent 58px 96px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 36%, transparent 100%);
+          mask-image: linear-gradient(to bottom, transparent 0, #000 36%, transparent 100%);
+  animation: rays-a 70s linear infinite;
+  will-change: transform;
+}
+.aur-rays.b {
+  top: 8%; height: 62%;
+  background: repeating-linear-gradient(90deg,
+    transparent 0 40px, rgba(165, 139, 255, .05) 52px, rgba(109, 255, 179, .04) 70px, transparent 88px 144px);
+  animation: rays-b 96s linear infinite;
+}
+@keyframes rays-a { to { transform: translate3d(-96px, 0, 0); } }
+@keyframes rays-b { to { transform: translate3d(144px, 0, 0); } }
+
+/* ---------- perspective floor ---------- */
+.floor {
+  position: absolute; left: -45%; right: -45%; bottom: 0; height: 44vh;
+  overflow: hidden; perspective: 380px; perspective-origin: 50% 0%;
+  -webkit-mask-image: linear-gradient(to top, #000 0, transparent 92%);
+          mask-image: linear-gradient(to top, #000 0, transparent 92%);
+  opacity: .8;
+}
+.floor-tilt { position: absolute; inset: 0; transform-origin: 50% 100%; transform: rotateX(64deg); }
+.floor-grid {
+  position: absolute; left: 0; right: 0; top: -64px; bottom: 0;
+  background-image:
+    linear-gradient(rgba(109, 255, 179, .26) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(123, 199, 255, .20) 1px, transparent 1px);
+  background-size: 64px 64px;
+  animation: floor-run 2.6s linear infinite;
+  will-change: transform;
+}
+@keyframes floor-run { to { transform: translate3d(0, 64px, 0); } }
+
+@media (max-width: 768px) {
+  .aur-4, .aur-rays.b { display: none; }
+  .floor { height: 34vh; opacity: .6; }
+}
