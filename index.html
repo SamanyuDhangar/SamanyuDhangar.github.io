@@ -11,18 +11,28 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="particles.css">
+  <link rel="stylesheet" href="cosmos.css">
   <link rel="stylesheet" href="experience.css">
+  <link rel="stylesheet" href="upgrade.css">
 
   <noscript>
     <style>
       .reveal { opacity: 1; translate: none; }
       .boot-screen { display: none; }
+      #cosmos { opacity: 1; }
     </style>
   </noscript>
 </head>
 <body>
-  <canvas id="cyber-particles" aria-hidden="true"></canvas>
+  <div id="cosmos" aria-hidden="true">
+    <div class="aur aur-1"></div>
+    <div class="aur aur-2"></div>
+    <div class="aur aur-3"></div>
+    <div class="aur aur-4"></div>
+    <div class="aur-rays"></div>
+    <div class="aur-rays b"></div>
+    <div class="floor"><div class="floor-tilt"><div class="floor-grid"></div></div></div>
+  </div>
   <div class="noise" aria-hidden="true"></div>
   <div class="grid" aria-hidden="true"></div>
   <div class="cursor-glow" aria-hidden="true"></div>
@@ -440,7 +450,7 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="script.js" defer></script>
-  <script src="particles.js" defer></script>
+  <script src="cosmos.js" defer></script>
   <script src="experience.js" defer></script>
 </body>
 </html>
