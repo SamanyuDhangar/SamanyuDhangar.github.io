@@ -34,7 +34,7 @@ Then visit `http://localhost:8000`.
 | `style.css` | Layout, theme, loader and vault-door styling |
 | `script.js` | Loader, header, reveal-on-scroll, pointer effects |
 | `abyss.js` | Background engine: dark-matter veins, hex lattice, stars, streaks (canvas) |
-| `abyss.css` | Background CSS layers: eclipse, orrery, light sweep |
+| `abyss.css` | Background CSS layers: dream planet, orrery, light sweep |
 | `clarity.css` | Readability layer: slabs, contrast, solid text |
 | `extras.js` / `extras.css` | Palette, themes, sound, cinema mode, lab |
 | `experience.css` / `experience.js` | Redesign layer: badge, orbit map, mission tabs, interactive shell, scroll effects |
@@ -51,7 +51,8 @@ A dark, always-live scene that never reacts to the cursor or the scroll position
 | **Dark matter** | A domain-warped noise field drawn as deep ink with thin glowing contour veins (canvas, low-res, smooth-scaled). |
 | **Hex lattice** | A faint hexagon grid; random cells power up and fade. |
 | **Stars + data streaks** | Drifting, twinkling stars and the occasional packet streaking across the sky. |
-| **Eclipse** | A black disc with a rotating corona and a diamond flare that travels around its rim (CSS). |
+| **Dream planet** | A pearl globe with soft rings and a little smiling moon that orbits it (CSS). |
+| **Sparkles + bubbles** | Twinkling four-point stars and soft pastel bubbles drifting upward (canvas). |
 | **Orrery** | A huge, slowly turning set of rings and nodes (SVG + CSS). |
 
 Colours come from `--ab-a/b/c`, so the theme switcher re-colours everything live.
@@ -60,7 +61,7 @@ Colours come from `--ab-a/b/c`, so the theme switcher re-colours everything live
 
 - **Command palette** — `Ctrl/⌘ + K` or `/`
 - **4 colour themes** — dock button or `theme` in the shell
-- **Ambient sound** — off by default
+- **Sound** — evolving ambient music plus click, hover, open and typing sounds; off by default
 - **Cinema mode** — press `V` (Esc to return)
 - **Root access** — Konami code, `matrix` in the shell, or click the logo 5 times
 - **Lab** — password strength estimator and hash generator, fully local
