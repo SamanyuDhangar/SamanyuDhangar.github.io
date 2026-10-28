@@ -5,7 +5,9 @@
    • Hex lattice   a faint hexagon grid drawn once; random cells power up and fade.
    • Stars         slowly drifting, twinkling, with depth.
    • Data streaks  an occasional packet streaks across the sky.
-   (The eclipse and orrery are CSS/SVG layers in abyss.css.)
+   • Sparkles      little four-point stars that twinkle in and out.
+   • Bubbles       soft pastel bubbles that float slowly upward.
+   (The pearl planet and the orrery are CSS/SVG layers in abyss.css.)
 
    NO cursor listener, NO scroll listener. The scene is identical wherever the pointer
    is and wherever the page is scrolled.
@@ -177,6 +179,41 @@
     return cv;
   }
   let spr = glowSprite(PB);
+  function bubbleSprite(c, size = 96) {
+    const cv = document.createElement("canvas");
+    cv.width = cv.height = size;
+    const g = cv.getContext("2d"), r = size / 2;
+    const gr = g.createRadialGradient(r, r, 0, r, r, r);
+    gr.addColorStop(0, rgba(c, 0.10));
+    gr.addColorStop(0.78, rgba(c, 0.22));
+    gr.addColorStop(0.94, rgba(c, 0.6));
+    gr.addColorStop(1, rgba(c, 0));
+    g.fillStyle = gr; g.fillRect(0, 0, size, size);
+    return cv;
+  }
+  let bub = [bubbleSprite(PA), bubbleSprite(PB), bubbleSprite(PC)];
+
+  const bubbles = [];
+  function initBubbles() {
+    bubbles.length = 0;
+    const n = small ? 7 : 13;
+    for (let i = 0; i < n; i++) bubbles.push({ x: rand(0, w), y: rand(0, h), r: rand(12, 52), v: rand(5, 13), ph: rand(0, TAU), k: (Math.random() * 3) | 0, a: rand(0.35, 0.8) });
+  }
+
+  const sparks = [];                                  // twinkling four-point stars
+  function spawnSpark(first) {
+    return { x: rand(0, w), y: rand(0, h * 0.9), s: rand(5, small ? 10 : 15), t: first ? rand(0, 4) : 0, dur: rand(2.4, 5), k: (Math.random() * 3) | 0 };
+  }
+  function initSparks() { sparks.length = 0; for (let i = 0; i < (small ? 9 : 17); i++) sparks.push(spawnSpark(true)); }
+  function starPath(g, x, y, s) {
+    g.beginPath();
+    g.moveTo(x, y - s);
+    g.quadraticCurveTo(x, y, x + s, y);
+    g.quadraticCurveTo(x, y, x, y + s);
+    g.quadraticCurveTo(x, y, x - s, y);
+    g.quadraticCurveTo(x, y, x, y - s);
+    g.closePath();
+  }
 
   const cells = [];       // powered hexes
   let cellTimer = 0;
@@ -211,6 +248,12 @@
       if (s.x < -4) { s.x = w + 4; s.y = rand(0, h); }
       if (s.y > h + 4) { s.y = -4; s.x = rand(0, w); }
     }
+    for (let i = 0; i < bubbles.length; i++) {
+      const b = bubbles[i];
+      b.y -= b.v * dt; b.x += Math.sin(T * 0.4 + b.ph) * 6 * dt;
+      if (b.y < -b.r * 2) { b.y = h + b.r * 2; b.x = rand(0, w); }
+    }
+    for (let i = 0; i < sparks.length; i++) { const p = sparks[i]; p.t += dt; if (p.t > p.dur) sparks[i] = spawnSpark(false); }
     cellTimer -= dt;
     if (cellTimer <= 0 && cells.length < (small ? 9 : 18)) { spawnCell(); cellTimer = rand(0.25, 0.7); }
     for (let i = cells.length - 1; i >= 0; i--) { cells[i].t += dt; if (cells[i].t > cells[i].dur) cells.splice(i, 1); }
@@ -226,6 +269,14 @@
   function drawFx() {
     fx.setTransform(dpr, 0, 0, dpr, 0, 0);
     fx.clearRect(0, 0, w, h);
+
+    // soft bubbles
+    for (let i = 0; i < bubbles.length; i++) {
+      const b = bubbles[i];
+      fx.globalAlpha = b.a * (0.75 + 0.25 * Math.sin(T * 0.7 + b.ph));
+      fx.drawImage(bub[b.k], b.x - b.r, b.y - b.r, b.r * 2, b.r * 2);
+    }
+    fx.globalAlpha = 1;
 
     // powered hex cells
     for (let i = 0; i < cells.length; i++) {
@@ -246,6 +297,21 @@
       fx.globalAlpha = a;
       fx.fillRect(s.x, s.y, sz, sz);
       if (s.z > 0.93) { fx.globalAlpha = a * 0.8; fx.drawImage(spr, s.x - 12, s.y - 12, 24, 24); }
+    }
+    fx.globalAlpha = 1;
+
+    // sparkles
+    for (let i = 0; i < sparks.length; i++) {
+      const p = sparks[i];
+      const k = Math.sin((Math.PI * p.t) / p.dur);
+      const e = k * k * k;
+      const c = p.k === 0 ? PA : p.k === 1 ? PB : PC;
+      fx.globalAlpha = 0.9 * e;
+      fx.fillStyle = `rgb(${Math.min(255, c[0] + 90)},${Math.min(255, c[1] + 90)},${Math.min(255, c[2] + 90)})`;
+      starPath(fx, p.x, p.y, p.s * (0.5 + 0.5 * e));
+      fx.fill();
+      fx.globalAlpha = 0.5 * e;
+      fx.drawImage(spr, p.x - p.s * 1.4, p.y - p.s * 1.4, p.s * 2.8, p.s * 2.8);
     }
     fx.globalAlpha = 1;
 
@@ -271,7 +337,7 @@
     for (const c of [hexCv, fxCv]) { c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); }
     sizeInk();
     drawHexStatic();
-    initStars();
+    initStars(); initBubbles(); initSparks();
     cells.length = 0; streaks.length = 0;
   }
 
@@ -316,6 +382,7 @@
   addEventListener("abyss:palette", () => {
     readPalette();
     spr = glowSprite(PB);
+    bub = [bubbleSprite(PA), bubbleSprite(PB), bubbleSprite(PC)];
     drawHexStatic();
     if (reduce && running) staticFrame();
   });
