@@ -1,7 +1,7 @@
 /* PROJECT : ECLIPSE — surprise features
    • Command palette   Ctrl/⌘ + K  or  /   — jump anywhere, open links, run actions
    • Colour themes     4 palettes; the whole site and the background re-colour live
-   • Ambient sound     a soft generated drone (off by default, one click)
+   • Sound             evolving ambient music + click/hover/open sounds (off by default)
    • Cinema mode       V — hide the interface and just watch the sky
    • Root access       Konami code, `matrix` in the shell, or click the logo 5 times
    • Lab               password strength estimator + hash generator (all local)
@@ -49,7 +49,7 @@
     root.style.setProperty("--ab-c", t.c.join(", "));
     dispatchEvent(new Event("abyss:palette"));
     store.set("eclipse-theme", t.n);
-    if (announce) toast(`theme → ${t.n}`);
+    if (announce) { toast(`theme → ${t.n}`); sfx("theme"); }
   }
   function nextTheme() { themeIx = (themeIx + 1) % THEMES.length; applyTheme(themeIx, true); return THEMES[themeIx].n; }
 
@@ -61,76 +61,266 @@
     setTimeout(go, 6500);
   }
 
-  /* ================================ SOUND ============================== */
-  let ctx = null, master = null, voices = [], pingTimer = 0, soundOn = false;
-  function soundStart() {
+  /* ================================ SOUND ==============================
+     One switch (the SOUND button) turns on two things:
+       1. evolving ambient music: pad chords that change, plucked notes with echo,
+          a deep bass, slow sweeps. It also brightens as you scroll down the page.
+       2. interface sounds: clicks, hovers, opening things, typing, section changes.
+     Everything is generated in the browser (no audio files). Off by default. */
+  const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const CHORDS = [
+    [45, 52, 57, 60, 64], [41, 48, 53, 57, 60], [48, 55, 60, 64, 67], [43, 50, 55, 59, 62],
+    [45, 52, 57, 60, 64], [41, 48, 53, 57, 62], [48, 55, 59, 64, 67], [43, 50, 55, 59, 66]
+  ];
+  let ctx = null, bus = null, musicBus = null, sfxBus = null, noiseBuf = null, soundOn = false;
+  let amb = null, energy = 0, scrollP = 0, lastSection = "", hoverEl = null, hoverAt = 0, userScrolled = false;
+
+  function ensureCtx() {
+    if (ctx) return ctx;
     const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) { toast("audio is not supported in this browser"); return false; }
-    ctx = ctx || new AC();
-    ctx.resume();
-    master = ctx.createGain();
-    master.gain.value = 0;
-    master.connect(ctx.destination);
-    const filt = ctx.createBiquadFilter();
-    filt.type = "lowpass"; filt.frequency.value = 380; filt.Q.value = 2;
-    filt.connect(master);
-    voices = [[55, "sine", 0.5], [82.41, "sine", 0.28], [110.6, "triangle", 0.16], [164.8, "sine", 0.07]].map(([f, type, g]) => {
-      const o = ctx.createOscillator(), gn = ctx.createGain();
-      o.type = type; o.frequency.value = f; gn.gain.value = g;
-      o.connect(gn); gn.connect(filt); o.start();
-      return o;
+    if (!AC) return null;
+    ctx = new AC();
+    const comp = ctx.createDynamicsCompressor();             // keeps loud moments from distorting
+    comp.threshold.value = -20; comp.knee.value = 18; comp.ratio.value = 5; comp.attack.value = 0.004; comp.release.value = 0.25;
+    bus = ctx.createGain(); bus.gain.value = 0;
+    musicBus = ctx.createGain(); musicBus.gain.value = 0.55;
+    sfxBus = ctx.createGain(); sfxBus.gain.value = 1.05;
+    musicBus.connect(bus); sfxBus.connect(bus); bus.connect(comp); comp.connect(ctx.destination);
+    noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    return ctx;
+  }
+  const panner = (p) => { if (!ctx.createStereoPanner) return null; const n = ctx.createStereoPanner(); n.pan.value = p; return n; };
+
+  /* ---------- sound effects ---------- */
+  function tone({ f, f2, type = "sine", a = 0.004, d = 0.12, v = 0.25, at = 0, pan = 0, dest }) {
+    const t = ctx.currentTime + at;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t);
+    if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + a + d);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(v, t + a);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + a + d);
+    o.connect(g);
+    const p = pan ? panner(pan) : null;
+    if (p) { g.connect(p); p.connect(dest || sfxBus); } else g.connect(dest || sfxBus);
+    o.start(t); o.stop(t + a + d + 0.05);
+  }
+  function noise({ d = 0.05, v = 0.2, f = 4000, f2, type = "highpass", q = 1, at = 0, dest }) {
+    const t = ctx.currentTime + at;
+    const src = ctx.createBufferSource(), fl = ctx.createBiquadFilter(), g = ctx.createGain();
+    src.buffer = noiseBuf; src.loopStart = 0;
+    fl.type = type; fl.Q.value = q; fl.frequency.setValueAtTime(f, t);
+    if (f2) fl.frequency.exponentialRampToValueAtTime(f2, t + d);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(v, t + Math.min(0.02, d / 3));
+    g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    src.connect(fl); fl.connect(g); g.connect(dest || sfxBus);
+    src.start(t, Math.random()); src.stop(t + d + 0.05);
+  }
+  const PENT = [523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.7];
+  const SFX = {
+    hover: () => tone({ f: rnd(1500, 1900), d: 0.035, v: 0.06 }),
+    click: () => { tone({ f: 950, f2: 480, type: "triangle", d: 0.08, v: 0.32 }); tone({ f: 1900, d: 0.05, v: 0.12 }); },
+    key: () => { noise({ d: 0.03, v: 0.18, f: 2200 }); tone({ f: rnd(1000, 1500), type: "square", d: 0.025, v: 0.05 }); },
+    enter: () => { tone({ f: 520, f2: 800, type: "triangle", d: 0.13, v: 0.3 }); tone({ f: 1040, d: 0.22, v: 0.14, at: 0.06 }); },
+    open: () => { tone({ f: 260, f2: 1100, d: 0.3, v: 0.24 }); noise({ d: 0.3, v: 0.07, f: 500, f2: 4500, type: "bandpass", q: 2 }); tone({ f: 880, d: 0.6, v: 0.16, at: 0.12 }); tone({ f: 1318.5, d: 0.7, v: 0.12, at: 0.2 }); },
+    close: () => { tone({ f: 900, f2: 240, d: 0.22, v: 0.22 }); noise({ d: 0.22, v: 0.05, f: 3000, f2: 400, type: "bandpass", q: 2 }); },
+    chime: () => { const i = (Math.random() * 5) | 0; tone({ f: PENT[i], type: "sine", d: 0.9, v: 0.2 }); tone({ f: PENT[i + 2], type: "sine", d: 1.1, v: 0.14, at: 0.11 }); tone({ f: PENT[i] * 2.01, d: 0.5, v: 0.05 }); },
+    theme: () => [523.25, 659.25, 783.99, 1046.5].forEach((f, k) => tone({ f, type: "triangle", d: 0.28, v: 0.22, at: k * 0.07 })),
+    whoosh: () => { noise({ d: 0.9, v: 0.32, f: 250, f2: 5000, type: "bandpass", q: 1.4 }); tone({ f: 120, f2: 60, d: 0.7, v: 0.25 }); },
+    level: () => tone({ f: 420 + rnd(0, 500), type: "triangle", d: 0.09, v: 0.16 }),
+    power: () => {
+      tone({ f: 90, f2: 32, d: 1.4, v: 0.55 });
+      noise({ d: 1.2, v: 0.3, f: 200, f2: 6000, type: "bandpass", q: 1.2 });
+      [783.99, 659.25, 523.25, 392, 329.63, 261.63].forEach((f, k) => tone({ f, type: "sawtooth", d: 0.35, v: 0.12, at: 0.15 + k * 0.1 }));
+    },
+    on: () => [392, 523.25, 659.25, 783.99, 1046.5].forEach((f, k) => tone({ f, type: "triangle", d: 0.5, v: 0.24, at: k * 0.09 }))
+  };
+  function sfx(name) { if (soundOn && ctx && SFX[name]) { try { SFX[name](); } catch (e) { /* audio hiccup */ } } }
+
+  /* ---------- ambient music ---------- */
+  function ambStart() {
+    const A = { timers: [], nodes: [], osc: [], chord: 0 };
+    const padFilter = ctx.createBiquadFilter();
+    padFilter.type = "lowpass"; padFilter.frequency.value = 700; padFilter.Q.value = 0.8;
+    const padGain = ctx.createGain(); padGain.gain.value = 0.2;
+    padFilter.connect(padGain); padGain.connect(musicBus);
+    A.filter = padFilter;
+
+    // echo for the plucks
+    const dry = ctx.createGain(); dry.gain.value = 0.9; dry.connect(musicBus);
+    const dly = ctx.createDelay(1); dly.delayTime.value = 0.42;
+    const fb = ctx.createGain(); fb.gain.value = 0.4;
+    const tone2 = ctx.createBiquadFilter(); tone2.type = "lowpass"; tone2.frequency.value = 2200;
+    const wet = ctx.createGain(); wet.gain.value = 0.5;
+    dly.connect(tone2); tone2.connect(fb); fb.connect(dly); tone2.connect(wet); wet.connect(musicBus);
+    A.pluckIn = ctx.createGain(); A.pluckIn.connect(dry); A.pluckIn.connect(dly);
+
+    // pad: five notes, each a saw + a triangle, slightly detuned
+    A.voices = CHORDS[0].map((m) => {
+      const pair = [["sawtooth", -7, 0.05], ["triangle", 7, 0.12]].map(([type, det, g]) => {
+        const o = ctx.createOscillator(), gn = ctx.createGain();
+        o.type = type; o.detune.value = det; o.frequency.value = mtof(m); gn.gain.value = g;
+        o.connect(gn); gn.connect(padFilter); o.start(); A.osc.push(o);
+        return o;
+      });
+      return pair;
     });
+    // bass: a deep note plus its octave so small speakers can hear it
+    A.bass = [[-12, "sine", 0.34], [0, "triangle", 0.1]].map(([off, type, g]) => {
+      const o = ctx.createOscillator(), gn = ctx.createGain();
+      o.type = type; o.frequency.value = mtof(CHORDS[0][0] + off); gn.gain.value = g;
+      o.connect(gn); gn.connect(musicBus); o.start(); A.osc.push(o);
+      return [o, off];
+    });
+    // slow filter wobble
     const lfo = ctx.createOscillator(), lg = ctx.createGain();
-    lfo.frequency.value = 0.07; lg.gain.value = 150;
-    lfo.connect(lg); lg.connect(filt.frequency); lfo.start();
-    voices.push(lfo);
-    master.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 3);
-    const ping = () => {
-      if (!soundOn) return;
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = "sine"; o.frequency.value = [659.3, 783.99, 880, 987.8][(Math.random() * 4) | 0];
-      g.gain.setValueAtTime(0, ctx.currentTime);
-      g.gain.linearRampToValueAtTime(0.035, ctx.currentTime + 0.05);
-      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.6);
-      o.connect(g); g.connect(master); o.start(); o.stop(ctx.currentTime + 2.7);
-      pingTimer = setTimeout(ping, 8000 + Math.random() * 8000);
+    lfo.frequency.value = 0.07; lg.gain.value = 260;
+    lfo.connect(lg); lg.connect(padFilter.frequency); lfo.start(); A.osc.push(lfo);
+
+    const pluck = () => {
+      if (!A.alive) return;
+      const notes = CHORDS[A.chord];
+      if (Math.random() < 0.8) {
+        const m = notes[(Math.random() * notes.length) | 0] + (Math.random() < 0.5 ? 12 : 24);
+        const t = ctx.currentTime, o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
+        o.type = "triangle"; o.frequency.value = mtof(m);
+        o2.type = "sine"; o2.frequency.value = mtof(m) * 2.005;     // bell-like overtone
+        lp.type = "lowpass"; lp.frequency.value = 2600 + energy * 2000 + scrollP * 1500;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(0.3, t + 0.006);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 1.8);
+        const og = ctx.createGain(); og.gain.value = 0.25;
+        o.connect(lp); o2.connect(og); og.connect(lp); lp.connect(g);
+        const p = panner(rnd(-0.7, 0.7));
+        if (p) { g.connect(p); p.connect(A.pluckIn); } else g.connect(A.pluckIn);
+        o.start(t); o2.start(t); o.stop(t + 1.9); o2.stop(t + 1.9);
+      }
+      const base = 0.5 - scrollP * 0.2 - energy * 0.15;              // busier the further you scroll
+      A.timers.push(setTimeout(pluck, (base + Math.random() * 0.55) * 1000));
     };
-    pingTimer = setTimeout(ping, 5000);
-    return true;
+    const changeChord = () => {
+      if (!A.alive) return;
+      A.chord = (A.chord + 1) % CHORDS.length;
+      const notes = CHORDS[A.chord], t = ctx.currentTime;
+      A.voices.forEach((pair, i) => pair.forEach((o) => o.frequency.setTargetAtTime(mtof(notes[i]), t, 1.3)));
+      A.bass.forEach(([o, off]) => o.frequency.setTargetAtTime(mtof(notes[0] + off), t, 0.5));
+      tone({ f: 70, f2: 40, d: 0.8, v: 0.28, dest: musicBus });      // soft thump on every change
+      A.timers.push(setTimeout(changeChord, rnd(9000, 14000)));
+    };
+    const sweep = () => {
+      if (!A.alive) return;
+      const p = panner(rnd(-0.6, 0.6));
+      noise({ d: 4.5, v: 0.1, f: 250, f2: 2600, type: "bandpass", q: 3, dest: musicBus });
+      if (p) { /* stereo placement is covered by the plucks */ }
+      A.timers.push(setTimeout(sweep, rnd(15000, 26000)));
+    };
+    A.alive = true;
+    A.timers.push(setTimeout(pluck, 900), setTimeout(changeChord, 10000), setTimeout(sweep, 7000));
+    return A;
   }
-  function soundStop() {
-    clearTimeout(pingTimer);
-    if (!ctx || !master) return;
-    const m = master, vs = voices;
-    m.gain.cancelScheduledValues(ctx.currentTime);
-    m.gain.setValueAtTime(m.gain.value, ctx.currentTime);
-    m.gain.linearRampToValueAtTime(0, ctx.currentTime + 1);
-    setTimeout(() => { vs.forEach((o) => { try { o.stop(); } catch (e) { /* already stopped */ } }); m.disconnect(); }, 1200);
-    voices = []; master = null;
+  function ambStop() {
+    const A = amb; amb = null;
+    if (!A) return;
+    A.alive = false;
+    A.timers.forEach(clearTimeout);
+    setTimeout(() => A.osc.forEach((o) => { try { o.stop(); } catch (e) { /* already stopped */ } }), 1500);
   }
+  function ambMood() {                       // the music opens up as you scroll or when something exciting happens
+    if (!amb) return;
+    amb.filter.frequency.setTargetAtTime(520 + scrollP * 2200 + energy * 1800, ctx.currentTime, 0.6);
+  }
+  function boost(sec) { energy = 1; ambMood(); setTimeout(() => { energy = 0; ambMood(); }, sec * 1000); }
+
   function toggleSound() {
-    if (soundOn) { soundOn = false; soundStop(); }
-    else { soundOn = soundStart(); }
     const b = $("#dock-sound");
+    if (!soundOn) {
+      if (!ensureCtx()) { toast("audio is not supported in this browser"); return false; }
+      ctx.resume();
+      soundOn = true;
+      bus.gain.cancelScheduledValues(ctx.currentTime);
+      bus.gain.setValueAtTime(bus.gain.value, ctx.currentTime);
+      bus.gain.linearRampToValueAtTime(1, ctx.currentTime + 1.5);
+      amb = ambStart();
+      sfx("on");
+      toast("sound on — music + click sounds");
+    } else {
+      soundOn = false;
+      bus.gain.cancelScheduledValues(ctx.currentTime);
+      bus.gain.setValueAtTime(bus.gain.value, ctx.currentTime);
+      bus.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.8);
+      ambStop();
+      toast("sound off");
+    }
     if (b) { b.setAttribute("aria-pressed", String(soundOn)); $("span", b).textContent = soundOn ? "SOUND ON" : "SOUND"; }
-    toast(soundOn ? "ambient sound on" : "ambient sound off");
+    return soundOn;
+  }
+
+  function initSound() {
+    const INTERACTIVE = "a, button, .tab, summary, [role=button], select, label[for]";
+    addEventListener("pointerdown", (e) => {
+      if (!soundOn || !e.target.closest) return;
+      const t = e.target.closest(INTERACTIVE);
+      if (t) sfx(t.matches("a[target=_blank]") ? "open" : "click");
+    }, true);
+    addEventListener("pointerover", (e) => {
+      if (!soundOn || e.pointerType !== "mouse" || !e.target.closest) return;
+      const t = e.target.closest(INTERACTIVE + ", .project-card, .skill-card, .timeline-item");
+      const now = performance.now();
+      if (t && t !== hoverEl && now - hoverAt > 70) { sfx("hover"); hoverAt = now; }
+      hoverEl = t;
+    });
+    const sh = $("#shell-in");
+    if (sh) sh.addEventListener("keydown", (e) => { if (e.key === "Enter") sfx("enter"); else if (e.key.length === 1 || e.key === "Backspace") sfx("key"); });
+    ["#pw-in", "#hash-in"].forEach((q) => { const el = $(q); if (el) el.addEventListener("input", () => sfx("key")); });
+
+    // a soft chime whenever you arrive at a new section
+    let tick = 0;
+    addEventListener("scroll", () => {
+      userScrolled = true;
+      if (tick) return;
+      tick = setTimeout(() => {
+        tick = 0;
+        const max = document.documentElement.scrollHeight - innerHeight;
+        scrollP = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+        ambMood();
+      }, 150);
+    }, { passive: true });
+    if ("IntersectionObserver" in window) {
+      let lastAt = 0;
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (!en.isIntersecting || !userScrolled || en.target.id === lastSection) return;
+          lastSection = en.target.id;
+          const now = performance.now();
+          if (now - lastAt > 700) { sfx("chime"); lastAt = now; }
+        });
+      }, { rootMargin: "-48% 0px -48% 0px" });
+      $$("main section[id], header#home, #home").forEach((s) => io.observe(s));
+    }
   }
 
   /* ============================== CINEMA =============================== */
   function cinema(on) {
     const next = typeof on === "boolean" ? on : !root.classList.contains("cinema");
     root.classList.toggle("cinema", next);
+    sfx("whoosh");
     if (next) setTimeout(() => addEventListener("pointerdown", exitCinema, { once: true, capture: true }), 400);
   }
   function exitCinema(e) {
     if (e && e.target && e.target.closest && e.target.closest(".dock")) return;   // dock button handles itself
     root.classList.remove("cinema");
+    sfx("whoosh");
   }
 
   /* ============================== MATRIX =============================== */
   let matrixBusy = false;
   function matrix() {
     toast("ROOT ACCESS GRANTED");
+    sfx("power"); boost(7);
     if (reduce || matrixBusy) return;
     matrixBusy = true;
     const cv = document.createElement("canvas");
@@ -225,9 +415,9 @@
       shown = q ? items.filter((it) => (it.label + " " + it.tag).toLowerCase().includes(q)) : items.slice();
       sel = 0; render();
     };
-    const openPal = () => { lastFocus = document.activeElement; wrap.classList.add("open"); input.value = ""; filter(); setTimeout(() => input.focus(), 30); };
-    const closePal = () => { wrap.classList.remove("open"); if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true }); };
-    const run = (it) => { closePal(); setTimeout(it.run, 120); };
+    const openPal = () => { sfx("open"); lastFocus = document.activeElement; wrap.classList.add("open"); input.value = ""; filter(); setTimeout(() => input.focus(), 30); };
+    const closePal = (quiet) => { if (quiet !== true) sfx("close"); wrap.classList.remove("open"); if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true }); };
+    const run = (it) => { closePal(true); sfx("enter"); setTimeout(it.run, 120); };
 
     input.addEventListener("input", filter);
     input.addEventListener("keydown", (e) => {
@@ -343,6 +533,7 @@
       bar.parentNode.style.setProperty("--lv", lv[2]);
       bar.style.setProperty("--lv", lv[2]);
       verdict.style.setProperty("--lv", lv[2]);
+      if (verdict.textContent !== lv[1]) sfx("level");
       verdict.textContent = lv[1];
       ent.textContent = `${Math.round(bits)} bits`;
       time.textContent = fmtTime(Math.pow(2, bits) / 2 / 1e10);          // average, offline attack at 10 billion guesses/s
@@ -378,13 +569,14 @@
     copy.addEventListener("click", () => {
       const v = out.textContent;
       if (!v || v === "—" || !navigator.clipboard) return toast("nothing to copy yet");
-      navigator.clipboard.writeText(v).then(() => toast("hash copied"), () => toast("couldn't copy"));
+      navigator.clipboard.writeText(v).then(() => toast("hash copied") || sfx("enter"), () => toast("couldn't copy"));
     });
   }
 
   /* ================================ INIT =============================== */
   window.eclipseFx = { nextTheme, cinema, matrix, toggleSound };
   initDock(initPalette());
+  initSound();
   initSecrets();
   initPassword();
   initHash();
