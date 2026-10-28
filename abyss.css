@@ -1,0 +1,147 @@
+/* PROJECT : ECLIPSE — ABYSS background
+   A fixed, always-live, dark scene. It never listens to the cursor and never reads
+   the scroll position, so nothing in it reacts to either.
+
+   Layers, back to front:
+     1. liquid dark-matter with glowing contour veins   (canvas, low-res, smooth-scaled)
+     2. faint hex lattice                               (canvas, drawn once)
+     3. stars, powered hex cells, data streaks          (canvas)
+     4. a total solar eclipse: black disc + rotating corona + travelling diamond flare (CSS)
+     5. a huge slowly turning orrery of rings and nodes (SVG + CSS)
+     6. a slow light sweep, then a dimming shade that keeps text readable (CSS)
+   Colours come from --ab-a / --ab-b / --ab-c so the theme switcher re-colours everything. */
+
+:root {
+  --ab-a: 109, 255, 179;
+  --ab-b: 123, 199, 255;
+  --ab-c: 165, 139, 255;
+}
+
+#abyss {
+  position: fixed;
+  inset: 0;
+  z-index: -999;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 2.4s ease;
+  background: #03040a;
+  contain: strict;
+}
+#abyss.live { opacity: 1; }
+#abyss canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* ---------- eclipse ---------- */
+.abyss-eclipse {
+  position: absolute;
+  right: calc(7vw - 5vmin);
+  top: calc(9vh - 4vmin);
+  width: 44vmin;
+  height: 44vmin;
+}
+.abyss-eclipse > * { position: absolute; border-radius: 50%; }
+.abyss-eclipse .halo {
+  inset: -70%;
+  background: radial-gradient(closest-side, rgba(var(--ab-a), .16), rgba(var(--ab-c), .07) 45%, transparent 72%);
+  animation: ab-breathe 9s ease-in-out infinite;
+}
+.abyss-eclipse .corona {
+  inset: -34%;
+  background: conic-gradient(from 0deg,
+    rgba(var(--ab-a), 0) 0deg, rgba(var(--ab-a), .55) 40deg, rgba(var(--ab-c), 0) 95deg,
+    rgba(var(--ab-b), .42) 160deg, rgba(var(--ab-a), 0) 215deg, rgba(var(--ab-c), .5) 285deg,
+    rgba(var(--ab-a), 0) 360deg);
+  -webkit-mask-image: radial-gradient(closest-side, transparent 58%, #000 63%, rgba(0, 0, 0, .5) 76%, transparent 100%);
+          mask-image: radial-gradient(closest-side, transparent 58%, #000 63%, rgba(0, 0, 0, .5) 76%, transparent 100%);
+  animation: ab-spin 140s linear infinite;
+  will-change: transform;
+}
+.abyss-eclipse .disc {
+  inset: 0;
+  background: radial-gradient(circle, #000 0, #01020a 100%);
+  box-shadow:
+    0 0 0 1px rgba(var(--ab-a), .38),
+    0 0 26px 3px rgba(var(--ab-a), .38),
+    0 0 90px 16px rgba(var(--ab-c), .2);
+}
+.abyss-eclipse .flare-orbit { inset: 0; animation: ab-spin 190s linear infinite; will-change: transform; }
+.abyss-eclipse .flare {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 8vmin;
+  height: 8vmin;
+  margin: -4vmin 0 0 -4vmin;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0, rgba(var(--ab-a), .95) 11%, rgba(var(--ab-a), .28) 34%, transparent 66%);
+  animation: ab-pulse 5.5s ease-in-out infinite;
+}
+.abyss-eclipse .flare::after {
+  content: "";
+  position: absolute;
+  left: -230%;
+  right: -230%;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(var(--ab-a), .75), transparent);
+}
+
+/* ---------- orrery ---------- */
+.abyss-orrery {
+  position: absolute;
+  width: 150vmin;
+  height: 150vmin;
+  left: -48vmin;
+  bottom: -62vmin;
+  opacity: .55;
+  overflow: visible;
+  fill: none;
+}
+.abyss-orrery .o-ring { stroke: rgba(var(--ab-b), .30); stroke-width: 1; }
+.abyss-orrery .o-ticks { stroke: rgba(var(--ab-a), .34); stroke-width: 9; stroke-dasharray: 1.1 9.9; }
+.abyss-orrery .o-dash { stroke: rgba(var(--ab-c), .34); stroke-dasharray: 3 9; }
+.abyss-orrery .o-dash.fine { stroke: rgba(var(--ab-b), .30); stroke-dasharray: 1 6; }
+.abyss-orrery .o-cross { stroke: rgba(var(--ab-a), .24); stroke-width: 1; }
+.abyss-orrery .o-node { fill: rgb(var(--ab-a)); }
+.abyss-orrery .o-node.b { fill: rgb(var(--ab-b)); }
+.abyss-orrery .o-node.c { fill: rgb(var(--ab-c)); }
+.abyss-orrery .o-spin { transform-origin: 300px 300px; animation: ab-spin 210s linear infinite; }
+.abyss-orrery .o-spin-rev { transform-origin: 300px 300px; animation: ab-spin 300s linear infinite reverse; }
+.abyss-orrery .o-slow { transform-origin: 300px 300px; animation: ab-spin 520s linear infinite; }
+
+/* ---------- sweep + shade ---------- */
+.abyss-sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 32vh;
+  background: linear-gradient(to bottom, transparent, rgba(var(--ab-a), .05) 60%, rgba(var(--ab-b), .12) 98%, transparent);
+  transform: translateY(-40vh);
+  animation: ab-sweep 19s linear infinite;
+  will-change: transform;
+}
+.abyss-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 38%, rgba(2, 3, 8, .10), rgba(2, 3, 8, .58) 100%),
+    rgba(2, 3, 8, .30);
+  transition: opacity 1.1s ease;
+}
+html.cinema .abyss-shade { opacity: .3; }
+
+@keyframes ab-spin { to { transform: rotate(360deg); } }
+@keyframes ab-breathe { 50% { opacity: .55; } }
+@keyframes ab-pulse { 0%, 100% { opacity: .55; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.12); } }
+@keyframes ab-sweep { to { transform: translateY(125vh); } }
+
+@media (max-width: 768px) {
+  .abyss-eclipse { width: 58vmin; height: 58vmin; right: -14vmin; top: 5vh; opacity: .8; }
+  .abyss-orrery { opacity: .4; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .abyss-eclipse .corona, .abyss-eclipse .flare-orbit, .abyss-eclipse .halo, .abyss-eclipse .flare,
+  .abyss-orrery .o-spin, .abyss-orrery .o-spin-rev, .abyss-orrery .o-slow, .abyss-sweep { animation: none !important; }
+  .abyss-sweep { display: none; }
+}
