@@ -2,11 +2,11 @@
    A fixed, always-live, dark scene. It never listens to the cursor and never reads
    the scroll position, so nothing in it reacts to either.
 
-   Layers, back to front:
+   Layers, back to front (plus twinkling sparkles and soft bubbles in the canvas):
      1. liquid dark-matter with glowing contour veins   (canvas, low-res, smooth-scaled)
      2. faint hex lattice                               (canvas, drawn once)
      3. stars, powered hex cells, data streaks          (canvas)
-     4. a total solar eclipse: black disc + rotating corona + travelling diamond flare (CSS)
+     4. a dreamy pearl planet with soft rings and a little smiling moon (CSS)
      5. a huge slowly turning orrery of rings and nodes (SVG + CSS)
      6. a slow light sweep, then a dimming shade that keeps text readable (CSS)
    Colours come from --ab-a / --ab-b / --ab-c so the theme switcher re-colours everything. */
@@ -31,59 +31,84 @@
 #abyss.live { opacity: 1; }
 #abyss canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-/* ---------- eclipse ---------- */
-.abyss-eclipse {
+/* ---------- dream planet (pearl globe, soft rings, a smiling moon) ---------- */
+.abyss-planet {
+  --p: 30vmin;
   position: absolute;
-  right: calc(7vw - 5vmin);
-  top: calc(9vh - 4vmin);
-  width: 44vmin;
-  height: 44vmin;
-}
-.abyss-eclipse > * { position: absolute; border-radius: 50%; }
-.abyss-eclipse .halo {
-  inset: -70%;
-  background: radial-gradient(closest-side, rgba(var(--ab-a), .16), rgba(var(--ab-c), .07) 45%, transparent 72%);
-  animation: ab-breathe 9s ease-in-out infinite;
-}
-.abyss-eclipse .corona {
-  inset: -34%;
-  background: conic-gradient(from 0deg,
-    rgba(var(--ab-a), 0) 0deg, rgba(var(--ab-a), .55) 40deg, rgba(var(--ab-c), 0) 95deg,
-    rgba(var(--ab-b), .42) 160deg, rgba(var(--ab-a), 0) 215deg, rgba(var(--ab-c), .5) 285deg,
-    rgba(var(--ab-a), 0) 360deg);
-  -webkit-mask-image: radial-gradient(closest-side, transparent 58%, #000 63%, rgba(0, 0, 0, .5) 76%, transparent 100%);
-          mask-image: radial-gradient(closest-side, transparent 58%, #000 63%, rgba(0, 0, 0, .5) 76%, transparent 100%);
-  animation: ab-spin 140s linear infinite;
+  right: calc(9vw - 2vmin);
+  top: calc(19vh - 2vmin);
+  width: var(--p);
+  height: var(--p);
+  animation: ab-float 11s ease-in-out infinite;
   will-change: transform;
 }
-.abyss-eclipse .disc {
-  inset: 0;
-  background: radial-gradient(circle, #000 0, #01020a 100%);
-  box-shadow:
-    0 0 0 1px rgba(var(--ab-a), .38),
-    0 0 26px 3px rgba(var(--ab-a), .38),
-    0 0 90px 16px rgba(var(--ab-c), .2);
-}
-.abyss-eclipse .flare-orbit { inset: 0; animation: ab-spin 190s linear infinite; will-change: transform; }
-.abyss-eclipse .flare {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: 8vmin;
-  height: 8vmin;
-  margin: -4vmin 0 0 -4vmin;
+.abyss-planet > * { position: absolute; }
+.abyss-planet .glow {
+  inset: -55%;
   border-radius: 50%;
-  background: radial-gradient(circle, #fff 0, rgba(var(--ab-a), .95) 11%, rgba(var(--ab-a), .28) 34%, transparent 66%);
-  animation: ab-pulse 5.5s ease-in-out infinite;
+  background: radial-gradient(closest-side, rgba(var(--ab-c), .22), rgba(var(--ab-b), .09) 50%, transparent 74%);
+  animation: ab-breathe 8s ease-in-out infinite;
 }
-.abyss-eclipse .flare::after {
+.abyss-planet .globe {
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 30% 26%, rgba(255, 255, 255, .75) 0, rgba(255, 255, 255, 0) 16%),
+    radial-gradient(circle at 34% 30%, rgba(var(--ab-b), .95), rgba(var(--ab-c), .85) 48%, rgba(var(--ab-a), .55) 78%, rgba(var(--ab-c), .5));
+  box-shadow: 0 0 50px 6px rgba(var(--ab-c), .35), 0 0 120px 20px rgba(var(--ab-b), .15);
+}
+.abyss-planet .globe::before {                       /* soft cloud bands */
   content: "";
   position: absolute;
-  left: -230%;
-  right: -230%;
+  inset: -10%;
+  background: repeating-linear-gradient(-14deg, transparent 0 9%, rgba(255, 255, 255, .13) 9% 12%, transparent 12% 21%, rgba(var(--ab-a), .16) 21% 24%);
+  filter: blur(3px);
+  animation: ab-bands 60s linear infinite;
+}
+.abyss-planet .globe::after {                        /* night side */
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 26%, transparent 38%, rgba(3, 4, 14, .86) 100%);
+}
+.abyss-planet .ring { inset: 0; display: grid; place-items: center; transform: rotate(-20deg); pointer-events: none; }
+.abyss-planet .ring i {
+  grid-area: 1 / 1;
+  width: 215%;
+  height: 62%;
+  background: radial-gradient(closest-side, transparent 66%, rgba(var(--ab-a), .0) 67%, rgba(var(--ab-a), .55) 71%, rgba(var(--ab-b), .35) 77%, transparent 79%, transparent 83%, rgba(var(--ab-c), .5) 86%, transparent 92%);
+  border-radius: 50%;
+}
+.abyss-planet .ring .back  { clip-path: inset(0 0 50% 0); }
+.abyss-planet .ring .front { clip-path: inset(50% 0 0 0); }
+.abyss-planet .moon-orbit { inset: -26%; animation: ab-spin 46s linear infinite; will-change: transform; }
+.abyss-planet .moon {
+  position: absolute;
+  left: -4%;
   top: 50%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(var(--ab-a), .75), transparent);
+  width: 24%;
+  aspect-ratio: 1;
+  margin-top: -12%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 20% 66%, rgba(255, 140, 175, .65) 0 9%, transparent 10%),
+    radial-gradient(circle at 80% 66%, rgba(255, 140, 175, .65) 0 9%, transparent 10%),
+    radial-gradient(circle at 35% 48%, #1c1233 0 6.5%, transparent 7.5%),
+    radial-gradient(circle at 65% 48%, #1c1233 0 6.5%, transparent 7.5%),
+    radial-gradient(circle at 32% 26%, #fff 0, #ece4ff 30%, #b9a9ff 78%, #8d7ae0);
+  box-shadow: 0 0 26px 4px rgba(var(--ab-c), .5), inset -8px -8px 16px rgba(60, 40, 140, .35);
+  animation: ab-spin 46s linear infinite reverse;   /* keeps the face upright */
+}
+.abyss-planet .moon i {                              /* smile */
+  position: absolute;
+  left: 39%;
+  top: 56%;
+  width: 22%;
+  height: 12%;
+  border-bottom: 2px solid #1c1233;
+  border-radius: 0 0 60% 60%;
 }
 
 /* ---------- orrery ---------- */
@@ -133,15 +158,16 @@ html.cinema .abyss-shade { opacity: .3; }
 
 @keyframes ab-spin { to { transform: rotate(360deg); } }
 @keyframes ab-breathe { 50% { opacity: .55; } }
-@keyframes ab-pulse { 0%, 100% { opacity: .55; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.12); } }
+@keyframes ab-float { 50% { transform: translateY(-16px); } }
+@keyframes ab-bands { to { transform: translateX(-12%); } }
 @keyframes ab-sweep { to { transform: translateY(125vh); } }
 
 @media (max-width: 768px) {
-  .abyss-eclipse { width: 58vmin; height: 58vmin; right: -14vmin; top: 5vh; opacity: .8; }
+  .abyss-planet { --p: 40vmin; right: 4vw; top: 8vh; opacity: .8; }
   .abyss-orrery { opacity: .4; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .abyss-eclipse .corona, .abyss-eclipse .flare-orbit, .abyss-eclipse .halo, .abyss-eclipse .flare,
+  .abyss-planet, .abyss-planet .glow, .abyss-planet .moon-orbit, .abyss-planet .moon, .abyss-planet .globe::before,
   .abyss-orrery .o-spin, .abyss-orrery .o-spin-rev, .abyss-orrery .o-slow, .abyss-sweep { animation: none !important; }
   .abyss-sweep { display: none; }
 }
