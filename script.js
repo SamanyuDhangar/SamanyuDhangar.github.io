@@ -238,9 +238,8 @@
 
   /* ---------- Pointer effects (cursor glow + terminal parallax) ---------- */
   function initPointerEffects() {
-    if (!canHover) return;
-
     const glow = $(".cursor-glow");
+    if (!canHover || !glow) return;   // the cursor glow was removed with the old background
     const terminal = null; // hero terminal replaced by the access badge (see experience.js)
 
     let x = 0;
