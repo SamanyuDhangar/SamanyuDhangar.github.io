@@ -11,31 +11,54 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="cosmos.css">
   <link rel="stylesheet" href="experience.css">
   <link rel="stylesheet" href="upgrade.css">
+  <link rel="stylesheet" href="abyss.css">
+  <link rel="stylesheet" href="clarity.css">
+  <link rel="stylesheet" href="extras.css">
 
   <noscript>
     <style>
       .reveal { opacity: 1; translate: none; }
       .boot-screen { display: none; }
-      #cosmos { opacity: 1; }
+      #abyss { opacity: 1; }
     </style>
   </noscript>
 </head>
 <body>
-  <div id="cosmos" aria-hidden="true">
-    <div class="aur aur-1"></div>
-    <div class="aur aur-2"></div>
-    <div class="aur aur-3"></div>
-    <div class="aur aur-4"></div>
-    <div class="aur-rays"></div>
-    <div class="aur-rays b"></div>
-    <div class="floor"><div class="floor-tilt"><div class="floor-grid"></div></div></div>
+  <div id="abyss" aria-hidden="true">
+    <div class="abyss-eclipse">
+      <div class="halo"></div>
+      <div class="corona"></div>
+      <div class="disc"></div>
+      <div class="flare-orbit"><div class="flare"></div></div>
+    </div>
+    <svg class="abyss-orrery" viewBox="0 0 600 600" focusable="false">
+      <g class="o-slow">
+        <circle class="o-ring" cx="300" cy="300" r="290"/>
+        <circle class="o-ticks" cx="300" cy="300" r="278"/>
+        <circle class="o-node c" cx="445" cy="48.9" r="5"/>
+      </g>
+      <g class="o-spin">
+        <circle class="o-dash" cx="300" cy="300" r="230"/>
+        <circle class="o-node" cx="516.1" cy="378.7" r="5"/>
+        <circle class="o-node b" cx="123.8" cy="447.8" r="4"/>
+        <circle class="o-node c" cx="260.1" cy="73.5" r="5"/>
+      </g>
+      <g class="o-spin-rev">
+        <circle class="o-dash fine" cx="300" cy="300" r="170"/>
+        <circle class="o-node" cx="329.5" cy="467.4" r="4"/>
+        <circle class="o-node b" cx="140.3" cy="241.9" r="4"/>
+        <circle class="o-node c" cx="430.2" cy="190.7" r="3.5"/>
+      </g>
+      <circle class="o-ring" cx="300" cy="300" r="110"/>
+      <path class="o-cross" d="M300 0V120M300 480V600M0 300H120M480 300H600"/>
+      <circle class="o-node" cx="300" cy="300" r="3"/>
+    </svg>
+    <div class="abyss-sweep"></div>
+    <div class="abyss-shade"></div>
   </div>
   <div class="noise" aria-hidden="true"></div>
-  <div class="grid" aria-hidden="true"></div>
-  <div class="cursor-glow" aria-hidden="true"></div>
   <div class="scroll-progress" aria-hidden="true"></div>
 
   <div id="boot-screen" class="boot-screen" aria-hidden="true">
@@ -65,6 +88,7 @@
       <a href="#journey">JOURNEY</a>
       <a href="#projects">PROJECTS</a>
       <a href="#shell">SHELL</a>
+      <a href="#lab">LAB</a>
       <a href="#contact">CONTACT</a>
     </nav>
   </header>
@@ -426,6 +450,53 @@
       </div>
     </section>
 
+    <!-- LAB (interactive security toys, all client-side) -->
+    <section id="lab" class="section content-section">
+      <div class="section-heading reveal">
+        <span>08</span>
+        <h2>LAB <em>// PLAYGROUND</em></h2>
+      </div>
+
+      <div class="lab-grid">
+        <div class="lab-card reveal">
+          <div class="panel-header"><span>PASSWORD_FORGE.exe</span><span>● LOCAL ONLY</span></div>
+          <div class="lab-body">
+            <label class="lab-label" for="pw-in">&gt; test a password — it never leaves your browser</label>
+            <div class="lab-row">
+              <input id="pw-in" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="type something…">
+              <button id="pw-eye" class="lab-btn" type="button" aria-pressed="false">SHOW</button>
+            </div>
+            <div class="pw-meter" aria-hidden="true"><i id="pw-bar"></i></div>
+            <p class="pw-verdict" id="pw-verdict" aria-live="polite">AWAITING INPUT</p>
+            <dl class="lab-stats">
+              <div><dt>ENTROPY</dt><dd id="pw-ent">—</dd></div>
+              <div><dt>OFFLINE CRACK TIME</dt><dd id="pw-time">—</dd></div>
+              <div><dt>CHARSET</dt><dd id="pw-pool">—</dd></div>
+            </dl>
+            <p class="lab-tip" id="pw-tip">A rough estimate: length matters far more than clever symbols.</p>
+          </div>
+        </div>
+
+        <div class="lab-card reveal">
+          <div class="panel-header"><span>HASH_FORGE.exe</span><span>● LOCAL ONLY</span></div>
+          <div class="lab-body">
+            <label class="lab-label" for="hash-in">&gt; turn any text into a fingerprint</label>
+            <textarea id="hash-in" rows="3" spellcheck="false" placeholder="type or paste text…"></textarea>
+            <div class="lab-row">
+              <select id="hash-algo" aria-label="Hash algorithm">
+                <option>SHA-256</option>
+                <option>SHA-512</option>
+                <option>SHA-1</option>
+              </select>
+              <button id="hash-copy" class="lab-btn" type="button">COPY</button>
+            </div>
+            <output id="hash-out" class="hash-out" for="hash-in hash-algo">—</output>
+            <p class="lab-tip">Change one letter and watch the whole hash change — that is the avalanche effect.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- CONTACT -->
     <section id="contact" class="section contact-section">
       <div class="contact-box reveal">
@@ -450,7 +521,8 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="script.js" defer></script>
-  <script src="cosmos.js" defer></script>
+  <script src="abyss.js" defer></script>
   <script src="experience.js" defer></script>
+  <script src="extras.js" defer></script>
 </body>
 </html>
