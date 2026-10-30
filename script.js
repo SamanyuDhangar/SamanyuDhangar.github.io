@@ -90,15 +90,39 @@
     Object.assign($("#pw-bar").style, { width: lv[1] + "%", background: lv[2] }); $("#pw-v").textContent = lv[0]; $("#pw-e").textContent = Math.round(bits) + " bits"; $("#pw-t").textContent = t;
   });
 
-  /* ---- hash forge ---- */
-  const hi = $("#hi"), ha = $("#ha"), ho = $("#ho");
-  async function doHash() {
-    if (!hi.value) return (ho.textContent = "—");
-    const b = await crypto.subtle.digest(ha.value, new TextEncoder().encode(hi.value));
-    ho.textContent = [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
+  /* ---- packet / HTTP header inspector: intentionally local-only ---- */
+  const packetInput = $("#packet-input"), packetResult = $("#packet-result");
+  const samplePacket = "GET / HTTP/1.1\nHost: example.com\nUser-Agent: browser\nAccept: */*\nConnection: close";
+  $("#packet-example").addEventListener("click", () => { packetInput.value = samplePacket; analyzePacket(); });
+  $("#packet-analyze").addEventListener("click", analyzePacket);
+  function analyzePacket() {
+    const raw = packetInput.value.trim();
+    if (!raw) { packetResult.innerHTML = '<span class="dim">No input supplied. Paste a request or response first.</span>'; return; }
+    const lines = raw.split(/\r?\n/), first = lines[0] || "", headers = {};
+    for (const line of lines.slice(1)) { const i = line.indexOf(":"); if (i > 0) headers[line.slice(0, i).trim().toLowerCase()] = line.slice(i + 1).trim(); }
+    const isRequest = /^(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS|CONNECT|TRACE)\s+\S+\s+HTTP\/\d/i.test(first);
+    const isResponse = /^HTTP\/\d(?:\.\d)?\s+\d{3}/i.test(first);
+    const flags = [];
+    if (/^HTTP\/1\.0/i.test(first)) flags.push("HTTP/1.0 is an older protocol version.");
+    if (headers["server"]) flags.push("Server banner is exposed: consider whether detailed version information is necessary.");
+    if (headers["x-powered-by"]) flags.push("X-Powered-By reveals application technology.");
+    if (headers["authorization"]) flags.push("Authorization header detected. Avoid sharing real credentials in samples.");
+    if (headers["cookie"]) flags.push("Cookie header detected. Treat session values as sensitive.");
+    if (headers["set-cookie"] && !/\bsecure\b/i.test(headers["set-cookie"])) flags.push("Set-Cookie sample does not show the Secure attribute (context matters).");
+    if (isRequest && !headers.host && /HTTP\/1\.[01]/i.test(first)) flags.push("Host header is missing from an HTTP/1.x request.");
+    const safe = (s) => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    let out = `<div class="line"><span>STRUCTURE</span><span class="value ${isRequest || isResponse ? 'good' : 'flag'}">${isRequest ? 'HTTP REQUEST' : isResponse ? 'HTTP RESPONSE' : 'UNRECOGNIZED / RAW TEXT'}</span></div>`;
+    out += `<div class="line"><span>START LINE</span><span class="value">${safe(first.slice(0, 150))}</span></div>`;
+    out += `<div class="line"><span>HEADERS PARSED</span><span class="value">${Object.keys(headers).length}</span></div>`;
+    out += `<div class="line"><span>HOST</span><span class="value">${safe(headers.host || 'not present')}</span></div>`;
+    out += `<div class="line"><span>HTTPS INDICATOR</span><span class="value">${/https:/i.test(first) ? 'URL mentions HTTPS' : 'Cannot determine from this text alone'}</span></div>`;
+    out += flags.length ? `<p class="flag" style="margin-top:.7rem">REVIEW NOTES</p><ul style="padding-left:1.2rem">${flags.map(f => `<li class="flag">${safe(f)}</li>`).join('')}</ul>` : `<p class="good" style="margin-top:.7rem">No basic review flags detected in the supplied text.</p>`;
+    packetResult.innerHTML = out;
   }
-  hi.addEventListener("input", doHash); ha.addEventListener("change", doHash);
-  $("#hc").onclick = () => { if (ho.textContent.length > 1) navigator.clipboard?.writeText(ho.textContent).then(() => toast("Hash copied.")); };
+
+  /* back-to-gate navigation */
+  $("#back-control").addEventListener("click", () => dive("landing"));
+
 })();
 
 /* ===== EFFECTS LAYER ===== */
@@ -140,6 +164,8 @@
   const pg = document.createElement("div"); pg.className = "prog"; document.body.appendChild(pg);
   const tl = $(".tl"), links = $$(".top nav a"), secs = links.map((a) => $(a.getAttribute("href")));
   addEventListener("scroll", () => {
+    document.documentElement.style.setProperty("--scroll-depth", Math.min(scrollY * .12, 900) + "px");
+    document.querySelector(".depth-grid")?.style.setProperty("background-position", `0 ${scrollY * .18}px, ${scrollY * .18}px 0`);
     pg.style.transform = `scaleX(${scrollY / ((document.documentElement.scrollHeight - innerHeight) || 1)})`;
     const r = tl.getBoundingClientRect(); if (r.height) tl.style.setProperty("--p", Math.max(0, Math.min(1, (innerHeight * .7 - r.top) / r.height)));
     let cur = -1; secs.forEach((s, i) => s && s.getBoundingClientRect().top < 140 && (cur = i)); links.forEach((a, i) => a.classList.toggle("act", i === cur));
