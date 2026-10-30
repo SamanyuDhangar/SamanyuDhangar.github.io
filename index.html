@@ -1,532 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Samanyu Dhangar — aspiring AI and cloud cybersecurity engineer. Project Eclipse: cybersecurity, cloud security and AI security portfolio.">
-  <meta name="theme-color" content="#05070a">
-  <title>PROJECT : ECLIPSE | Samanyu Dhangar</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="experience.css">
-  <link rel="stylesheet" href="upgrade.css">
-  <link rel="stylesheet" href="abyss.css">
-  <link rel="stylesheet" href="clarity.css">
-  <link rel="stylesheet" href="extras.css">
-
-  <noscript>
-    <style>
-      .reveal { opacity: 1; translate: none; }
-      .boot-screen { display: none; }
-      #abyss { opacity: 1; }
-    </style>
-  </noscript>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Samanyu Dhangar — aspiring AI and cloud cybersecurity engineer. Cybersecurity, cloud security and AI security portfolio.">
+<meta name="theme-color" content="#05060a">
+<title>PROJECT : ECLIPSE | Samanyu Dhangar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<noscript><style>#boot{display:none}.view{display:block!important}#connect{display:none!important}.rv{opacity:1!important;transform:none!important}</style></noscript>
 </head>
 <body>
-  <div id="abyss" aria-hidden="true">
-    <div class="abyss-planet">
-      <div class="glow"></div>
-      <div class="ring"><i class="back"></i></div>
-      <div class="globe"></div>
-      <div class="ring"><i class="front"></i></div>
-      <div class="moon-orbit"><div class="moon"><i></i></div></div>
-    </div>
-    <svg class="abyss-orrery" viewBox="0 0 600 600" focusable="false">
-      <g class="o-slow">
-        <circle class="o-ring" cx="300" cy="300" r="290"/>
-        <circle class="o-ticks" cx="300" cy="300" r="278"/>
-        <circle class="o-node c" cx="445" cy="48.9" r="5"/>
-      </g>
-      <g class="o-spin">
-        <circle class="o-dash" cx="300" cy="300" r="230"/>
-        <circle class="o-node" cx="516.1" cy="378.7" r="5"/>
-        <circle class="o-node b" cx="123.8" cy="447.8" r="4"/>
-        <circle class="o-node c" cx="260.1" cy="73.5" r="5"/>
-      </g>
-      <g class="o-spin-rev">
-        <circle class="o-dash fine" cx="300" cy="300" r="170"/>
-        <circle class="o-node" cx="329.5" cy="467.4" r="4"/>
-        <circle class="o-node b" cx="140.3" cy="241.9" r="4"/>
-        <circle class="o-node c" cx="430.2" cy="190.7" r="3.5"/>
-      </g>
-      <circle class="o-ring" cx="300" cy="300" r="110"/>
-      <path class="o-cross" d="M300 0V120M300 480V600M0 300H120M480 300H600"/>
-      <circle class="o-node" cx="300" cy="300" r="3"/>
-    </svg>
-    <div class="abyss-sweep"></div>
-    <div class="abyss-shade"></div>
-  </div>
-  <div class="noise" aria-hidden="true"></div>
-  <div class="scroll-progress" aria-hidden="true"></div>
+<canvas id="fog" aria-hidden="true"></canvas>
+<canvas id="hole" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
 
-  <div id="boot-screen" class="boot-screen" aria-hidden="true">
-    <div class="boot-door boot-door-left"></div>
-    <div class="boot-door boot-door-right"></div>
-    <div class="boot-seam"></div>
-    <div class="boot-box">
-      <div class="boot-label">PROJECT : ECLIPSE // INITIALIZING</div>
-      <div id="boot-log" class="boot-log"></div>
-      <div class="boot-snake">
-        <svg id="boot-snake-svg" viewBox="0 0 680 64" preserveAspectRatio="xMidYMid meet" focusable="false"></svg>
-      </div>
-      <div class="boot-percent"><span id="boot-percent">0</span>%</div>
-    </div>
+<div id="boot" aria-hidden="true">
+  <div class="boot-box">
+    <p class="mono dim">PROJECT : ECLIPSE // INITIALIZING</p>
+    <div id="boot-log" class="mono"></div>
+    <div class="bar"><i id="boot-bar"></i></div>
+    <p class="mono"><span id="boot-pct">0</span>%<span id="boot-ok" class="ok"> — ACCESS GRANTED</span></p>
   </div>
+</div>
 
-  <header class="topbar">
-    <a class="brand" href="#home" aria-label="Project Eclipse home">
-      <span class="brand-mark">⌁</span>
-      <span>PROJECT : ECLIPSE</span>
-    </a>
-    <button id="menu-toggle" class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav">MENU</button>
-    <nav id="nav">
-      <a href="#about">ABOUT</a>
-      <a href="#mission">MISSION</a>
-      <a href="#skills">SKILLS</a>
-      <a href="#journey">JOURNEY</a>
-      <a href="#projects">PROJECTS</a>
-      <a href="#shell">SHELL</a>
-      <a href="#lab">LAB</a>
-      <a href="#contact">CONTACT</a>
+<!-- LANDING -->
+<section id="landing" class="view on">
+  <div class="land">
+    <p class="mono tag"><span class="dot"></span> SYSTEM ONLINE // INDIA</p>
+    <h1>SAMANYU<br><span>DHANGAR</span></h1>
+    <p class="role">Aspiring AI <i>+</i> Cloud Cybersecurity Engineer</p>
+    <p class="lead">Building a foundation in networking, Linux, cloud security and AI security — one system, one packet and one project at a time.</p>
+    <div class="cta">
+      <button class="btn primary" data-go="explore">EXPLORE <span>↘</span></button>
+      <button class="btn" data-go="connect">CONNECT <span>↘</span></button>
+    </div>
+    <p class="mono dim hint">Choose a path — both lead into the abyss.</p>
+  </div>
+</section>
+
+<!-- EXPLORE -->
+<div id="explore" class="view">
+  <header class="top">
+    <a class="brand mono" href="#about" data-top>⌁ PROJECT : ECLIPSE</a>
+    <nav class="mono">
+      <a href="#about">ABOUT</a><a href="#mission">MISSION</a><a href="#skills">SKILLS</a><a href="#journey">JOURNEY</a><a href="#projects">PROJECTS</a><a href="#certifications">CREDENTIALS</a><a href="#lab">LAB</a>
+      <button class="link" data-go="connect">CONNECT ↘</button>
     </nav>
   </header>
 
-  <nav class="rail" id="rail" aria-label="Section progress"></nav>
-
-  <main>
-    <!-- HOME -->
-    <section id="home" class="hero section">
-      <div class="hero-content reveal">
-        <p class="eyebrow"><span class="status-dot"></span> SYSTEM ONLINE // INDIA <span class="clock" id="clock"></span></p>
-        <p class="boot-text">INITIALIZING USER PROFILE...</p>
-        <h1 class="name" id="name" aria-label="Samanyu Dhangar">
-          <span class="name-line" data-text="SAMANYU" aria-hidden="true">SAMANYU</span>
-          <span class="name-line outline" data-text="DHANGAR" aria-hidden="true">DHANGAR</span>
-        </h1>
-        <p class="hero-role">ASPIRING AI <i>+</i> CLOUD CYBERSECURITY ENGINEER</p>
-        <p class="hero-type">&gt; learning to secure <b id="typed">cloud infrastructure</b><span class="cursor">█</span></p>
-        <p class="hero-description">
-          Building a foundation in networking, Linux, cloud security and AI security —
-          one system, one packet and one project at a time.
-        </p>
-        <div class="hero-actions">
-          <a href="#projects" class="btn btn-primary mag">ENTER SYSTEM <span>↗</span></a>
-          <a href="#contact" class="btn btn-ghost mag">CONNECT</a>
-        </div>
+  <section id="about" class="sec">
+    <h2 class="rv"><span>01</span>ABOUT <em>// PROFILE</em></h2>
+    <div class="grid two">
+      <div class="panel rv">
+        <div class="ph mono"><span>USER_PROFILE.sys</span><span class="ok">● ACTIVE</span></div>
+        <dl class="kv mono">
+          <div><dt>USER</dt><dd>SAMANYU</dd></div>
+          <div><dt>FOCUS</dt><dd>CLOUD + AI SECURITY</dd></div>
+          <div><dt>FOUNDATION</dt><dd>NETWORKING / LINUX</dd></div>
+          <div><dt>BUILDING</dt><dd>SECURITY PROJECTS</dd></div>
+          <div><dt>STATUS</dt><dd class="ok">LEARNING // BUILDING</dd></div>
+        </dl>
       </div>
-
-      <div class="hero-badge reveal">
-        <div class="badge-float">
-          <div class="badge" id="badge">
-            <div class="badge-glare"></div>
-            <div class="badge-slot" aria-hidden="true"></div>
-            <div class="badge-head"><span>ECLIPSE // ACCESS BADGE</span><span class="green">● ACTIVE</span></div>
-            <div class="badge-id">
-              <div class="badge-ring"><span>SD</span></div>
-              <div>
-                <h3>SAMANYU DHANGAR</h3>
-                <p>ASPIRING AI &amp; CLOUD<br>CYBERSECURITY ENGINEER</p>
-              </div>
-            </div>
-            <dl class="badge-fields">
-              <div><dt>BASE</dt><dd>INDIA</dd></div>
-              <div><dt>FOCUS</dt><dd>CLOUD + AI SECURITY</dd></div>
-              <div><dt>FOUNDATION</dt><dd>NETWORKING / LINUX</dd></div>
-              <div><dt>STATUS</dt><dd class="green">LEARNING // BUILDING</dd></div>
-            </dl>
-            <div class="badge-domains">CYBERSECURITY <i>×</i> CLOUD <i>×</i> AI SECURITY</div>
-            <svg class="badge-barcode" id="barcode" aria-hidden="true" focusable="false"></svg>
-          </div>
-        </div>
+      <div class="rv">
+        <p class="mono kick">&gt; WHOAMI</p>
+        <h3>Curious about how systems work — and how they can be secured.</h3>
+        <p>I'm building my cybersecurity foundation through hands-on learning, labs and small projects. My current path centers on networking, Linux, traffic analysis, cloud security and AI security.</p>
+        <p>This site documents the journey rather than pretending the journey is finished.</p>
+        <div class="stats mono"><div><b>01</b>Curiosity</div><div><b>02</b>Hands-on labs</div><div><b>03</b>Continuous learning</div></div>
       </div>
-
-      <div class="scroll-cue">SCROLL TO EXPLORE <span>↓</span></div>
-    </section>
-
-    <!-- ABOUT -->
-    <section id="about" class="section content-section">
-      <div class="section-heading reveal">
-        <span>01</span>
-        <h2>ABOUT <em>// PROFILE</em></h2>
-      </div>
-
-      <div class="about-grid">
-        <div class="panel terminal-panel reveal">
-          <div class="panel-header"><span>USER_PROFILE.sys</span><span>● ACTIVE</span></div>
-          <div class="profile-lines">
-            <div><span>USER</span><strong>SAMANYU</strong></div>
-            <div><span>FOCUS</span><strong>CLOUD + AI SECURITY</strong></div>
-            <div><span>FOUNDATION</span><strong>NETWORKING / LINUX</strong></div>
-            <div><span>BUILDING</span><strong>SECURITY PROJECTS</strong></div>
-            <div><span>STATUS</span><strong class="green">LEARNING // BUILDING</strong></div>
-          </div>
-        </div>
-
-        <div class="about-copy reveal">
-          <p class="kicker">&gt; WHOAMI</p>
-          <h3 class="scrub">Curious about how systems work — and how they can be secured.</h3>
-          <p class="scrub">
-            I'm building my cybersecurity foundation through hands-on learning,
-            labs and small projects. My current path centers on networking,
-            Linux, traffic analysis, cloud security and AI security.
-          </p>
-          <p class="scrub">
-            This site documents the journey rather than pretending the journey
-            is finished.
-          </p>
-          <div class="mini-stats">
-            <div><strong>01</strong><span>Curiosity</span></div>
-            <div><strong>02</strong><span>Hands-on labs</span></div>
-            <div><strong>03</strong><span>Continuous learning</span></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- MARQUEE (scroll-velocity driven) -->
-    <div class="marquee" aria-hidden="true">
-      <div class="marquee-track" data-dir="-1"><span>NETWORKING</span><span>LINUX</span><span>WIRESHARK</span><span>CLOUD SECURITY</span><span>AI SECURITY</span><span>PYTHON</span><span>C</span><span>GIT</span></div>
-      <div class="marquee-track outline" data-dir="1"><span>TCP/IP</span><span>DNS</span><span>ARP</span><span>ICMP</span><span>ROUTING</span><span>VPN</span><span>HTTP(S)</span><span>TRAFFIC ANALYSIS</span></div>
     </div>
+  </section>
 
-    <!-- MISSION -->
-    <section id="mission" class="section content-section">
-      <div class="section-heading reveal">
-        <span>02</span>
-        <h2>MISSION <em>// TARGET LOCK</em></h2>
+  <section id="mission" class="sec">
+    <h2 class="rv"><span>02</span>MISSION <em>// TARGET LOCK</em></h2>
+    <div class="panel rv">
+      <p class="mono kick">&gt; OBJECTIVE --lock</p>
+      <h3>Aspiring AI &amp; Cloud Cybersecurity Engineer.</h3>
+      <p>Cloud platforms and AI systems are quickly becoming some of the most important things to secure. I'm building the foundations to understand them properly — and, in time, to defend them.</p>
+      <div class="tabs mono" role="tablist">
+        <button class="on" role="tab" data-tab="cloud">CLOUD SECURITY</button><button role="tab" data-tab="ai">AI SECURITY</button><button role="tab" data-tab="core">FOUNDATION</button>
       </div>
+      <div id="tabp" class="tabp" aria-live="polite"></div>
+    </div>
+  </section>
 
-      <div class="mission-grid">
-        <div class="reticle-wrap reveal">
-          <svg class="reticle" viewBox="0 0 400 400" aria-hidden="true" focusable="false">
-            <circle class="rt-ring" cx="200" cy="200" r="190"/>
-            <g class="rt-spin"><circle class="rt-dash" cx="200" cy="200" r="160"/><path class="rt-arc" d="M200 30 A170 170 0 0 1 370 200"/><path class="rt-arc" d="M200 370 A170 170 0 0 1 30 200"/></g>
-            <g class="rt-spin-rev"><circle class="rt-dash fine" cx="200" cy="200" r="125"/></g>
-            <path class="rt-cross" d="M200 0V70M200 330V400M0 200H70M330 200H400"/>
-          </svg>
-          <div class="reticle-label">
-            <small>TARGET</small>
-            <strong id="reticle-title">AI + CLOUD</strong>
-            <small>SECURITY ENGINEER</small>
-          </div>
-        </div>
+  <section id="skills" class="sec">
+    <h2 class="rv"><span>03</span>SKILLS <em>// ORBIT MAP</em></h2>
+    <div class="grid four">
+      <article class="card rv"><span class="mono n">01</span><h3>NETWORKING</h3><p>TCP/IP · HTTP(S) · DNS · ARP · ICMP · Routing · VPN fundamentals</p></article>
+      <article class="card rv"><span class="mono n">02</span><h3>LINUX</h3><p>CLI · permissions · processes · filesystems · shell fundamentals</p></article>
+      <article class="card rv"><span class="mono n">03</span><h3>SECURITY</h3><p>Wireshark · traffic analysis · security labs · reconnaissance concepts · exploring cloud &amp; AI security</p></article>
+      <article class="card rv"><span class="mono n">04</span><h3>DEVELOPMENT</h3><p>C · Git</p>
+        <p class="plan mono">PLANNED TO LEARN<br><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Python</span><span>Java</span></p></article>
+    </div>
+  </section>
 
-        <div class="mission-copy reveal">
-          <p class="kicker">&gt; OBJECTIVE --lock</p>
-          <h3>Aspiring AI &amp; Cloud Cybersecurity Engineer.</h3>
-          <p>
-            Cloud platforms and AI systems are quickly becoming some of the most important
-            things to secure. I'm building the foundations to understand them properly — and, in time, to defend them.
-          </p>
-          <div class="tabs" role="tablist" aria-label="Focus areas">
-            <button class="tab on" role="tab" aria-selected="true" data-tab="cloud">CLOUD SECURITY</button>
-            <button class="tab" role="tab" aria-selected="false" data-tab="ai">AI SECURITY</button>
-            <button class="tab" role="tab" aria-selected="false" data-tab="core">FOUNDATION</button>
-          </div>
-          <div class="tab-panel" id="tab-panel" role="tabpanel" aria-live="polite">
-            <p class="tab-status">STATUS // EXPLORING</p>
-            <p>Protecting the infrastructure, identities and data that live in the cloud.</p>
-            <div class="tags"><span>IDENTITY &amp; ACCESS</span><span>SECURE CONFIGURATION</span><span>NETWORK EXPOSURE</span><span>LOGGING &amp; MONITORING</span></div>
-          </div>
-        </div>
+  <section id="journey" class="sec">
+    <h2 class="rv"><span>04</span>JOURNEY <em>// LOG</em></h2>
+    <p class="mono kick rv">&gt; SECURITY_LOG --follow</p>
+    <h3 class="rv">Learning by doing.</h3>
+    <p class="rv">Selected milestones from the current cybersecurity journey.</p>
+    <ol class="tl">
+      <li class="rv"><span class="mono n">01</span><div><p class="mono dim">FOUNDATION</p><h4>Networking + Linux</h4><p>Building the fundamentals behind how systems communicate and operate.</p></div></li>
+      <li class="rv"><span class="mono n">02</span><div><p class="mono dim">TRYHACKME</p><h4>Pre Security Path</h4><p>Hands-on rooms covering core security and computing concepts.</p></div></li>
+      <li class="rv"><span class="mono n">03</span><div><p class="mono dim">TRAFFIC ANALYSIS</p><h4>Wireshark Basics</h4><p>Learning to inspect packets and understand network conversations.</p></div></li>
+      <li class="rv"><span class="mono n">04</span><div><p class="mono dim">NEXT TARGET</p><h4>Cloud + AI Security</h4><p>Moving from foundations toward secure cloud infrastructure, AI system security and practical labs.</p></div></li>
+    </ol>
+  </section>
+
+  <section id="projects" class="sec">
+    <h2 class="rv"><span>05</span>PROJECTS <em>// LAB</em></h2>
+    <div class="grid three">
+      <article class="card proj rv"><div class="mono ptop"><span>PROJECT_01</span><span>LAB // ACTIVE</span></div><h3>NETWORK TRAFFIC LAB</h3><p>Hands-on exploration of packets, protocols and traffic patterns using Wireshark.</p><div class="tags mono"><span>WIRESHARK</span><span>TCP/IP</span><span>NETWORKING</span></div><a href="#" class="plink mono" data-soon>COMING SOON ↗</a></article>
+      <article class="card proj rv"><div class="mono ptop"><span>PROJECT_02</span><span>BUILD // LOCAL</span></div><h3>LINUX SECURITY LAB</h3><p>Linux command-line practice, system exploration and security-focused experiments.</p><div class="tags mono"><span>LINUX</span><span>BASH</span><span>CLI</span></div><a href="#" class="plink mono" data-soon>COMING SOON ↗</a></article>
+      <article class="card proj rv"><div class="mono ptop"><span>PROJECT_03</span><span>BUILD // NEXT</span></div><h3>TOOLS</h3><p>A growing toolkit of security utilities and experiments, built while exploring cloud and AI security.</p><div class="tags mono"><span>TOOLS</span><span>CLOUD</span><span>AI SECURITY</span></div><a href="https://eyesoftruth.onrender.com/" class="plink mono" target="_blank" rel="noopener noreferrer">EyesOfTruth ↗</a></article>
+    </div>
+  </section>
+
+  <section id="certifications" class="sec">
+    <h2 class="rv"><span>06</span>CREDENTIALS <em>// VERIFIED</em></h2>
+    <div class="panel rv creds">
+      <div class="cred"><span class="mono ok">VERIFIED</span><div><p class="mono dim">TRYHACKME</p><h4>Pre Security Path</h4><small>Hands-on cybersecurity fundamentals</small></div><a class="mono" href="https://tryhackme-certificates.s3-eu-west-1.amazonaws.com/THM-Z8NA9FIYDI.pdf" target="_blank" rel="noopener">VIEW CERTIFICATE ↗</a></div>
+      <div class="cred"><span class="mono ok">VERIFIED</span><div><p class="mono dim">TRYHACKME</p><h4>SEC0</h4><small>Security fundamentals assessment</small></div><a class="mono" href="https://assets.tryhackme.com/certification-certificate/6a5f428c6161de0fadc8ae25.pdf" target="_blank" rel="noopener">VIEW CERTIFICATE ↗</a></div>
+      <div class="cred"><span class="mono ok">COMPLETED</span><div><p class="mono dim">TRYHACKME</p><h4>Wireshark Basics</h4><small>Packet analysis fundamentals</small></div><span class="mono dim">THM // WIRESHARK</span></div>
+    </div>
+  </section>
+
+  <section id="lab" class="sec">
+    <h2 class="rv"><span>07</span>LAB <em>// PLAYGROUND</em></h2>
+    <div class="grid two">
+      <div class="panel rv">
+        <div class="ph mono"><span>PASSWORD_FORGE.exe</span><span class="ok">● LOCAL ONLY</span></div>
+        <label class="mono dim" for="pw">&gt; test a password — it never leaves your browser</label>
+        <div class="row"><input id="pw" type="password" autocomplete="off" spellcheck="false" placeholder="type something…"><button id="pw-eye" class="mini mono" type="button">SHOW</button></div>
+        <div class="meter"><i id="pw-bar"></i></div>
+        <p class="mono" id="pw-v">AWAITING INPUT</p>
+        <dl class="kv mono"><div><dt>ENTROPY</dt><dd id="pw-e">—</dd></div><div><dt>OFFLINE CRACK TIME</dt><dd id="pw-t">—</dd></div></dl>
+        <p class="dim small">A rough estimate: length matters far more than clever symbols.</p>
       </div>
-    </section>
-
-    <!-- SKILLS -->
-    <section id="skills" class="section content-section">
-      <div class="section-heading reveal">
-        <span>03</span>
-        <h2>SKILLS <em>// ORBIT MAP</em></h2>
+      <div class="panel rv">
+        <div class="ph mono"><span>HASH_FORGE.exe</span><span class="ok">● LOCAL ONLY</span></div>
+        <label class="mono dim" for="hi">&gt; turn any text into a fingerprint</label>
+        <textarea id="hi" rows="3" spellcheck="false" placeholder="type or paste text…"></textarea>
+        <div class="row"><select id="ha" aria-label="Hash algorithm"><option>SHA-256</option><option>SHA-512</option><option>SHA-1</option></select><button id="hc" class="mini mono" type="button">COPY</button></div>
+        <output id="ho" class="mono hash">—</output>
+        <p class="dim small">Change one letter and watch the whole hash change — that is the avalanche effect.</p>
       </div>
+    </div>
+  </section>
+  <footer class="mono dim"><span>PROJECT : ECLIPSE</span><span>© <span id="yr"></span> SAMANYU DHANGAR</span><span>STATIC SITE // GITHUB PAGES</span></footer>
+</div>
 
-      <div class="skills-layout">
-        <div class="skill-command reveal">
-          <div class="orbit-wrap" id="orbit-wrap">
-            <div class="orbit" id="orbit" aria-label="Skill orbit map"><div class="orbit-core">SD</div></div>
-          </div>
-          <p class="orbit-read" id="orbit-read">NODE // hover a skill</p>
-          <p class="cmd-line"><span class="prompt">samanyu@eclipse:~$</span> ls -la ./skills</p>
-          <div class="command-list">
-            <span>networking</span>
-            <span>linux</span>
-            <span>wireshark</span>
-            <span>python</span>
-            <span>c</span>
-            <span>git</span>
-            <span>cloud</span>
-            <span>ai</span>
-            <span>security</span>
-          </div>
-        </div>
-
-        <div class="skill-cards">
-          <article class="skill-card reveal">
-            <span class="skill-number">01</span>
-            <h3>NETWORKING</h3>
-            <p>TCP/IP · HTTP(S) · DNS · ARP · ICMP · Routing · VPN fundamentals</p>
-          </article>
-          <article class="skill-card reveal">
-            <span class="skill-number">02</span>
-            <h3>LINUX</h3>
-            <p>CLI · permissions · processes · filesystems · shell fundamentals</p>
-          </article>
-          <article class="skill-card reveal">
-            <span class="skill-number">03</span>
-            <h3>SECURITY</h3>
-            <p>Wireshark · traffic analysis · security labs · reconnaissance concepts · exploring cloud &amp; AI security</p>
-          </article>
-          <article class="skill-card reveal">
-            <span class="skill-number">04</span>
-            <h3>DEVELOPMENT</h3>
-            <p>C · Python fundamentals · HTML · CSS · JavaScript · Git</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- JOURNEY -->
-    <section id="journey" class="section content-section">
-      <div class="section-heading reveal">
-        <span>04</span>
-        <h2>JOURNEY <em>// LOG</em></h2>
-      </div>
-
-      <div class="journey-layout">
-        <div class="journey-intro reveal">
-          <p class="kicker">&gt; SECURITY_LOG --follow</p>
-          <h3>Learning by doing.</h3>
-          <p>Selected milestones from the current cybersecurity journey.</p>
-        </div>
-
-        <div class="timeline" id="timeline">
-          <div class="timeline-track" aria-hidden="true"><i class="timeline-fill"></i><b class="timeline-packet"></b></div>
-          <article class="timeline-item reveal">
-            <span class="timeline-index">01</span>
-            <div>
-              <p class="timeline-date">FOUNDATION</p>
-              <h3>Networking + Linux</h3>
-              <p>Building the fundamentals behind how systems communicate and operate.</p>
-            </div>
-          </article>
-          <article class="timeline-item reveal">
-            <span class="timeline-index">02</span>
-            <div>
-              <p class="timeline-date">TRYHACKME</p>
-              <h3>Pre Security Path</h3>
-              <p>Hands-on rooms covering core security and computing concepts.</p>
-            </div>
-          </article>
-          <article class="timeline-item reveal">
-            <span class="timeline-index">03</span>
-            <div>
-              <p class="timeline-date">TRAFFIC ANALYSIS</p>
-              <h3>Wireshark Basics</h3>
-              <p>Learning to inspect packets and understand network conversations.</p>
-            </div>
-          </article>
-          <article class="timeline-item reveal">
-            <span class="timeline-index">04</span>
-            <div>
-              <p class="timeline-date">NEXT TARGET</p>
-              <h3>Cloud + AI Security</h3>
-              <p>Moving from foundations toward secure cloud infrastructure, AI system security and practical labs.</p>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- PROJECTS -->
-    <section id="projects" class="section content-section">
-      <div class="section-heading reveal">
-        <span>05</span>
-        <h2>PROJECTS <em>// LAB</em></h2>
-      </div>
-
-      <div class="projects-grid">
-        <article class="project-card featured reveal">
-          <i class="lab-scan" aria-hidden="true"></i>
-          <div class="project-top"><span>PROJECT_01</span><span>LAB // ACTIVE</span></div>
-          <div class="project-icon">⌘</div>
-          <h3>NETWORK TRAFFIC LAB</h3>
-          <p>Hands-on exploration of packets, protocols and traffic patterns using Wireshark.</p>
-          <div class="tags"><span>WIRESHARK</span><span>TCP/IP</span><span>NETWORKING</span></div>
-          <a href="#" class="project-link" data-placeholder="Link of project is not added please wait.">COMING SOON ↗</a>
-        </article>
-
-        <article class="project-card reveal">
-          <i class="lab-scan" aria-hidden="true"></i>
-          <div class="project-top"><span>PROJECT_02</span><span>BUILD // LOCAL</span></div>
-          <div class="project-icon">◈</div>
-          <h3>LINUX SECURITY LAB</h3>
-          <p>Linux command-line practice, system exploration and security-focused experiments.</p>
-          <div class="tags"><span>LINUX</span><span>BASH</span><span>CLI</span></div>
-          <a href="#" class="project-link" data-placeholder="Link of project is not added please wait.">COMING SOON ↗</a>
-        </article>
-
-        <article class="project-card reveal">
-          <i class="lab-scan" aria-hidden="true"></i>
-          <div class="project-top"><span>PROJECT_03</span><span>BUILD // NEXT</span></div>
-          <div class="project-icon">⬡</div>
-          <h3>TOOLS</h3>
-          <p>A growing toolkit of security utilities and experiments, built while exploring cloud and AI security.</p>
-          <div class="tags"><span>TOOLS</span><span>CLOUD</span><span>AI SECURITY</span></div>
-          <a href="https://eyesoftruth.onrender.com/"
-   class="project-link"
-   target="_blank"
-   rel="noopener noreferrer">
-   EyesOfTruth
-</a>
-        </article>
-      </div>
-    </section>
-
-    <!-- CREDENTIALS -->
-    <section id="certifications" class="section content-section">
-      <div class="section-heading reveal">
-        <span>06</span>
-        <h2>CREDENTIALS <em>// VERIFIED</em></h2>
-      </div>
-
-      <div class="credential-panel reveal">
-        <div class="credential-item">
-          <span class="credential-status">VERIFIED</span>
-          <div>
-            <p>TRYHACKME</p>
-            <h3>Pre Security Path</h3>
-            <span>Hands-on cybersecurity fundamentals</span>
-          </div>
-          <a class="credential-code"
-             href="https://tryhackme-certificates.s3-eu-west-1.amazonaws.com/THM-Z8NA9FIYDI.pdf"
-             target="_blank" rel="noopener">VIEW CERTIFICATE ↗</a>
-        </div>
-
-        <div class="credential-item">
-          <span class="credential-status">VERIFIED</span>
-          <div>
-            <p>TRYHACKME</p>
-            <h3>SEC0</h3>
-            <span>Security fundamentals assessment</span>
-          </div>
-          <a class="credential-code"
-             href="https://assets.tryhackme.com/certification-certificate/6a5f428c6161de0fadc8ae25.pdf"
-             target="_blank" rel="noopener">VIEW CERTIFICATE ↗</a>
-        </div>
-
-        <div class="credential-item">
-          <span class="credential-status">COMPLETED</span>
-          <div>
-            <p>TRYHACKME</p>
-            <h3>Wireshark Basics</h3>
-            <span>Packet analysis fundamentals</span>
-          </div>
-          <span class="credential-code">THM // WIRESHARK</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- SHELL (interactive terminal) -->
-    <section id="shell" class="section content-section">
-      <div class="section-heading reveal">
-        <span>07</span>
-        <h2>SHELL <em>// TRY ME</em></h2>
-      </div>
-
-      <div class="shell-wrap reveal">
-        <div class="terminal-window shell">
-          <div class="terminal-bar">
-            <span class="terminal-dot"></span>
-            <span class="terminal-dot"></span>
-            <span class="terminal-dot"></span>
-            <span class="terminal-title">samanyu@eclipse:~</span>
-          </div>
-          <div class="terminal-body" id="shell-body">
-            <div id="shell-out"></div>
-            <label class="shell-line"><span class="prompt">samanyu@eclipse:~$</span>
-              <input id="shell-in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Terminal command" placeholder="type help">
-            </label>
-          </div>
-        </div>
-        <div class="shell-chips" id="shell-chips" aria-label="Quick commands"></div>
-      </div>
-    </section>
-
-    <!-- LAB (interactive security toys, all client-side) -->
-    <section id="lab" class="section content-section">
-      <div class="section-heading reveal">
-        <span>08</span>
-        <h2>LAB <em>// PLAYGROUND</em></h2>
-      </div>
-
-      <div class="lab-grid">
-        <div class="lab-card reveal">
-          <div class="panel-header"><span>PASSWORD_FORGE.exe</span><span>● LOCAL ONLY</span></div>
-          <div class="lab-body">
-            <label class="lab-label" for="pw-in">&gt; test a password — it never leaves your browser</label>
-            <div class="lab-row">
-              <input id="pw-in" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="type something…">
-              <button id="pw-eye" class="lab-btn" type="button" aria-pressed="false">SHOW</button>
-            </div>
-            <div class="pw-meter" aria-hidden="true"><i id="pw-bar"></i></div>
-            <p class="pw-verdict" id="pw-verdict" aria-live="polite">AWAITING INPUT</p>
-            <dl class="lab-stats">
-              <div><dt>ENTROPY</dt><dd id="pw-ent">—</dd></div>
-              <div><dt>OFFLINE CRACK TIME</dt><dd id="pw-time">—</dd></div>
-              <div><dt>CHARSET</dt><dd id="pw-pool">—</dd></div>
-            </dl>
-            <p class="lab-tip" id="pw-tip">A rough estimate: length matters far more than clever symbols.</p>
-          </div>
-        </div>
-
-        <div class="lab-card reveal">
-          <div class="panel-header"><span>HASH_FORGE.exe</span><span>● LOCAL ONLY</span></div>
-          <div class="lab-body">
-            <label class="lab-label" for="hash-in">&gt; turn any text into a fingerprint</label>
-            <textarea id="hash-in" rows="3" spellcheck="false" placeholder="type or paste text…"></textarea>
-            <div class="lab-row">
-              <select id="hash-algo" aria-label="Hash algorithm">
-                <option>SHA-256</option>
-                <option>SHA-512</option>
-                <option>SHA-1</option>
-              </select>
-              <button id="hash-copy" class="lab-btn" type="button">COPY</button>
-            </div>
-            <output id="hash-out" class="hash-out" for="hash-in hash-algo">—</output>
-            <p class="lab-tip">Change one letter and watch the whole hash change — that is the avalanche effect.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact" class="section contact-section">
-      <div class="contact-box reveal">
-        <p class="kicker">&gt; CONNECTION_REQUEST</p>
-        <h2>LET'S BUILD<br><span>SOMETHING SECURE.</span></h2>
-        <p>Interested in cybersecurity, cloud security, AI security, projects or learning together?</p>
-        <div class="contact-actions">
-          <a class="btn btn-primary mag" href="https://github.com/SamanyuDhangar" target="_blank" rel="noopener">GITHUB ↗</a>
-          <a class="btn btn-ghost mag" href="https://www.linkedin.com/in/samanyu-dhangar-191529413/" target="_blank" rel="noopener">LINKEDIN ↗</a>
-        </div>
-        <p class="contact-note">THANK YOU FOR VISITING.</p>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <span>PROJECT : ECLIPSE</span>
-    <span>© <span id="year"></span> SAMANYU DHANGAR</span>
-    <span>BUILT WITH HTML / CSS / JS</span>
-  </footer>
-
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-  <script src="script.js" defer></script>
-  <script src="abyss.js" defer></script>
-  <script src="experience.js" defer></script>
-  <script src="extras.js" defer></script>
+<!-- CONNECT -->
+<section id="connect" class="view">
+  <div class="land">
+    <p class="mono kick">&gt; CONNECTION_REQUEST</p>
+    <h1 class="sm">LET'S BUILD<br><span>SOMETHING SECURE.</span></h1>
+    <p class="lead">Interested in cybersecurity, cloud security, AI security, projects or learning together?</p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/SamanyuDhangar" target="_blank" rel="noopener">GITHUB ↗</a>
+      <a class="btn" href="https://www.linkedin.com/in/samanyu-dhangar-191529413/" target="_blank" rel="noopener">LINKEDIN ↗</a>
+    </div>
+    <p class="mono dim hint">THANK YOU FOR VISITING.</p>
+    <button class="link mono" data-go="explore">← EXPLORE THE REST</button>
+  </div>
+</section>
+<div id="toast" class="toast mono" role="status" aria-live="polite"></div>
+<script src="script.js" defer></script>
 </body>
 </html>
