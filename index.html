@@ -16,8 +16,23 @@
 <canvas id="fog" aria-hidden="true"></canvas>
 <canvas id="hole" aria-hidden="true"></canvas>
 <div class="vignette" aria-hidden="true"></div>
+<div class="depth-grid" aria-hidden="true"></div><div class="corner-rune rune-left" aria-hidden="true"></div><div class="corner-rune rune-right" aria-hidden="true"></div>
+<button class="back-control mono" id="back-control" type="button" aria-label="Return to landing"><span>↶</span> BACK TO GATE</button>
 
 <div id="boot" aria-hidden="true">
+  <div class="boot-visual" aria-hidden="true">
+    <div class="sigil sigil-a"></div><div class="sigil sigil-b"></div><div class="sigil sigil-c"></div>
+    <svg class="dragon-mark" viewBox="0 0 220 220" role="presentation">
+      <defs><linearGradient id="dragonMetal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d7f4ff"/><stop offset=".48" stop-color="#7fd4ff"/><stop offset="1" stop-color="#8b7bff"/></linearGradient><filter id="dragonGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g fill="none" stroke="url(#dragonMetal)" stroke-linecap="round" stroke-linejoin="round" filter="url(#dragonGlow)" stroke-width="2.2">
+        <path d="M110 177 C82 166 58 143 58 117 C58 94 76 82 92 74 L77 45 L105 60 L122 32 L134 68 C155 74 173 91 170 111 L194 127 L164 132 C154 151 137 165 110 177Z"/>
+        <path d="M91 78 L60 67 L76 91 M133 70 L160 52 L151 84 M83 111 L45 105 L68 126 M136 109 L165 101 M101 92 L91 104 L104 108 M126 91 L138 103 L126 108"/>
+        <path d="M87 134 C101 126 118 126 133 135 C125 148 113 155 101 152 M106 153 L104 171 M122 151 L133 165"/>
+        <path d="M59 143 C37 127 29 105 36 85 M163 145 C184 134 194 112 187 92" stroke-dasharray="3 7"/>
+      </g><circle cx="104" cy="99" r="2.5" fill="#d7f4ff"/><circle cx="129" cy="99" r="2.5" fill="#d7f4ff"/>
+    </svg>
+    <div class="boot-visual-label mono">ECLIPSE // ENTITY DETECTED</div>
+  </div>
   <div class="boot-box">
     <p class="mono dim">PROJECT : ECLIPSE // INITIALIZING</p>
     <div id="boot-log" class="mono"></div>
@@ -133,7 +148,7 @@
     <h2 class="rv"><span>07</span>LAB <em>// PLAYGROUND</em></h2>
     <div class="grid two">
       <div class="panel rv">
-        <div class="ph mono"><span>PASSWORD_FORGE.exe</span><span class="ok">● LOCAL ONLY</span></div>
+        <div class="ph mono"><span>PASSWORD STRENGTH CHECK</span><span class="ok">● LOCAL ONLY</span></div>
         <label class="mono dim" for="pw">&gt; test a password — it never leaves your browser</label>
         <div class="row"><input id="pw" type="password" autocomplete="off" spellcheck="false" placeholder="type something…"><button id="pw-eye" class="mini mono" type="button">SHOW</button></div>
         <div class="meter"><i id="pw-bar"></i></div>
@@ -141,17 +156,17 @@
         <dl class="kv mono"><div><dt>ENTROPY</dt><dd id="pw-e">—</dd></div><div><dt>OFFLINE CRACK TIME</dt><dd id="pw-t">—</dd></div></dl>
         <p class="dim small">A rough estimate: length matters far more than clever symbols.</p>
       </div>
-      <div class="panel rv">
-        <div class="ph mono"><span>HASH_FORGE.exe</span><span class="ok">● LOCAL ONLY</span></div>
-        <label class="mono dim" for="hi">&gt; turn any text into a fingerprint</label>
-        <textarea id="hi" rows="3" spellcheck="false" placeholder="type or paste text…"></textarea>
-        <div class="row"><select id="ha" aria-label="Hash algorithm"><option>SHA-256</option><option>SHA-512</option><option>SHA-1</option></select><button id="hc" class="mini mono" type="button">COPY</button></div>
-        <output id="ho" class="mono hash">—</output>
-        <p class="dim small">Change one letter and watch the whole hash change — that is the avalanche effect.</p>
+      <div class="panel rv packet-panel">
+        <div class="ph mono"><span>PACKET / HEADER INSPECTOR</span><span class="ok">● CLIENT-SIDE</span></div>
+        <label class="mono dim" for="packet-input">&gt; inspect a sample HTTP request or response</label>
+        <textarea id="packet-input" rows="5" spellcheck="false" placeholder="GET / HTTP/1.1&#10;Host: example.com&#10;User-Agent: browser&#10;Connection: close"></textarea>
+        <div class="row"><button id="packet-analyze" class="mini mono" type="button">ANALYZE TRAFFIC</button><button id="packet-example" class="mini mono" type="button">LOAD SAMPLE</button></div>
+        <div id="packet-result" class="packet-result mono" aria-live="polite"><span class="dim">AWAITING INPUT // NO DATA SENT</span></div>
+        <p class="dim small">A small learning aid for reading HTTP structure and security-relevant headers. Analysis runs locally in your browser; it is not a full packet capture or vulnerability scanner.</p>
       </div>
     </div>
   </section>
-  <footer class="mono dim"><span>PROJECT : ECLIPSE</span><span>© <span id="yr"></span> SAMANYU DHANGAR</span><span>STATIC SITE // GITHUB PAGES</span></footer>
+  <footer class="mono dim"><span>PROJECT : ECLIPSE // FIELD NOTES</span><span>© <span id="yr"></span> SAMANYU DHANGAR</span><span>STATIC SITE // GITHUB PAGES</span></footer>
 </div>
 
 <!-- CONNECT -->
