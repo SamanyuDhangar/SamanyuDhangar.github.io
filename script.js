@@ -1,328 +1,147 @@
-/* PROJECT : ECLIPSE — site interactions
-   One script, one listener per event type, all work batched with rAF. */
 (() => {
-  "use strict";
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const toast = (t) => { const e = $("#toast"); e.textContent = t; e.classList.add("on"); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove("on"), 2600); };
+  $("#yr").textContent = new Date().getFullYear();
 
-  const $ = (selector, parent = document) => parent.querySelector(selector);
-  const $$ = (selector, parent = document) => [...parent.querySelectorAll(selector)];
-
-  const canHover = matchMedia("(hover: hover) and (pointer: fine)").matches;
-
-  /* ---------- Boot screen: snake loader + Chamber-of-Secrets vault door ---------- */
-  function vaultSVG() {
-    // coiled serpent spiral, generated once and reused in both door halves
-    const spiral = (rot) => {
-      const pts = [];
-      for (let t = 0; t <= 3.7 * Math.PI; t += 0.12) {
-        const r = 12 + t * 6.4;
-        const a = t + rot;
-        pts.push([100 + r * Math.cos(a), 100 + r * Math.sin(a)]);
-      }
-      const d = "M" + pts.map((p) => p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" L");
-      const e = pts[pts.length - 1], q = pts[pts.length - 2];
-      const ang = (Math.atan2(e[1] - q[1], e[0] - q[0]) * 180) / Math.PI;
-      return `<path d="${d}" fill="none" stroke="#0f3d2a" stroke-width="5" stroke-linecap="round"/>
-        <path d="${d}" fill="none" stroke="#2bd68c" stroke-width="5" stroke-linecap="round" stroke-dasharray="1.2 4.2" opacity=".6"/>
-        <g transform="translate(${e[0].toFixed(1)} ${e[1].toFixed(1)}) rotate(${ang.toFixed(1)})">
-          <ellipse cx="3" cy="0" rx="7" ry="4.2" fill="#13674a"/>
-          <circle cx="5" cy="-1.8" r=".9" fill="#ff647c"/><circle cx="5" cy="1.8" r=".9" fill="#ff647c"/>
-        </g>`;
-    };
-    let spokes = "";
-    for (let i = 0; i < 12; i++) {
-      spokes += `<line x1="100" y1="${100 - 70}" x2="100" y2="${100 - 96}" stroke="#14513a" stroke-width="2.4" transform="rotate(${i * 30} 100 100)"/>`;
+  /* ---- shadowy fog ---- */
+  const fog = $("#fog"), fx = fog.getContext("2d"); let W, H;
+  const blobs = Array.from({ length: 7 }, (_, i) => ({ x: Math.random(), y: Math.random(), r: .3 + Math.random() * .35, s: .00005 + Math.random() * .00007, p: Math.random() * 6.28, c: i % 2 ? "139,123,255" : "90,150,210" }));
+  const size = () => { W = fog.width = innerWidth; H = fog.height = innerHeight; };
+  addEventListener("resize", size); size();
+  (function drawFog(t) {
+    fx.fillStyle = "#05060a"; fx.fillRect(0, 0, W, H);
+    for (const b of blobs) {
+      const x = (b.x + Math.sin(t * b.s + b.p) * .18) * W, y = (b.y + Math.cos(t * b.s * 1.3 + b.p) * .15) * H, r = b.r * Math.max(W, H);
+      const g = fx.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, `rgba(${b.c},.10)`); g.addColorStop(1, `rgba(${b.c},0)`);
+      fx.fillStyle = g; fx.fillRect(0, 0, W, H);
     }
-    return `<svg class="vault" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
-      <circle cx="100" cy="100" r="98" fill="none" stroke="#14513a" stroke-width="1.5"/>
-      <circle cx="100" cy="100" r="92" fill="none" stroke="#0f3a2a" stroke-width="1" stroke-dasharray="2 5"/>
-      <g class="vault-spin-rev">${spokes}</g>
-      <circle cx="100" cy="100" r="68" fill="rgba(3,10,8,.7)" stroke="#14513a" stroke-width="1.2"/>
-      <g class="vault-spin">${spiral(0)}${spiral(Math.PI)}</g>
-      <circle cx="100" cy="100" r="9" fill="#04120c" stroke="#2bd68c" stroke-width="1.2"/>
-    </svg>`;
+    if (!document.hidden && !reduce) requestAnimationFrame(drawFog); else setTimeout(() => requestAnimationFrame(drawFog), 400);
+  })(0);
+
+  /* ---- loader ---- */
+  const lines = ["mounting encrypted volume...", "scanning for intruders...", "loading profile: samanyu", "the dark is listening..."];
+  let pct = 0, li = 0; const log = $("#boot-log");
+  const tick = setInterval(() => {
+    pct = Math.min(100, pct + 1 + Math.random() * 2.4);
+    $("#boot-bar").style.width = pct + "%"; $("#boot-pct").textContent = Math.floor(pct);
+    const want = Math.floor(pct / 26); while (li < Math.min(want, lines.length)) log.insertAdjacentHTML("beforeend", "> " + lines[li++] + "<br>");
+    if (pct >= 100) { clearInterval(tick); $("#boot-ok").classList.add("on"); setTimeout(() => $("#boot").classList.add("off"), 900); }
+  }, reduce ? 4 : 55);
+
+  /* ---- abyss dive ---- */
+  const hole = $("#hole"), hx = hole.getContext("2d"); let diving = false;
+  function show(id) { $$(".view").forEach((v) => v.classList.toggle("on", v.id === id)); scrollTo(0, 0); }
+  function dive(id) {
+    if (diving || $(".view.on").id === id) return;
+    if (reduce) return show(id);
+    diving = true; hole.width = innerWidth; hole.height = innerHeight;
+    const cx = W / 2, cy = H / 2, R = Math.hypot(W, H) / 2;
+    const ps = Array.from({ length: 520 }, () => ({ a: Math.random() * 6.28, r: R * (.15 + Math.random() * 1.1), w: .6 + Math.random() * 1.6, h: Math.random() < .5 }));
+    const T = 2300, t0 = performance.now(); let swapped = false;
+    hole.style.transition = "opacity .5s"; hole.style.opacity = 1;
+    (function f(now) {
+      const t = (now - t0) / T, e = Math.min(t, 1);
+      hx.fillStyle = `rgba(2,3,7,${.16 + e * .1})`; hx.fillRect(0, 0, W, H);
+      for (const p of ps) {
+        p.a += .012 + (R * .09) / (p.r + 30) * (.4 + e * 2.2); p.r *= .985 - e * .02;
+        if (p.r < 4) { p.r = R * (.5 + Math.random() * .7); }
+        const x = cx + Math.cos(p.a) * p.r, y = cy + Math.sin(p.a) * p.r * .62, k = 1 - p.r / (R * 1.2);
+        hx.fillStyle = p.h ? `rgba(139,123,255,${.2 + k})` : `rgba(127,212,255,${.2 + k})`; hx.fillRect(x, y, p.w + k * 2.4, p.w + k * 2.4);
+      }
+      const rr = 40 + e * e * R * 1.25, g = hx.createRadialGradient(cx, cy, rr * .55, cx, cy, rr * 1.25);
+      g.addColorStop(0, "rgba(0,0,0,1)"); g.addColorStop(.55, "rgba(0,0,0,1)"); g.addColorStop(.72, "rgba(127,212,255,.55)"); g.addColorStop(1, "rgba(0,0,0,0)");
+      hx.fillStyle = g; hx.beginPath(); hx.arc(cx, cy, rr * 1.25, 0, 6.28); hx.fill();
+      if (t > .78 && !swapped) { swapped = true; hx.fillStyle = "#000"; hx.fillRect(0, 0, W, H); show(id); }
+      if (t < 1) return requestAnimationFrame(f);
+      hole.style.transition = "opacity 1.1s"; hole.style.opacity = 0; setTimeout(() => { diving = false; hx.clearRect(0, 0, W, H); }, 1150);
+    })(t0);
   }
+  document.addEventListener("click", (e) => {
+    const g = e.target.closest("[data-go]"); if (g) return dive(g.dataset.go);
+    if (e.target.closest("[data-soon]")) { e.preventDefault(); toast("Link of project is not added please wait."); }
+  });
 
-  function initBoot() {
-    const boot = $("#boot-screen");
-    const log = $("#boot-log");
-    const percent = $("#boot-percent");
-    const svg = $("#boot-snake-svg");
+  /* ---- reveal ---- */
+  const io = new IntersectionObserver((es) => es.forEach((x) => x.isIntersecting && (x.target.classList.add("in"), io.unobserve(x.target))), { threshold: .12 });
+  $$(".rv").forEach((n) => io.observe(n));
 
-    // vault emblem inside both door halves
-    $$(".boot-door", boot).forEach((door) => door.insertAdjacentHTML("beforeend", vaultSVG()));
+  /* ---- mission tabs ---- */
+  const T = {
+    cloud: ["EXPLORING", "Protecting the infrastructure, identities and data that live in the cloud.", ["IDENTITY & ACCESS", "SECURE CONFIGURATION", "NETWORK EXPOSURE", "LOGGING & MONITORING"]],
+    ai: ["EXPLORING", "Protecting AI models, the data behind them and the apps built on top.", ["DATA & MODEL PROTECTION", "PROMPT INJECTION", "ADVERSARIAL INPUTS", "SECURE AI APPS"]],
+    core: ["IN PROGRESS", "Networking, Linux and traffic analysis — the base everything else sits on.", ["TCP/IP", "DNS", "LINUX CLI", "WIRESHARK"]]
+  };
+  const tp = $("#tabp");
+  const setTab = (k) => { const [s, d, c] = T[k]; tp.innerHTML = `<p class="mono ok">STATUS // ${s}</p><p>${d}</p><div class="tags mono">${c.map((x) => `<span>${x}</span>`).join("")}</div>`; $$(".tabs button").forEach((b) => b.classList.toggle("on", b.dataset.tab === k)); };
+  $$(".tabs button").forEach((b) => b.addEventListener("click", () => setTab(b.dataset.tab))); setTab("cloud");
 
-    // upgrade: energy glow behind the text, a shockwave ring, and an ACCESS GRANTED stamp
-    boot.insertAdjacentHTML("afterbegin", '<div class="boot-glow"></div>');
-    boot.insertAdjacentHTML("beforeend", '<div class="boot-ring"></div>');
-    $(".boot-percent", boot).insertAdjacentHTML("afterend", '<div class="boot-granted">ACCESS GRANTED</div>');
+  /* ---- password forge ---- */
+  const pw = $("#pw");
+  $("#pw-eye").onclick = (e) => { const s = pw.type === "password"; pw.type = s ? "text" : "password"; e.target.textContent = s ? "HIDE" : "SHOW"; };
+  const COMMON = ["password", "123456", "qwerty", "letmein", "admin", "welcome", "iloveyou", "abc123"];
+  pw.addEventListener("input", () => {
+    const v = pw.value; if (!v) { $("#pw-bar").style.width = 0; $("#pw-v").textContent = "AWAITING INPUT"; $("#pw-e").textContent = $("#pw-t").textContent = "—"; return; }
+    const pool = (/[a-z]/.test(v) * 26) + (/[A-Z]/.test(v) * 26) + (/\d/.test(v) * 10) + (/[^\w]/.test(v) * 32);
+    let bits = v.length * Math.log2(pool || 1); if (COMMON.some((c) => v.toLowerCase().startsWith(c))) bits = Math.min(bits, 12);
+    const sec = Math.pow(2, bits) / 1e10 / 2, u = [[31536e3, "years"], [86400, "days"], [3600, "hours"], [60, "minutes"]];
+    let t = sec < 1 ? "instantly" : sec > 31536e9 ? "centuries+" : (() => { for (const [s, n] of u) if (sec >= s) return Math.round(sec / s) + " " + n; return Math.round(sec) + " seconds"; })();
+    const lv = bits < 28 ? ["VERY WEAK", 12, "#ff5d6c"] : bits < 40 ? ["WEAK", 35, "#ff9f5d"] : bits < 60 ? ["FAIR", 60, "#ffd45d"] : bits < 80 ? ["STRONG", 82, "#9dff6d"] : ["EXCELLENT", 100, "#6dffb3"];
+    Object.assign($("#pw-bar").style, { width: lv[1] + "%", background: lv[2] }); $("#pw-v").textContent = lv[0]; $("#pw-e").textContent = Math.round(bits) + " bits"; $("#pw-t").textContent = t;
+  });
 
-    /* ----- snake geometry: a sine wave weaving over/under a straight bar ----- */
-    const NS = "http://www.w3.org/2000/svg";
-    const W = 680, MID = 32, AMP = 15, LAMBDA = 120, HALF = LAMBDA / 2;
-    const yAt = (x) => MID + AMP * Math.sin((2 * Math.PI * x) / LAMBDA);
-    const dyAt = (x) => AMP * Math.cos((2 * Math.PI * x) / LAMBDA) * ((2 * Math.PI) / LAMBDA);
-
-    let d = "";
-    for (let x = 0; x <= W; x += 2) d += (x ? " L" : "M") + x + " " + yAt(x).toFixed(2);
-
-    // clip regions: front = snake below the bar (sin > 0), back = above it
-    const clipRects = (front) => {
-      let out = "";
-      for (let k = 0; k * HALF < W; k++) {
-        const isFront = k % 2 === 0;
-        if (isFront === front) out += `<rect x="${k * HALF}" y="-20" width="${HALF}" height="110"/>`;
-      }
-      return out;
-    };
-
-    svg.innerHTML = `
-      <defs>
-        <clipPath id="snk-front">${clipRects(true)}</clipPath>
-        <clipPath id="snk-back">${clipRects(false)}</clipPath>
-        <mask id="snk-reveal"><rect id="snk-reveal-rect" x="-10" y="-20" width="0" height="110" fill="#fff"/></mask>
-      </defs>
-      <line class="bar-track" x1="0" y1="${MID}" x2="${W}" y2="${MID}"/>
-      <line id="snk-fill" class="bar-fill" x1="0" y1="${MID}" x2="0" y2="${MID}"/>
-      <g mask="url(#snk-reveal)">
-        <g clip-path="url(#snk-back)">
-          <path class="snake-glow" d="${d}"/><path class="snake-body" d="${d}"/><path class="snake-scales" d="${d}"/>
-        </g>
-      </g>
-      <line class="bar-track" x1="0" y1="${MID}" x2="${W}" y2="${MID}" style="stroke:#26323b"/>
-      <g mask="url(#snk-reveal)">
-        <g clip-path="url(#snk-front)">
-          <path class="snake-glow" d="${d}"/><path class="snake-body" d="${d}"/><path class="snake-scales" d="${d}"/>
-        </g>
-      </g>
-      <g id="snk-head" opacity="0">
-        <path class="snake-tongue" d="M9 0 L16 0 M16 0 L19 -2.6 M16 0 L19 2.6"/>
-        <ellipse class="snake-head" cx="2" cy="0" rx="9" ry="6"/>
-        <circle class="snake-eye" cx="3.5" cy="-2.6" r="1.4"/>
-        <circle class="snake-eye" cx="3.5" cy="2.6" r="1.4"/>
-      </g>`;
-
-    const reveal = $("#snk-reveal-rect");
-    const fill = $("#snk-fill");
-    const head = $("#snk-head");
-
-    const messages = [
-      "loading kernel modules...",
-      "checking network stack...",
-      "mounting security protocols...",
-      "calibrating aurora lattice...",
-      "loading user profile...",
-      "eclipse interface ready."
-    ];
-
-    let target = 0;       // where the loader wants to be (0–100)
-    let shown = 0;        // eased value actually drawn
-    let messageIndex = 0;
-    let finished = false;
-    let last = performance.now();
-    let nextBump = last + 140;
-
-    const paint = () => {
-      const x = (shown / 100) * W;
-      reveal.setAttribute("width", String(x + 10 + 10));
-      fill.setAttribute("x2", String(x));
-      const y = yAt(x);
-      const ang = (Math.atan2(dyAt(x), 1) * 180) / Math.PI;
-      head.setAttribute("transform", `translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${ang.toFixed(1)})`);
-      head.setAttribute("opacity", shown > 0.3 ? "1" : "0");
-      const pct = Math.round(shown);
-      percent.textContent = pct;
-      boot.style.setProperty("--p", (shown / 100).toFixed(3));   // drives the vault glow
-
-      while (messageIndex < messages.length && pct >= (messageIndex + 1) * (96 / messages.length)) {
-        const line = document.createElement("div");
-        line.textContent = `[ OK ] ${messages[messageIndex++]}`;
-        log.appendChild(line);
-      }
-    };
-
-    const open = () => {
-      boot.classList.add("opening");                       // doors slide apart
-      setTimeout(() => {
-        $$(".reveal").slice(0, 2).forEach((el) => el.classList.add("visible"));
-        window.dispatchEvent(new Event("eclipse:ready"));  // lets the black hole fade in
-      }, 650);
-      setTimeout(() => boot.classList.add("done"), 1900);
-    };
-
-    const tick = (now) => {
-      const dt = Math.min((now - last) / 1000, 0.1);
-      last = now;
-      if (now >= nextBump && target < 100) {
-        target = Math.min(100, target + Math.floor(Math.random() * 12) + 5);
-        nextBump = now + 120;
-      }
-      shown += (target - shown) * (1 - Math.exp(-dt * 7));
-      if (target >= 100 && shown > 99.6) shown = 100;
-      paint();
-      if (shown >= 100) {
-        if (!finished) {
-          finished = true;
-          boot.classList.add("granted");                    // ACCESS GRANTED + shockwave
-          setTimeout(open, 900);
-        }
-        return;
-      }
-      requestAnimationFrame(tick);
-    };
-    paint();
-    requestAnimationFrame(tick);
+  /* ---- hash forge ---- */
+  const hi = $("#hi"), ha = $("#ha"), ho = $("#ho");
+  async function doHash() {
+    if (!hi.value) return (ho.textContent = "—");
+    const b = await crypto.subtle.digest(ha.value, new TextEncoder().encode(hi.value));
+    ho.textContent = [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
   }
+  hi.addEventListener("input", doHash); ha.addEventListener("change", doHash);
+  $("#hc").onclick = () => { if (ho.textContent.length > 1) navigator.clipboard?.writeText(ho.textContent).then(() => toast("Hash copied.")); };
+})();
 
-  /* ---------- Header: background, hide on scroll, mobile menu ---------- */
-  function initHeader() {
-    const topbar = $(".topbar");
-    const menu = $("#menu-toggle");
-    const nav = $("#nav");
-    const navLinks = $$("#nav a");
-
-    let lastY = 0;
-    let ticking = false;
-
-    const onScroll = () => {
-      const y = window.scrollY;
-      topbar.classList.toggle("scrolled", y > 30);
-      // hide while scrolling down, show while scrolling up (never while menu is open)
-      topbar.classList.toggle("hide", y > lastY && y > 160 && !nav.classList.contains("open"));
-      lastY = Math.max(y, 0);
-      ticking = false;
-    };
-
-    window.addEventListener("scroll", () => {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(onScroll);
-      }
-    }, { passive: true });
-    onScroll();
-
-    const setMenu = (open) => {
-      nav.classList.toggle("open", open);
-      menu.textContent = open ? "CLOSE" : "MENU";
-      menu.setAttribute("aria-expanded", String(open));
-    };
-
-    menu.addEventListener("click", () => setMenu(!nav.classList.contains("open")));
-    navLinks.forEach((link) => link.addEventListener("click", () => setMenu(false)));
-
-    // Active link — IntersectionObserver instead of measuring offsets on every scroll
-    const setActive = (id) => {
-      navLinks.forEach((link) => {
-        link.classList.toggle("active", link.getAttribute("href") === `#${id}`);
-      });
-    };
-    const sectionObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => entry.isIntersecting && setActive(entry.target.id));
-    }, { rootMargin: "-35% 0px -60% 0px" });
-
-    $$("main section[id]").forEach((section) => sectionObserver.observe(section));
+/* ===== EFFECTS LAYER ===== */
+(() => {
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const CH = "!<>-_\\/[]{}=+*^?#01";
+  function scr(el) {
+    if (reduce || el.dataset.s || el.children.length) return; el.dataset.s = 1;
+    const t = el.textContent, n = 22; let f = 0;
+    const id = setInterval(() => { f++; el.textContent = [...t].map((c, i) => c === " " || i < f * t.length / n ? c : CH[Math.random() * CH.length | 0]).join(""); if (f >= n) { el.textContent = t; clearInterval(id); } }, 34);
   }
-
-  /* ---------- Reveal on scroll ---------- */
-  function initReveal() {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("visible");
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12 });
-
-    $$(".reveal").forEach((el) => observer.observe(el));
-  }
-
-  /* ---------- Pointer effects (cursor glow + terminal parallax) ---------- */
-  function initPointerEffects() {
-    const glow = $(".cursor-glow");
-    if (!canHover || !glow) return;   // the cursor glow was removed with the old background
-    const terminal = null; // hero terminal replaced by the access badge (see experience.js)
-
-    let x = 0;
-    let y = 0;
-    let ticking = false;
-
-    const update = () => {
-      glow.style.transform = `translate3d(${x - 180}px, ${y - 180}px, 0)`;
-
-      if (terminal && window.innerWidth >= 900) {
-        const nx = (x / window.innerWidth - 0.5) * 2;
-        const ny = (y / window.innerHeight - 0.5) * 2;
-        terminal.style.transform =
-          `perspective(1000px) rotateY(${-4 + nx * 1.5}deg) rotateX(${2 - ny * 1.2}deg)`;
-      }
-      ticking = false;
-    };
-
-    window.addEventListener("pointermove", (event) => {
-      x = event.clientX;
-      y = event.clientY;
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(update);
-      }
-    }, { passive: true });
-  }
-
-  /* ---------- Project card tilt ---------- */
-  function initCardTilt() {
-    if (!canHover) return;
-
-    $$(".project-card").forEach((card) => {
-      let ticking = false;
-      let event;
-
-      const update = () => {
-        const rect = card.getBoundingClientRect();
-        const dx = (event.clientX - rect.left) / rect.width - 0.5;
-        const dy = (event.clientY - rect.top) / rect.height - 0.5;
-        card.style.setProperty("--ry", `${dx * 14}deg`);
-        card.style.setProperty("--rx", `${-dy * 14}deg`);
-        ticking = false;
-      };
-
-      card.addEventListener("pointermove", (e) => {
-        event = e;
-        if (!ticking) {
-          ticking = true;
-          requestAnimationFrame(update);
-        }
-      }, { passive: true });
-
-      card.addEventListener("pointerleave", () => {
-        card.style.removeProperty("--rx");
-        card.style.removeProperty("--ry");
-      });
+  /* staggered reveal + scramble */
+  $$(".grid").forEach((g) => [...g.children].forEach((c, i) => c.classList.contains("rv") && (c.style.transitionDelay = i * 130 + "ms")));
+  $$(".tl li").forEach((c, i) => c.style.transitionDelay = i * 120 + "ms");
+  const io = new IntersectionObserver((es) => es.forEach((x) => { if (!x.isIntersecting) return; const e = x.target; io.unobserve(e); scr(e); if (e.classList.contains("rv")) setTimeout(() => e.style.transitionDelay = "", 1600); }), { threshold: .3 });
+  $$("h3, h4, .kick").forEach((e) => io.observe(e));
+  $$(".rv").forEach((e) => io.observe(e));
+  /* 3D tilt + cursor spotlight on cards and panels */
+  $$(".card,.panel").forEach((c) => {
+    c.addEventListener("pointermove", (e) => {
+      const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+      c.style.setProperty("--mx", x * 100 + "%"); c.style.setProperty("--my", y * 100 + "%");
+      if (!reduce && c.classList.contains("card") && c.classList.contains("in")) c.style.transform = `perspective(800px) rotateX(${(.5 - y) * 9}deg) rotateY(${(x - .5) * 11}deg) translateY(-4px)`;
     });
-  }
-
-  /* ---------- Placeholder project links ---------- */
-  function initPlaceholderLinks() {
-    const toast = $("#toast");
-    let hideTimer;
-
-    $$(".project-link[data-placeholder]").forEach((link) => {
-      link.addEventListener("click", (event) => {
-        if (link.getAttribute("href") !== "#") return;
-        event.preventDefault();
-        toast.textContent = `// ${link.dataset.placeholder}`;
-        toast.classList.add("show");
-        clearTimeout(hideTimer);
-        hideTimer = setTimeout(() => toast.classList.remove("show"), 2600);
-      });
-    });
-  }
-
-  /* ---------- Init ---------- */
-  initBoot();
-  initHeader();
-  initReveal();
-  initPointerEffects();
-  initCardTilt();
-  initPlaceholderLinks();
-  $("#year").textContent = new Date().getFullYear();
+    c.addEventListener("pointerleave", () => c.style.transform = "");
+  });
+  /* tabs: sliding indicator, ripple, animated content */
+  const tabs = $(".tabs"), tp = $("#tabp"), ind = document.createElement("i"); ind.className = "ind"; tabs.appendChild(ind);
+  const move = () => { const b = $(".tabs button.on"); if (b && b.offsetWidth) { ind.style.left = b.offsetLeft + "px"; ind.style.width = b.offsetWidth + "px"; } };
+  new ResizeObserver(move).observe(tabs);
+  const swap = () => { move(); tp.classList.remove("sw"); void tp.offsetWidth; tp.classList.add("sw"); const p = tp.children[1]; if (p) { delete p.dataset.s; scr(p); } };
+  $$(".tabs button").forEach((b) => b.addEventListener("click", (e) => {
+    const r = b.getBoundingClientRect(), s = document.createElement("i"), d = Math.max(r.width, r.height) * 2; s.className = "rp";
+    Object.assign(s.style, { width: d + "px", height: d + "px", left: e.clientX - r.left - d / 2 + "px", top: e.clientY - r.top - d / 2 + "px" }); b.appendChild(s); setTimeout(() => s.remove(), 650);
+    swap();
+  }));
+  /* scroll: progress bar, timeline fill, active nav */
+  const pg = document.createElement("div"); pg.className = "prog"; document.body.appendChild(pg);
+  const tl = $(".tl"), links = $$(".top nav a"), secs = links.map((a) => $(a.getAttribute("href")));
+  addEventListener("scroll", () => {
+    pg.style.transform = `scaleX(${scrollY / ((document.documentElement.scrollHeight - innerHeight) || 1)})`;
+    const r = tl.getBoundingClientRect(); if (r.height) tl.style.setProperty("--p", Math.max(0, Math.min(1, (innerHeight * .7 - r.top) / r.height)));
+    let cur = -1; secs.forEach((s, i) => s && s.getBoundingClientRect().top < 140 && (cur = i)); links.forEach((a, i) => a.classList.toggle("act", i === cur));
+  }, { passive: true });
 })();
