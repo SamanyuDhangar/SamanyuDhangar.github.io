@@ -1,0 +1,37 @@
+/* MAZE LAYER — chambers, minimap, warp, hub, secure channel, mini Ultron */
+:root{--ua:var(--accent,#6dffb3);--ub:var(--accent-2,#7bc7ff)}
+.section{--dx:0px;--dy:60px}
+.section[data-dir="L"]{--dx:-110px;--dy:0px}.section[data-dir="R"]{--dx:110px;--dy:0px}.section[data-dir="D"]{--dx:0px;--dy:110px}
+.js-maze .section .reveal{opacity:0;filter:blur(10px) brightness(1.8);translate:var(--dx) var(--dy);scale:.96;transition:opacity 1s ease,filter 1.1s ease,translate 1.1s cubic-bezier(.2,.8,.2,1),scale 1.1s ease}
+.js-maze .section .reveal.visible{opacity:1;filter:none;translate:0 0;scale:1}
+.js-maze .section .panel,.js-maze .skill-card,.js-maze .project-card,.js-maze .credential-item,.js-maze .timeline-item>div{position:relative;box-shadow:0 0 0 1px rgba(109,255,179,.12),0 0 28px -8px var(--ua)}
+.js-maze .visible.panel::after,.js-maze .visible.project-card::after,.js-maze .visible.skill-card::after{content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;background:conic-gradient(from var(--ang,0deg),transparent 0 70%,var(--ua) 85%,transparent 100%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:mzspin 5s linear infinite}
+@property --ang{syntax:"<angle>";inherits:false;initial-value:0deg}
+@keyframes mzspin{to{--ang:360deg}}
+.loc-tag{display:block;font:600 11px/1 "JetBrains Mono",monospace;letter-spacing:.3em;color:var(--ua);opacity:.75;margin:0 0 10px}
+.ult-ico{display:inline-block;width:22px;height:22px;vertical-align:-4px;margin-right:10px;filter:drop-shadow(0 0 6px var(--ua))}
+.warp{position:fixed;inset:0;z-index:90;pointer-events:none;opacity:0;background:radial-gradient(circle,transparent 0 18%,rgba(2,6,10,.92) 70%);transition:opacity .35s}
+.warp.go{opacity:1}.warp b{position:absolute;left:50%;top:50%;translate:-50% -50%;font:600 13px "JetBrains Mono",monospace;letter-spacing:.4em;color:var(--ua);text-shadow:0 0 14px var(--ua);text-align:center}
+.warp::before{content:"";position:absolute;inset:-50%;background:repeating-conic-gradient(from 0deg,rgba(109,255,179,.0) 0 5deg,rgba(109,255,179,.18) 5.4deg 5.8deg);animation:mzspin2 .9s linear infinite}
+@keyframes mzspin2{to{transform:rotate(30deg) scale(1.4)}}
+.mmap{position:fixed;left:18px;bottom:18px;z-index:40;width:132px;padding:8px;border:1px solid rgba(109,255,179,.25);background:rgba(3,8,12,.7);backdrop-filter:blur(8px);border-radius:10px;font:600 9px "JetBrains Mono",monospace;letter-spacing:.18em;color:var(--ua)}
+.mmap svg{display:block;width:100%;height:auto;overflow:visible}.mmap path{fill:none;stroke:rgba(109,255,179,.28);stroke-width:2}
+.mmap .done{stroke:var(--ua);filter:drop-shadow(0 0 3px var(--ua))}.mmap circle.n{fill:#05070a;stroke:var(--ua);stroke-width:1.4;cursor:pointer}.mmap circle.n.on{fill:var(--ua)}.mmap circle.me{fill:#fff;filter:drop-shadow(0 0 5px var(--ua));pointer-events:none}
+.hubwrap{position:fixed;inset:0;z-index:95;display:grid;place-items:center;background:rgba(2,5,9,.88);backdrop-filter:blur(10px);opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s}
+.hubwrap.open{opacity:1;visibility:visible}
+.hub{width:min(920px,92vw);max-height:88vh;overflow:auto;padding:28px;border:1px solid rgba(109,255,179,.3);border-radius:14px;box-shadow:0 0 60px -10px var(--ua);background:linear-gradient(160deg,rgba(6,14,20,.95),rgba(3,6,10,.95));transform:scale(.9) rotateX(12deg);transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.hubwrap.open .hub{transform:none}.hub h3{margin:0 0 4px;font:700 20px "Space Grotesk",sans-serif;letter-spacing:.14em;color:#e9fff5}.hub p.sub{margin:0 0 20px;font:12px "JetBrains Mono",monospace;color:#8fb3a6}
+.hub-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.hub-grid button,.hub-grid a,.hub .tour{all:unset;box-sizing:border-box;cursor:pointer;padding:14px;border:1px solid rgba(109,255,179,.22);border-radius:10px;font:600 12px "JetBrains Mono",monospace;letter-spacing:.12em;color:#d7fff0;transition:.25s;display:block;opacity:0;transform:translateY(16px);animation:mzin .5s forwards}
+.hub-grid button small,.hub-grid a small{display:block;margin-top:6px;font-weight:400;letter-spacing:0;color:#7fa396;line-height:1.5}
+.hub-grid button:hover,.hub-grid a:hover,.hub .tour:hover{border-color:var(--ua);box-shadow:0 0 22px -4px var(--ua);background:rgba(109,255,179,.07);translate:0 -3px}
+.hub .tour{display:inline-block;margin-top:18px;color:var(--ua);border-color:var(--ua)}.hub .x{position:absolute;right:18px;top:12px;all:unset;cursor:pointer;color:var(--ua);font:600 12px "JetBrains Mono",monospace;padding:8px;position:absolute}
+@keyframes mzin{to{opacity:1;transform:none}}
+.ultron{position:fixed;right:22px;bottom:92px;z-index:70;width:74px;cursor:pointer;animation:ufloat 4s ease-in-out infinite;filter:drop-shadow(0 0 12px var(--ua));transition:right .9s cubic-bezier(.3,.7,.2,1),bottom .9s cubic-bezier(.3,.7,.2,1)}
+.ultron svg{width:100%;display:block}.ultron .eye{fill:#ff4d5e;filter:drop-shadow(0 0 4px #ff4d5e);animation:ublink 5s infinite}.ultron .ring{transform-origin:50px 50px;animation:mzspin2 6s linear infinite reverse}
+.ultron .say{position:absolute;right:82px;bottom:34px;width:max-content;max-width:230px;padding:9px 12px;border:1px solid var(--ua);border-radius:8px 8px 2px 8px;background:rgba(3,9,13,.92);font:11px/1.5 "JetBrains Mono",monospace;color:#d7fff0;opacity:0;translate:10px 0;transition:.4s;pointer-events:none}
+.ultron.talk .say{opacity:1;translate:0 0}
+@keyframes ufloat{50%{transform:translateY(-10px) rotate(2deg)}}@keyframes ublink{0%,94%,100%{opacity:1}96%{opacity:.1}}
+.chan a{display:block;margin:6px 0}
+@media(max-width:760px){.mmap{display:none}.ultron{width:54px;right:10px;bottom:84px}.ultron .say{max-width:170px;right:60px}}
+@media(prefers-reduced-motion:reduce){.js-maze .section .reveal{transition:none;filter:none;translate:0 0;scale:1;opacity:1}.ultron,.warp::before{animation:none}}
