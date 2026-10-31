@@ -82,10 +82,10 @@
     if (!AC) return null;
     ctx = new AC();
     const comp = ctx.createDynamicsCompressor();             // keeps loud moments from distorting
-    comp.threshold.value = -20; comp.knee.value = 18; comp.ratio.value = 5; comp.attack.value = 0.004; comp.release.value = 0.25;
+    comp.threshold.value = -12; comp.knee.value = 18; comp.ratio.value = 5; comp.attack.value = 0.004; comp.release.value = 0.25;
     bus = ctx.createGain(); bus.gain.value = 0;
-    musicBus = ctx.createGain(); musicBus.gain.value = 0.55;
-    sfxBus = ctx.createGain(); sfxBus.gain.value = 1.05;
+    musicBus = ctx.createGain(); musicBus.gain.value = 1.25;
+    sfxBus = ctx.createGain(); sfxBus.gain.value = 1.5;
     musicBus.connect(bus); sfxBus.connect(bus); bus.connect(comp); comp.connect(ctx.destination);
     noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
     const d = noiseBuf.getChannelData(0);
@@ -139,87 +139,60 @@
     },
     on: () => [392, 523.25, 659.25, 783.99, 1046.5].forEach((f, k) => tone({ f, type: "triangle", d: 0.5, v: 0.24, at: k * 0.09 }))
   };
+  Object.assign(SFX, {
+    hover: () => tone({ f: rnd(2200, 3200), type: "square", d: 0.03, v: 0.05 }),
+    click: () => { tone({ f: 880, type: "square", d: 0.05, v: 0.2 }); tone({ f: 1320, type: "square", d: 0.07, v: 0.16, at: 0.06 }); },
+    chime: () => [0, 0.09, 0.18].forEach((a, k) => tone({ f: [660, 990, 1485][k], type: "sawtooth", d: 0.08, v: 0.14, at: a })),
+    open: () => { tone({ f: 90, f2: 900, type: "sawtooth", d: 0.5, v: 0.22 }); noise({ d: 0.5, v: 0.1, f: 400, f2: 5000, type: "bandpass", q: 3 }); },
+    on: () => { tone({ f: 55, f2: 440, type: "sawtooth", d: 1.1, v: 0.4 }); [440, 660, 880].forEach((f, k) => tone({ f, type: "square", d: 0.15, v: 0.16, at: 0.5 + k * 0.12 })); },
+    blip: () => { tone({ f: 1200, f2: 600, type: "square", d: 0.06, v: 0.14 }); tone({ f: 600, f2: 1200, type: "square", d: 0.06, v: 0.12, at: 0.07 }); }
+  });
   function sfx(name) { if (soundOn && ctx && SFX[name]) { try { SFX[name](); } catch (e) { /* audio hiccup */ } } }
 
   /* ---------- ambient music ---------- */
   function ambStart() {
-    const A = { timers: [], nodes: [], osc: [], chord: 0 };
-    const padFilter = ctx.createBiquadFilter();
-    padFilter.type = "lowpass"; padFilter.frequency.value = 700; padFilter.Q.value = 0.8;
-    const padGain = ctx.createGain(); padGain.gain.value = 0.2;
-    padFilter.connect(padGain); padGain.connect(musicBus);
-    A.filter = padFilter;
-
-    // echo for the plucks
-    const dry = ctx.createGain(); dry.gain.value = 0.9; dry.connect(musicBus);
-    const dly = ctx.createDelay(1); dly.delayTime.value = 0.42;
-    const fb = ctx.createGain(); fb.gain.value = 0.4;
-    const tone2 = ctx.createBiquadFilter(); tone2.type = "lowpass"; tone2.frequency.value = 2200;
-    const wet = ctx.createGain(); wet.gain.value = 0.5;
-    dly.connect(tone2); tone2.connect(fb); fb.connect(dly); tone2.connect(wet); wet.connect(musicBus);
-    A.pluckIn = ctx.createGain(); A.pluckIn.connect(dry); A.pluckIn.connect(dly);
-
-    // pad: five notes, each a saw + a triangle, slightly detuned
-    A.voices = CHORDS[0].map((m) => {
-      const pair = [["sawtooth", -7, 0.05], ["triangle", 7, 0.12]].map(([type, det, g]) => {
-        const o = ctx.createOscillator(), gn = ctx.createGain();
-        o.type = type; o.detune.value = det; o.frequency.value = mtof(m); gn.gain.value = g;
-        o.connect(gn); gn.connect(padFilter); o.start(); A.osc.push(o);
-        return o;
-      });
-      return pair;
+    /* ROBOTIC CIVILIZATION: sub drone, ring-modulated metal, bit-crushed saw sequencer, machine kick, talking-robot formants */
+    const A = { timers: [], osc: [], alive: true, step: 0 };
+    const sat = ctx.createWaveShaper(), curve = new Float32Array(256);
+    for (let i = 0; i < 256; i++) curve[i] = Math.tanh((i / 128 - 1) * 3.4);
+    sat.curve = curve; sat.connect(musicBus);
+    const lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 700; lp.Q.value = 7; lp.connect(sat); A.filter = lp;
+    const start = (o) => { o.start(); A.osc.push(o); return o; };
+    [[55, "sawtooth", 0.2], [55.5, "square", 0.1], [27.5, "sine", 0.55]].forEach(([f, t, g]) => {
+      const o = ctx.createOscillator(), gn = ctx.createGain(); o.type = t; o.frequency.value = f; gn.gain.value = g; o.connect(gn); gn.connect(lp); start(o);
     });
-    // bass: a deep note plus its octave so small speakers can hear it
-    A.bass = [[-12, "sine", 0.34], [0, "triangle", 0.1]].map(([off, type, g]) => {
-      const o = ctx.createOscillator(), gn = ctx.createGain();
-      o.type = type; o.frequency.value = mtof(CHORDS[0][0] + off); gn.gain.value = g;
-      o.connect(gn); gn.connect(musicBus); o.start(); A.osc.push(o);
-      return [o, off];
-    });
-    // slow filter wobble
-    const lfo = ctx.createOscillator(), lg = ctx.createGain();
-    lfo.frequency.value = 0.07; lg.gain.value = 260;
-    lfo.connect(lg); lg.connect(padFilter.frequency); lfo.start(); A.osc.push(lfo);
-
-    const pluck = () => {
+    const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.11; lg.gain.value = 380; lfo.connect(lg); lg.connect(lp.frequency); start(lfo);
+    const car = ctx.createOscillator(), rm = ctx.createGain(), mod = ctx.createOscillator(), rg = ctx.createGain();
+    car.type = "sawtooth"; car.frequency.value = 110; rm.gain.value = 0; mod.frequency.value = 37; rg.gain.value = 0.14;
+    mod.connect(rm.gain); car.connect(rm); rm.connect(rg); rg.connect(sat); start(car); start(mod);
+    const SCALE = [45, 46, 48, 50, 52, 53, 55, 57];
+    const seq = () => {
       if (!A.alive) return;
-      const notes = CHORDS[A.chord];
-      if (Math.random() < 0.8) {
-        const m = notes[(Math.random() * notes.length) | 0] + (Math.random() < 0.5 ? 12 : 24);
-        const t = ctx.currentTime, o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
-        o.type = "triangle"; o.frequency.value = mtof(m);
-        o2.type = "sine"; o2.frequency.value = mtof(m) * 2.005;     // bell-like overtone
-        lp.type = "lowpass"; lp.frequency.value = 2600 + energy * 2000 + scrollP * 1500;
-        g.gain.setValueAtTime(0.0001, t);
-        g.gain.exponentialRampToValueAtTime(0.3, t + 0.006);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + 1.8);
-        const og = ctx.createGain(); og.gain.value = 0.25;
-        o.connect(lp); o2.connect(og); og.connect(lp); lp.connect(g);
-        const p = panner(rnd(-0.7, 0.7));
-        if (p) { g.connect(p); p.connect(A.pluckIn); } else g.connect(A.pluckIn);
-        o.start(t); o2.start(t); o.stop(t + 1.9); o2.stop(t + 1.9);
+      const i = A.step++;
+      if (i % 4 === 0) tone({ f: 130, f2: 36, d: 0.3, v: 0.8, dest: musicBus });
+      if (i % 2 === 1) noise({ d: 0.04, v: 0.14, f: 7500, dest: musicBus });
+      if (i % 16 === 10) { tone({ f: rnd(280, 520), type: "square", d: 0.2, v: 0.14, dest: sat }); noise({ d: 0.18, v: 0.1, f: 1800, f2: 400, type: "bandpass", q: 6, dest: musicBus }); }
+      if (Math.random() < 0.72) {
+        const m = SCALE[(Math.random() * SCALE.length) | 0] + (Math.random() < 0.35 ? 12 : 24);
+        tone({ f: mtof(m), type: "sawtooth", a: 0.002, d: 0.14, v: 0.2 + energy * 0.1, dest: lp });
       }
-      const base = 0.5 - scrollP * 0.2 - energy * 0.15;              // busier the further you scroll
-      A.timers.push(setTimeout(pluck, (base + Math.random() * 0.55) * 1000));
+      A.timers.push(setTimeout(seq, 148 - scrollP * 22));
     };
-    const changeChord = () => {
+    const babble = () => {                      // a talking-robot formant voice
       if (!A.alive) return;
-      A.chord = (A.chord + 1) % CHORDS.length;
-      const notes = CHORDS[A.chord], t = ctx.currentTime;
-      A.voices.forEach((pair, i) => pair.forEach((o) => o.frequency.setTargetAtTime(mtof(notes[i]), t, 1.3)));
-      A.bass.forEach(([o, off]) => o.frequency.setTargetAtTime(mtof(notes[0] + off), t, 0.5));
-      tone({ f: 70, f2: 40, d: 0.8, v: 0.28, dest: musicBus });      // soft thump on every change
-      A.timers.push(setTimeout(changeChord, rnd(9000, 14000)));
+      const t0 = ctx.currentTime, n = 5 + ((Math.random() * 5) | 0), o = ctx.createOscillator(), g = ctx.createGain();
+      const f1 = ctx.createBiquadFilter(), f2 = ctx.createBiquadFilter(); f1.type = f2.type = "bandpass"; f1.Q.value = f2.Q.value = 7;
+      o.type = "sawtooth"; o.frequency.value = rnd(62, 85); g.gain.value = 0.0001;
+      o.connect(f1); o.connect(f2); f1.connect(g); f2.connect(g); g.connect(sat);
+      for (let k = 0; k < n; k++) {
+        const t = t0 + k * 0.16;
+        f1.frequency.setValueAtTime(rnd(300, 900), t); f2.frequency.setValueAtTime(rnd(1100, 2600), t);
+        g.gain.setValueAtTime(0.5, t); g.gain.linearRampToValueAtTime(0.08, t + 0.14);
+      }
+      g.gain.linearRampToValueAtTime(0.0001, t0 + n * 0.16 + 0.1); o.start(t0); o.stop(t0 + n * 0.16 + 0.2);
+      A.timers.push(setTimeout(babble, rnd(9000, 17000)));
     };
-    const sweep = () => {
-      if (!A.alive) return;
-      const p = panner(rnd(-0.6, 0.6));
-      noise({ d: 4.5, v: 0.1, f: 250, f2: 2600, type: "bandpass", q: 3, dest: musicBus });
-      if (p) { /* stereo placement is covered by the plucks */ }
-      A.timers.push(setTimeout(sweep, rnd(15000, 26000)));
-    };
-    A.alive = true;
-    A.timers.push(setTimeout(pluck, 900), setTimeout(changeChord, 10000), setTimeout(sweep, 7000));
+    A.timers.push(setTimeout(seq, 400), setTimeout(babble, 4000));
     return A;
   }
   function ambStop() {
@@ -243,17 +216,17 @@
       soundOn = true;
       bus.gain.cancelScheduledValues(ctx.currentTime);
       bus.gain.setValueAtTime(bus.gain.value, ctx.currentTime);
-      bus.gain.linearRampToValueAtTime(1, ctx.currentTime + 1.5);
+      bus.gain.linearRampToValueAtTime(1.5, ctx.currentTime + 1.5);
       amb = ambStart();
       sfx("on");
-      toast("sound on — music + click sounds");
+      store.set("eclipse-sound", "on"); toast("sound on — robotic music + Ultron voice");
     } else {
       soundOn = false;
       bus.gain.cancelScheduledValues(ctx.currentTime);
       bus.gain.setValueAtTime(bus.gain.value, ctx.currentTime);
       bus.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.8);
       ambStop();
-      toast("sound off");
+      store.set("eclipse-sound", "off"); try { speechSynthesis.cancel(); } catch (x) { /* none */ } toast("sound off");
     }
     if (b) { b.setAttribute("aria-pressed", String(soundOn)); $("span", b).textContent = soundOn ? "SOUND ON" : "SOUND"; }
     return soundOn;
@@ -357,7 +330,7 @@
   }
 
   /* ============================ COMMAND PALETTE ======================== */
-  const SECTIONS = [["home", "Home"], ["about", "About"], ["mission", "Mission"], ["skills", "Skills"], ["journey", "Journey"], ["projects", "Projects"], ["certifications", "Credentials"], ["shell", "Shell"], ["lab", "Lab"], ["contact", "Contact"]];
+  const SECTIONS = [["home", "Home"], ["about", "About"], ["mission", "Mission"], ["skills", "Skills"], ["journey", "Journey"], ["projects", "Projects"], ["certifications", "Credentials"], ["shell", "Shell"], ["contact", "Contact"]];
   const goto = (id) => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); };
   const open = (url) => window.open(url, "_blank", "noopener");
 
@@ -574,10 +547,8 @@
   }
 
   /* ================================ INIT =============================== */
-  window.eclipseFx = { nextTheme, cinema, matrix, toggleSound };
+  window.eclipseFx = { nextTheme, cinema, matrix, toggleSound, sfx, soundOn: () => soundOn, autoSound: () => { if (!soundOn && store.get("eclipse-sound") !== "off") toggleSound(); } };
   initDock(initPalette());
   initSound();
   initSecrets();
-  initPassword();
-  initHash();
 })();
