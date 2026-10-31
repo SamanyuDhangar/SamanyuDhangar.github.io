@@ -23,9 +23,10 @@
     projects:       { c: [85, 205, 180],  fog: .45, name: "Laboratory" },
     certifications: { c: [215, 188, 125], fog: .50, name: "Vault" },
     shell:          { c: [100, 190, 250], fog: .45, name: "Terminal" },
-    lab:            { c: [110, 200, 235], fog: .45, name: "Playground" },
     contact:        { c: [205, 125, 170], fog: .70, name: "Horizon" }
   };
+  const SHIFT = { about: -.2, mission: .2, skills: -.2, journey: .2, projects: 0, certifications: -.2, shell: .2, contact: 0, home: 0 };
+  let vxo = 0, vxt = 0;
   let cur = [...SCENES.home.c], tgt = [...SCENES.home.c], fogT = .55;
 
   /* ---- sizing / quality ---- */
@@ -91,6 +92,13 @@
       ctx.strokeStyle = rgba(.03 + z * .14); ctx.beginPath(); ctx.moveTo(VX - half, y); ctx.lineTo(VX + half, y); ctx.stroke();
     }
 
+    // maze door-frames glide toward you down the corridor
+    for (let k = 0; k < 6; k++) {
+      const z = ((k / 6) + off) % 1, p = proj(z), y = VY + (H - VY) * p, hw = W * .34 * p, hh = H * .5 * p;
+      ctx.strokeStyle = rgba(.04 + z * .32); ctx.lineWidth = .8 + z * 1.6;
+      ctx.strokeRect(VX - hw, y - hh, hw * 2, hh);
+      ctx.beginPath(); ctx.moveTo(VX - hw, y - hh * .5); ctx.lineTo(VX - hw * 1.5, y - hh * .5); ctx.moveTo(VX + hw, y - hh * .5); ctx.lineTo(VX + hw * 1.5, y - hh * .5); ctx.stroke();
+    }
     // light trails
     ctx.lineCap = "round";
     for (const t of trails) {
@@ -127,7 +135,7 @@
   const setScene = (id) => {
     const s = SCENES[id]; if (!s || id === sceneId) return;
     const first = !sceneId; sceneId = id;
-    tgt = [...s.c]; fogT = s.fog; hn.textContent = s.name;
+    tgt = [...s.c]; fogT = s.fog; vxt = SHIFT[id] || 0; hn.textContent = s.name;
     document.body.dataset.scene = id;
     if (!first && !reduce) { gate.classList.remove("go"); void gate.offsetWidth; gate.classList.add("go"); }
   };
@@ -143,6 +151,7 @@
     if (!run) return;
     const dt = Math.min((now - last) / 1000, .05); last = now;
     sp = clamp(scrollY / max(), 0, 1);
+    vxo += (vxt - vxo) * (1 - Math.exp(-dt * 1.4)); VX = W / 2 + vxo * W;
     const dy = Math.abs(scrollY - lastY); lastY = scrollY;
     dist += dy;
     vel += (clamp(dy / (dt * 1000 + 1) * .5, 0, 1.4) - vel) * (1 - Math.exp(-dt * 6));
