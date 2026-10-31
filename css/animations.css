@@ -1,0 +1,25 @@
+@keyframes pulse{70%{box-shadow:0 0 0 10px rgba(111,214,232,0)}100%{box-shadow:0 0 0 0 rgba(111,214,232,0)}}
+@keyframes drip{0%{transform:scaleY(0)}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+/* reveals are opt-in via .js so no-JS visitors always see content */
+.js .rv{opacity:0;transform:translateY(28px);transition:opacity 1s cubic-bezier(.2,.7,.2,1),transform 1.1s cubic-bezier(.2,.7,.2,1)}
+.js .rv.in{opacity:1;transform:none}
+.js .skill-list .skill:nth-child(2),.js .proj .txt{transition-delay:.08s}.js .skill-list .skill:nth-child(3){transition-delay:.16s}.js .skill-list .skill:nth-child(4){transition-delay:.24s}
+.js .ch{display:inline-block;opacity:0;transform:translateY(60%) rotate(4deg);filter:blur(8px);transition:opacity .9s,transform 1.1s cubic-bezier(.2,.7,.2,1),filter .9s;transition-delay:calc(var(--i)*55ms + 150ms)}
+.js .in .ch,.js .ch.in{opacity:1;transform:none;filter:none}
+.js [data-split]:not(.in) .ch{opacity:0}
+.js [data-split].in .ch{opacity:1;transform:none;filter:none}
+/* intro: canvas sits above content, content hidden, never for longer than the loader's failsafe */
+html.is-intro #stage{z-index:90}html.is-intro .veil{z-index:91}
+html.is-intro main,html.is-intro .nav,html.is-intro .foot{visibility:hidden}
+html.is-intro body{overflow:hidden}
+html.is-intro body{background:#000}
+#intro{position:fixed;inset:0;z-index:95;display:none;pointer-events:none;color:var(--dim)}
+.is-intro #intro{display:block}
+#intro p{position:absolute;left:var(--pad);bottom:2.2rem}
+#intro-skip{pointer-events:auto;position:absolute;right:var(--pad);bottom:2rem;background:none;border:0;color:var(--si);cursor:pointer;padding:.5rem}
+html.is-ready .hero .idline,html.is-ready .nav{animation:fade 1s .2s both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition-duration:.01ms!important;transition-delay:0s!important}
+  .js .rv,.js .ch{opacity:1;transform:none;filter:none}.nav.hide{transform:none}
+}
