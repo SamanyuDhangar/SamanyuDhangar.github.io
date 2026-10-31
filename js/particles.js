@@ -64,8 +64,30 @@ void main(){ float a=vC.a; if(uLine<.5){ float d=length(gl_PointCoord-.5); a*=sm
     E.reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
     gl = null;
     try { gl = canvas.getContext("webgl", { alpha: true, antialias: false, powerPreference: "low-power", premultipliedAlpha: true }); } catch (e) {}
-    if (gl && setupGL()) E.mode = "gl";
-    else { E.mode = "2d"; N = mobile ? 1200 : 1800; ctx2 = canvas.getContext("2d"); }
+  
+if (gl && setupGL()) {
+  E.mode = "gl";
+} else {
+  // WebGL may have initialized even if shader setup failed.
+  // A canvas cannot switch from WebGL to 2D, so replace it.
+  if (gl) {
+    const fallbackCanvas = canvas.cloneNode(false);
+    canvas.replaceWith(fallbackCanvas);
+    canvas = fallbackCanvas;
+    gl = null;
+  }
+
+  E.mode = "2d";
+  N = mobile ? 1200 : 1800;
+  ctx2 = canvas.getContext("2d");
+
+  if (!ctx2) {
+    console.error("Particle canvas: unable to initialize 2D context.");
+    E.mode = "none";
+    return false;
+  }
+}
+
     E.N = N;
     const R = Math.random;
     rankArr = new Float32Array(N);
