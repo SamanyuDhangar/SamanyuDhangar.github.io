@@ -1,1 +1,157 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Samanyu Dhangar — Exploring the invisible side of technology</title>
+<meta name="description" content="Samanyu Dhangar — cybersecurity learner, technology enthusiast and builder. Linux, networking, traffic analysis and security experiments.">
+<meta name="theme-color" content="#05070a">
+<meta property="og:title" content="Samanyu Dhangar">
+<meta property="og:description" content="Exploring the invisible side of technology.">
+<script>
+  document.documentElement.classList.add("js");
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("is-intro");
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/animations.css">
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+<a class="skip" href="#about">Skip to content</a>
+<canvas id="stage" aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"></div>
+<div id="cursor" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"></div>
+
+<div id="intro" aria-hidden="true"><p class="mono"><span id="intro-line">signal</span></p><button id="intro-skip" class="mono" type="button" aria-label="Skip intro">skip ↘</button></div>
+
+<header class="nav">
+  <a class="logo mono" href="#hero" aria-label="Samanyu Dhangar — top">SD<i>/</i></a>
+  <nav aria-label="Primary" class="mono"><a href="#about">About</a><a href="#skills">Explore</a><a href="#work">Work</a><a href="#contact">Contact</a></nav>
+</header>
+
+<main>
+<section id="hero" class="hero">
+  <p class="mono idline"><span class="pulse"></span>India &nbsp;·&nbsp; learning in public</p>
+  <h1 class="mega"><span data-split>SAMANYU</span><span data-split>DHANGAR</span></h1>
+  <p class="statement rv">Exploring the <em>invisible</em> side of technology.</p>
+  <p class="lede rv">I explore systems, understand how they work, investigate how they fail, and build things that make technology more understandable and secure.</p>
+  <a class="scroll mono" href="#about" aria-label="Scroll to About"><span class="line"></span>scroll</a>
+</section>
+
+<section id="about" class="about">
+  <div class="sticky-cap mono" aria-hidden="true"><span>01 — Identity</span><span class="cap">particle portrait · glasses &amp; a small white tilak</span></div>
+  <div class="about-body">
+    <h2 class="display rv">Curiosity has <em>no perimeter.</em></h2>
+    <p class="big rv">I’m Samanyu — a cybersecurity learner, technology enthusiast and builder. I’m still early on this path, and I’d rather show the work of learning than pretend it’s finished.</p>
+    <div class="cols rv">
+      <p>Right now I’m exploring Linux and the command line, networking and packet analysis, and the foundations of defensive security — how systems talk, how they break, and how people notice.</p>
+      <p>Next on the horizon: cloud and AI security. Everything on this page is a work in progress, and it’s labelled that way on purpose.</p>
+    </div>
+    <ul class="facts mono rv"><li>Cybersecurity learner</li><li>Linux &amp; networking</li><li>Builder</li></ul>
+  </div>
+</section>
+
+<section id="skills" class="skills">
+  <p class="mono eyebrow rv">02 — Explore my world</p>
+  <h2 class="display rv">A small constellation,<br><em>honestly mapped.</em></h2>
+  <div class="skill-list">
+    <article class="skill rv" data-k="0"><h3 class="mono">Systems</h3><ul><li>Linux</li><li>Command line</li><li>Operating system fundamentals</li></ul><span class="lvl mono">learning</span></article>
+    <article class="skill rv" data-k="1"><h3 class="mono">Networks</h3><ul><li>TCP/IP</li><li>Networking fundamentals</li><li>Wireshark</li><li>Packet analysis</li></ul><span class="lvl mono">learning</span></article>
+    <article class="skill rv" data-k="2"><h3 class="mono">Security</h3><ul><li>Cybersecurity fundamentals</li><li>Defensive security concepts</li><li>Threat awareness</li><li>Digital investigation concepts</li></ul><span class="lvl mono">learning</span></article>
+    <article class="skill rv" data-k="3"><h3 class="mono">Development</h3><ul><li>Git</li><li>C programming</li></ul><span class="lvl mono">learning</span></article>
+  </div>
+  <p class="note mono rv">Every item here is a learning area, not a claim of mastery.</p>
+</section>
+
+<section id="work" class="work">
+  <p class="mono eyebrow rv">03 — Selected work</p>
+  <h2 class="display rv">Things I’m <em>building &amp; testing.</em></h2>
+
+  <article class="proj rv">
+    <div class="vis"><canvas data-vis="eye" role="img" aria-label="Animated particle eye that follows the cursor"></canvas></div>
+    <div class="txt">
+      <p class="mono meta">01 · <span class="status">In development</span></p>
+      <h3>Eyes of Truth</h3>
+      <p>A local cybersecurity analysis dashboard — a place to look closer at things you’re asked to trust.</p>
+      <ul class="tags mono"><li>Python</li><li>FastAPI</li><li>Phishing analysis</li><li>URL analysis</li></ul>
+      <details><summary class="mono">Details</summary><ul class="det"><li>Email phishing analysis</li><li>URL analysis</li><li>Terms &amp; conditions summarisation</li><li>Python backend with FastAPI</li></ul></details>
+      <p class="links mono"><a data-eot href="https://eyesoftruth.onrender.com/" target="_blank" rel="noopener noreferrer">Open hosted preview ↗</a><a data-cfg="github" href="#">GitHub ↗</a></p>
+    </div>
+  </article>
+
+  <article class="proj flip rv">
+    <div class="vis"><canvas data-vis="net" role="img" aria-label="Animated network of nodes with packets travelling between them"></canvas></div>
+    <div class="txt">
+      <p class="mono meta">02 · <span class="status">Ongoing experiments</span></p>
+      <h3>Network Field Notes</h3>
+      <p>My networking and traffic-analysis learning experiments — reading packets to understand how machines hold a conversation.</p>
+      <ul class="tags mono"><li>Wireshark</li><li>TCP/IP</li><li>Packet analysis</li></ul>
+      <details><summary class="mono">Details</summary><ul class="det"><li>Completed TryHackMe’s Wireshark Basics room</li><li>Write-ups and captures are not published yet</li></ul></details>
+    </div>
+  </article>
+
+  <article class="proj rv">
+    <div class="vis"><canvas data-vis="path" role="img" aria-label="Animated path extending through a field of points"></canvas></div>
+    <div class="txt">
+      <p class="mono meta">03 · <span class="status">Continuing</span></p>
+      <h3>Security Learning Journey</h3>
+      <p>Hands-on cybersecurity learning through TryHackMe and other educational environments.</p>
+      <ul class="tags mono"><li>TryHackMe</li><li>Linux</li><li>Networking</li></ul>
+      <details><summary class="mono">Details &amp; credentials</summary><ul class="det">
+        <li>TryHackMe Pre Security Path — <a href="https://tryhackme-certificates.s3-eu-west-1.amazonaws.com/THM-Z8NA9FIYDI.pdf" target="_blank" rel="noopener noreferrer">certificate ↗</a></li>
+        <li>TryHackMe SEC0 — <a href="https://assets.tryhackme.com/certification-certificate/6a5f428c6161de0fadc8ae25.pdf" target="_blank" rel="noopener noreferrer">certificate ↗</a></li>
+        <li>TryHackMe Wireshark Basics — completed</li></ul></details>
+      <p class="links mono"><a data-cfg="tryhackme" href="#">TryHackMe profile ↗</a></p>
+    </div>
+  </article>
+
+  <div class="lab rv">
+    <p class="mono eyebrow">Small experiments · run entirely in your browser</p>
+    <div class="lab-grid">
+      <div class="panel"><p class="mono ph">Password strength estimate</p>
+        <label class="mono dim" for="pw">test a password — it never leaves your browser</label>
+        <div class="row"><input id="pw" type="password" autocomplete="off" spellcheck="false" placeholder="type something…"><button id="pw-eye" class="mini mono" type="button">SHOW</button></div>
+        <div class="meter"><i id="pw-bar"></i></div><p class="mono" id="pw-v">AWAITING INPUT</p>
+        <dl class="kv mono"><div><dt>Entropy</dt><dd id="pw-e">—</dd></div><div><dt>Offline crack time</dt><dd id="pw-t">—</dd></div></dl>
+        <p class="dim small">A rough estimate: length matters far more than clever symbols.</p></div>
+      <div class="panel"><p class="mono ph">HTTP header inspector</p>
+        <label class="mono dim" for="packet-input">inspect a sample HTTP request or response</label>
+        <textarea id="packet-input" rows="5" spellcheck="false" placeholder="GET / HTTP/1.1&#10;Host: example.com"></textarea>
+        <div class="row"><button id="packet-analyze" class="mini mono" type="button">ANALYZE</button><button id="packet-example" class="mini mono" type="button">LOAD SAMPLE</button></div>
+        <div id="packet-result" class="packet-result mono" aria-live="polite"><span class="dim">awaiting input · no data sent</span></div>
+        <p class="dim small">A learning aid, not a packet capture or vulnerability scanner.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="contact">
+  <p class="mono eyebrow rv">04 — Contact</p>
+  <h2 class="display rv">Every good discovery <em>begins with a question.</em></h2>
+  <ul class="contacts mono rv">
+    <li><a class="mag" data-cfg="email" href="#">Email ↗</a></li>
+    <li><a class="mag" data-cfg="github" href="#">GitHub ↗</a></li>
+    <li><a class="mag" data-cfg="linkedin" href="#">LinkedIn ↗</a></li>
+    <li><a class="mag" data-cfg="tryhackme" href="#">TryHackMe ↗</a></li>
+  </ul>
+</section>
+</main>
+
+<footer class="foot mono"><span>© <span id="yr"></span> Samanyu Dhangar</span><span>Static site · GitHub Pages</span><button id="top" type="button" aria-label="Back to top">Back to top ↑</button></footer>
+
+<noscript><style>.rv,[data-split]{opacity:1!important;transform:none!important}.ch{opacity:1!important}</style></noscript>
+<script src="js/config.js"></script>
+<script src="js/shapes.js" defer></script>
+<script src="js/particles.js" defer></script>
+<script src="js/scroll.js" defer></script>
+<script src="js/loader.js" defer></script>
+<script src="js/interactions.js" defer></script>
+<script src="js/projects.js" defer></script>
+<script src="js/lab.js" defer></script>
+<script src="js/main.js" defer></script>
+</body>
+</html>
