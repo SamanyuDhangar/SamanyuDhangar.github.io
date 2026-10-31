@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="clarity.css">
   <link rel="stylesheet" href="extras.css">
   <link rel="stylesheet" href="cinematic.css">
+  <link rel="stylesheet" href="maze.css">
 
   <noscript>
     <style>
@@ -60,7 +61,6 @@
       <a href="#journey">JOURNEY</a>
       <a href="#projects">PROJECTS</a>
       <a href="#shell">SHELL</a>
-      <a href="#lab">LAB</a>
       <a href="#contact">CONTACT</a>
     </nav>
   </header>
@@ -425,53 +425,6 @@
       </div>
     </section>
 
-    <!-- LAB (interactive security toys, all client-side) -->
-    <section id="lab" class="section content-section">
-      <div class="section-heading reveal">
-        <span>08</span>
-        <h2>LAB <em>// PLAYGROUND</em></h2>
-      </div>
-
-      <div class="lab-grid">
-        <div class="lab-card reveal">
-          <div class="panel-header"><span>PASSWORD_FORGE.exe</span><span>● LOCAL ONLY</span></div>
-          <div class="lab-body">
-            <label class="lab-label" for="pw-in">&gt; test a password — it never leaves your browser</label>
-            <div class="lab-row">
-              <input id="pw-in" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="type something…">
-              <button id="pw-eye" class="lab-btn" type="button" aria-pressed="false">SHOW</button>
-            </div>
-            <div class="pw-meter" aria-hidden="true"><i id="pw-bar"></i></div>
-            <p class="pw-verdict" id="pw-verdict" aria-live="polite">AWAITING INPUT</p>
-            <dl class="lab-stats">
-              <div><dt>ENTROPY</dt><dd id="pw-ent">—</dd></div>
-              <div><dt>OFFLINE CRACK TIME</dt><dd id="pw-time">—</dd></div>
-              <div><dt>CHARSET</dt><dd id="pw-pool">—</dd></div>
-            </dl>
-            <p class="lab-tip" id="pw-tip">A rough estimate: length matters far more than clever symbols.</p>
-          </div>
-        </div>
-
-        <div class="lab-card reveal">
-          <div class="panel-header"><span>HASH_FORGE.exe</span><span>● LOCAL ONLY</span></div>
-          <div class="lab-body">
-            <label class="lab-label" for="hash-in">&gt; turn any text into a fingerprint</label>
-            <textarea id="hash-in" rows="3" spellcheck="false" placeholder="type or paste text…"></textarea>
-            <div class="lab-row">
-              <select id="hash-algo" aria-label="Hash algorithm">
-                <option>SHA-256</option>
-                <option>SHA-512</option>
-                <option>SHA-1</option>
-              </select>
-              <button id="hash-copy" class="lab-btn" type="button">COPY</button>
-            </div>
-            <output id="hash-out" class="hash-out" for="hash-in hash-algo">—</output>
-            <p class="lab-tip">Change one letter and watch the whole hash change — that is the avalanche effect.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- CONTACT -->
     <section id="contact" class="section contact-section">
       <div class="contact-box reveal">
@@ -501,5 +454,6 @@
   <script src="cinematic.js" defer></script>
   <script src="experience.js" defer></script>
   <script src="extras.js" defer></script>
+  <script src="maze.js" defer></script>
 </body>
 </html>
