@@ -52,3 +52,22 @@
 .umenu.open{opacity:1;visibility:visible;translate:0 0}.umenu b{display:block;margin-bottom:8px;color:var(--ua);letter-spacing:.2em;font-size:11px}
 .umenu .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.umenu button{all:unset;cursor:pointer;padding:5px 9px;border:1px solid rgba(109,255,179,.35);border-radius:999px;font-size:11px;color:#d7fff0}.umenu button:hover{background:rgba(109,255,179,.14);border-color:var(--ua)}
 .umenu .log{max-height:130px;overflow:auto;margin-bottom:8px;color:#9fd6c2}.umenu input{width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid rgba(109,255,179,.3);border-radius:8px;background:#05090d;color:#e9fff5;font:inherit;outline:0}.umenu input:focus{border-color:var(--ua)}
+
+html,body{overflow-x:clip}
+.mmap{display:none!important}
+.section{will-change:translate}
+.ultron{animation:none!important;filter:none!important;transition:none!important;right:22px!important;bottom:92px!important}
+.ultron .ring{animation:none}
+.ultron .say{width:280px;max-width:62vw;white-space:pre-line}
+/* JOURNEY cards v2 */
+.timeline{gap:20px}
+.timeline-item{display:grid;grid-template-columns:72px 1fr;gap:20px;align-items:start;padding:24px 26px;overflow:hidden;box-shadow:inset 3px 0 0 var(--accent)}
+.timeline-index{margin:0;padding:0;border:0;border-radius:0;font:700 2.6rem/1 "Space Grotesk",sans-serif;color:transparent;-webkit-text-stroke:1px var(--accent);opacity:.85}
+.timeline-date{display:inline-block;margin:0 0 12px;padding:5px 12px;border-radius:999px;border:1px solid rgba(var(--scene),.4);background:rgba(var(--scene),.1);color:var(--accent);letter-spacing:.2em;font-size:.68rem}
+.timeline-item h3{margin:0 0 8px;font-size:1.35rem;color:#fff}
+.timeline-item p:last-child{margin:0;color:var(--muted);font-size:.95rem;line-height:1.7}
+.umenu{width:min(340px,calc(100vw - 32px))}
+.umenu .log{max-height:170px;display:flex;flex-direction:column;gap:6px}
+.umenu .log div{padding:6px 9px;border-radius:8px;background:rgba(109,255,179,.07)}
+.umenu .log .me{align-self:flex-end;background:rgba(123,199,255,.12);color:#cfe9ff}
+@media(max-width:760px){.timeline-item{grid-template-columns:48px 1fr;gap:12px;padding:18px}.timeline-index{font-size:1.9rem}}
