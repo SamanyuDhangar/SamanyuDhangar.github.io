@@ -147,7 +147,7 @@
     say(info, 9000); speak(SAY[id]);
   }
   function frame() {
-    tick = false; const vh = innerHeight, amp = innerWidth < 760 ? 0 : Math.min(innerWidth * .035, 40);
+    tick = false; const vh = innerHeight, amp = 0; /* sideways sway removed: sections stay centred */
     const r = secs.map((s) => s && s.getBoundingClientRect()); let cur = 0;
     r.forEach((b, i) => { if (b && b.top < vh * .5) cur = i; });
     if (amp === 0) secs.forEach((s) => { if (s && s.style.translate) { s.style.translate = ""; s.style.rotate = ""; } });
