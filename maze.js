@@ -55,7 +55,7 @@
   U.innerHTML = '<div class="say"></div><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke-width="1.2" stroke-dasharray="4 7" style="stroke:var(--ua)"/><path d="M50 12 78 26v30L50 86 22 56V26z" fill="#0b141b" stroke="#9fb4bf" stroke-width="3"/><path d="M50 12v22M22 26l28 8 28-8" stroke="#40525c" stroke-width="2" fill="none"/><path class="eye" d="M31 44h14l-3 8H34zM55 44h14l-3 8H58z"/><path d="M40 66h20" stroke="#ff4d5e" stroke-width="2.4" stroke-linecap="round"/></svg>';
   document.body.appendChild(U);
   const bubble = $(".say", U); let bT = 0;
-  function say(t, ms = 8000) { bubble.textContent = t; U.classList.add("talk"); clearTimeout(bT); bT = setTimeout(() => U.classList.remove("talk"), ms); }
+  function say(t, ms = 8000) { if (innerWidth < 760) t = t.split("\n")[0].slice(0, 90); bubble.textContent = t; U.classList.add("talk"); clearTimeout(bT); bT = setTimeout(() => U.classList.remove("talk"), ms); }
 
   /* ---------- chat menu ---------- */
   const M = document.createElement("div"); M.className = "umenu";
@@ -63,7 +63,7 @@
   M.innerHTML = '<b>ULTRON // CHAT</b><div class="chips">' + chips.map((c) => `<button type="button" data-c="${c[0]}">${c[1]}</button>`).join("") + '</div><div class="log"></div><input type="text" placeholder="say something to Ultron…" aria-label="Chat with Ultron" autocomplete="off">';
   document.body.appendChild(M);
   const log = $(".log", M), inp = $("input", M);
-  function add(t, who) { const d = document.createElement("div"); d.textContent = t; if (who) d.className = who; log.appendChild(d); while (log.children.length > 30) log.firstChild.remove(); log.scrollTop = log.scrollHeight; }
+  function add(t, who) { const d = document.createElement("div"); d.textContent = t; if (who) d.className = who; log.appendChild(d); while (log.children.length > 30) log.firstChild.remove(); log.scrollTop = log.scrollHeight; return d; }
   const idx = () => Math.max(0, CH.findIndex((c) => c[0] === lastSec));
   function bot(t, go) { add(t); say(t, 7000); speak(t); if (go) setTimeout(() => travel(go), 1800); }
   function act(c) {
@@ -74,6 +74,35 @@
     else if (c === "sound") f.toggleSound && f.toggleSound();
     else if (c === "voice") { voiceOn = !voiceOn; store.set("ultron-voice", voiceOn ? "on" : "off"); if (!voiceOn) { try { speechSynthesis.cancel(); } catch (e) { /* none */ } } started = true; bot(voiceOn ? "Voice enabled. Can you hear me?" : "Voice muted."); }
   }
+  /* page knowledge: the chat reads this site's own text */
+  const STOP = new Set("the a an and or of to in on is are was be do does did you your i me my it its for with what who how why when where can tell about this that there any some more".split(" "));
+  const chunks = []; let lastHit = "";
+  const hist = [];
+  function buildChunks() {
+    CH.forEach(([id], i) => { const s = secs[i]; if (!s || !i) return; $$("p,h3,li,.skill-card,.credential-item", s).forEach((e) => { const t = e.textContent.trim().replace(/\s+/g, " "); if (t.length > 28 && t.length < 360) chunks.push({ id, t, w: new Set(t.toLowerCase().match(/[a-z0-9+#]+/g) || []) }); }); });
+  }
+  function retrieve(q) {
+    if (!chunks.length) buildChunks();
+    const qs = (q.toLowerCase().match(/[a-z0-9+#]+/g) || []).filter((w) => !STOP.has(w) && w.length > 1); if (!qs.length) return null;
+    let best = null, bs = 0; chunks.forEach((c) => { let sc = 0; qs.forEach((w) => { if (c.w.has(w)) sc += 2; else if (w.length > 3 && [...c.w].some((x) => x.startsWith(w))) sc += 1; }); if (sc > bs) { bs = sc; best = c; } });
+    return bs >= 2 ? best : null;
+  }
+  function ctxText() { if (!chunks.length) buildChunks(); return chunks.map((c) => c.id + ": " + c.t).join("\n").slice(0, 3500); }
+  async function ask(q) {
+    started = true; add(q, "me"); hist.push({ role: "user", content: q });
+    const t = q.toLowerCase().trim(), hit = Object.keys(KB).find((id) => KB[id].some((w) => t.includes(w)));
+    if (/^(tour|map|next|prev|top|theme|sound|voice)$/.test(t)) return act(t);
+    if (/\b(take me|go to|show me|open|scroll to)\b/.test(t) && hit) { lastHit = hit; return bot("Heading to " + CH.find((x) => x[0] === hit)[2] + ".", hit); }
+    if (window.ULTRON_API) {
+      const th = add("…", "think");
+      try {
+        const r = await fetch(window.ULTRON_API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: hist.slice(-10), context: ctxText() }) });
+        const d = await r.json(); th.remove();
+        if (d.reply) { hist.push({ role: "assistant", content: d.reply }); return bot(d.reply); }
+      } catch (e) { th.remove(); }
+    }
+    reply(q);
+  }
   const KB = { about: ["who is", "about", "samanyu", "bio", "owner", "creator"], mission: ["mission", "goal", "target", "aim", "dream"], skills: ["skill", "tech", "stack", "language", "tool", "good at"], journey: ["journey", "timeline", "path", "history", "story", "learning"], projects: ["project", "build", "lab", "work", "github", "made"], certifications: ["cert", "credential", "badge", "course", "proof"], shell: ["terminal", "shell", "command"], contact: ["contact", "hire", "email", "reach", "linkedin", "message", "connect"] };
   const JOKES = ["Why did the hacker leave the party? Too many open ports.", "There are 10 kinds of people: those who know binary and those who don't.", "My password is the last thing I'd tell you. It is also the first thing I forget.", "Why do Linux users never get lost? They always know their root directory."];
   let myName = store.get("ultron-name") || "";
@@ -81,6 +110,7 @@
     const t = q.toLowerCase().trim(), nm = myName ? ", " + myName : "";
     let m;
     if ((m = t.match(/(?:my name is|i am|i'm|call me)\s+([a-z]{2,20})$/)) && !/ultron|fine|good|ok/.test(m[1])) { myName = m[1][0].toUpperCase() + m[1].slice(1); store.set("ultron-name", myName); return bot(`Nice to meet you, ${myName}. I will remember that.`); }
+    if (/^(more|tell me more|yes|yeah|sure|ok|okay|go on|go)$/.test(t) && lastHit) return bot("Heading there.", lastHit);
     if (/^(hi|hello|hey|yo|sup|hola|namaste)\b/.test(t)) return bot(`Hello${nm}. I am Ultron, the guide of this site. Ask me anything.`);
     if (/how are you|how r u|what's up|whats up/.test(t)) return bot("All systems nominal. Thanks for asking. How are you?");
     if (/^(i'm|i am|im) (fine|good|great|ok|okay|well)|^(fine|good|great|ok|okay)$/.test(t)) return bot("Good to hear. Shall I show you around?");
@@ -94,13 +124,14 @@
     if (/^(tour|map|next|prev|top|theme|sound|voice)$/.test(t)) return act(t);
     if (/go to|take me|show me|open/.test(t) || true) {
       const hit = Object.keys(KB).find((id) => KB[id].some((w) => t.includes(w)));
-      if (hit) { const sec = document.getElementById(hit), p = $("p:not(.kicker)", sec), c = CH.find((x) => x[0] === hit); return bot(`${c[2]}: ${(p ? p.textContent : c[3]).trim().replace(/\s+/g, " ").slice(0, 160)}`, hit); }
+      if (hit) { lastHit = hit; const sec = document.getElementById(hit), p = $("p:not(.kicker)", sec), c = CH.find((x) => x[0] === hit); return bot(`${c[2]}: ${(p ? p.textContent : c[3]).trim().replace(/\s+/g, " ").slice(0, 160)}`, hit); }
     }
+    const rc = retrieve(t); if (rc) { lastHit = rc.id; return bot(rc.t.slice(0, 200) + " Want me to take you there?"); }
     if (/\?$/.test(t)) return bot("Good question. I only know this site well, but I can show you Samanyu's skills, projects and journey. Want a tour?");
     return bot(["Interesting. Tell me more.", "I am listening. Ask about skills, projects or contact, or just talk.", "Understood. Want me to take you somewhere?"][(Math.random() * 3) | 0]);
   }
   M.addEventListener("click", (e) => { const b = e.target.closest("[data-c]"); if (b) act(b.dataset.c); });
-  inp.addEventListener("keydown", (e) => { e.stopPropagation(); if (e.key === "Enter" && inp.value.trim()) { started = true; add(inp.value, "me"); reply(inp.value); inp.value = ""; } });
+  inp.addEventListener("keydown", (e) => { e.stopPropagation(); if (e.key === "Enter" && inp.value.trim()) { ask(inp.value); inp.value = ""; } });
   U.addEventListener("click", () => {
     started = true; M.classList.toggle("open");
     if (M.classList.contains("open")) { fx().autoSound && fx().autoSound(); if (!log.children.length) bot(`Hello${myName ? ", " + myName : ""}. I am Ultron. Talk to me, or ask about skills, projects, journey or contact.`); inp.focus(); }
@@ -116,10 +147,11 @@
     say(info, 9000); speak(SAY[id]);
   }
   function frame() {
-    tick = false; const vh = innerHeight, amp = Math.min(innerWidth * .035, 40);
+    tick = false; const vh = innerHeight, amp = innerWidth < 760 ? 0 : Math.min(innerWidth * .035, 40);
     const r = secs.map((s) => s && s.getBoundingClientRect()); let cur = 0;
     r.forEach((b, i) => { if (b && b.top < vh * .5) cur = i; });
-    if (!reduce) r.forEach((b, i) => {
+    if (amp === 0) secs.forEach((s) => { if (s && s.style.translate) { s.style.translate = ""; s.style.rotate = ""; } });
+    else if (!reduce) r.forEach((b, i) => {
       if (!b || !i || b.bottom < -vh || b.top > vh * 2) return;
       const w = Math.sin(((b.top + b.height / 2 - vh / 2) / vh) * 1.5 + i * 1.3);
       secs[i].style.translate = (w * amp).toFixed(1) + "px 0"; secs[i].style.rotate = (w * .25).toFixed(2) + "deg";
