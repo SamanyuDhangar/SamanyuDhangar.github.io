@@ -26,13 +26,13 @@
     contact:        { c: [205, 125, 170], fog: .70, name: "Horizon" }
   };
   const SHIFT = { about: -.2, mission: .2, skills: -.2, journey: .2, projects: 0, certifications: -.2, shell: .2, contact: 0, home: 0 };
-  let vxo = 0, vxt = 0;
+  let vxo = 0, vxt = 0, fogCur = .5;
   let cur = [...SCENES.home.c], tgt = [...SCENES.home.c], fogT = .55;
 
   /* ---- sizing / quality ---- */
   let W = 0, H = 0, dpr = 1, VX = 0, VY = 0;
   const resize = () => {
-    dpr = Math.min(devicePixelRatio || 1, small ? 1.25 : 1.5);
+    dpr = Math.min(devicePixelRatio || 1, 1);
     W = innerWidth; H = innerHeight;
     cv.width = W * dpr; cv.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -42,10 +42,10 @@
   let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => { resize(); draw(0, true); }, 120); });
 
   /* ---- world ---- */
-  const N_TRAIL = small ? 9 : 16, N_DUST = small ? 38 : 80;
+  const N_TRAIL = small ? 5 : 8, N_DUST = small ? 18 : 36;
   const trails = Array.from({ length: N_TRAIL }, () => ({ x: (Math.random() * 2 - 1) * 1.6, z: Math.random(), s: .12 + Math.random() * .22, a: .25 + Math.random() * .5 }));
   const dust = Array.from({ length: N_DUST }, () => ({ x: Math.random() * 2 - 1, y: Math.random() * 2 - 1, z: Math.random(), r: .4 + Math.random() * 1.1 }));
-  const stars = Array.from({ length: small ? 40 : 90 }, () => ({ x: Math.random(), y: Math.random() * .42, t: Math.random() * 6.28, r: Math.random() * .9 + .2 }));
+  const stars = Array.from({ length: small ? 24 : 50 }, () => ({ x: Math.random(), y: Math.random() * .42, t: Math.random() * 6.28, r: Math.random() * .9 + .2 }));
 
   /* ---- scroll state ---- */
   let sp = 0, spS = 0, vel = 0, lastY = scrollY, dist = 0;
@@ -57,9 +57,7 @@
 
   function draw(dt, still) {
     ctx.clearRect(0, 0, W, H);
-    const horizon = ctx.createLinearGradient(0, 0, 0, H);
-    horizon.addColorStop(0, "#02040a"); horizon.addColorStop(.4, "#050912"); horizon.addColorStop(1, "#03050a");
-    ctx.fillStyle = horizon; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#04070d"; ctx.fillRect(0, 0, W, H);
 
     // distant glow at the vanishing point
     const g = ctx.createRadialGradient(VX, VY, 0, VX, VY, Math.max(W, H) * .5);
@@ -75,14 +73,12 @@
     ctx.globalAlpha = 1;
 
     // road lane lines converge on the horizon
-    const lanes = small ? 5 : 9, span = W * 1.9;
+    const lanes = small ? 3 : 6, span = W * 1.9;
     ctx.lineWidth = 1;
     for (let i = -lanes; i <= lanes; i++) {
       const bx = VX + (i / lanes) * span * .5;
       const edge = Math.abs(i) / lanes;
-      const lg = ctx.createLinearGradient(VX, VY, bx, H);
-      lg.addColorStop(0, "transparent"); lg.addColorStop(.35, rgba(.05 + (1 - edge) * .06)); lg.addColorStop(1, rgba(.2 * (1 - edge * .6)));
-      ctx.strokeStyle = lg; ctx.beginPath(); ctx.moveTo(VX, VY); ctx.lineTo(bx, H + 40); ctx.stroke();
+      ctx.strokeStyle = rgba(.05 + (1 - edge) * .1); ctx.beginPath(); ctx.moveTo(VX, VY); ctx.lineTo(bx, H + 40); ctx.stroke();
     }
     // cross bars rush toward the camera as you scroll
     const rows = small ? 10 : 16, off = (dist * .0016) % 1;
@@ -93,8 +89,8 @@
     }
 
     // maze door-frames glide toward you down the corridor
-    for (let k = 0; k < 6; k++) {
-      const z = ((k / 6) + off) % 1, p = proj(z), y = VY + (H - VY) * p, hw = W * .34 * p, hh = H * .5 * p;
+    for (let k = 0; k < 4; k++) {
+      const z = ((k / 4) + off) % 1, p = proj(z), y = VY + (H - VY) * p, hw = W * .34 * p, hh = H * .5 * p;
       ctx.strokeStyle = rgba(.04 + z * .32); ctx.lineWidth = .8 + z * 1.6;
       ctx.strokeRect(VX - hw, y - hh, hw * 2, hh);
       ctx.beginPath(); ctx.moveTo(VX - hw, y - hh * .5); ctx.lineTo(VX - hw * 1.5, y - hh * .5); ctx.moveTo(VX + hw, y - hh * .5); ctx.lineTo(VX + hw * 1.5, y - hh * .5); ctx.stroke();
@@ -149,6 +145,7 @@
   let last = performance.now(), run = true, hudT = 0;
   const frame = (now) => {
     if (!run) return;
+    if (now - last < 30) { requestAnimationFrame(frame); return; }
     const dt = Math.min((now - last) / 1000, .05); last = now;
     sp = clamp(scrollY / max(), 0, 1);
     vxo += (vxt - vxo) * (1 - Math.exp(-dt * 1.4)); VX = W / 2 + vxo * W;
@@ -156,9 +153,9 @@
     dist += dy;
     vel += (clamp(dy / (dt * 1000 + 1) * .5, 0, 1.4) - vel) * (1 - Math.exp(-dt * 6));
     for (let i = 0; i < 3; i++) cur[i] = lerp(cur[i], tgt[i], 1 - Math.exp(-dt * 1.6));
-    const fogNow = lerp(parseFloat(getComputedStyle(root).getPropertyValue("--fog")) || .5, fogT, .04);
+    const fogNow = (fogCur = lerp(fogCur, fogT, .04));
     hudT += dt;
-    if (hudT > .12) { hudT = 0; root.style.setProperty("--scene", `${cur[0] | 0},${cur[1] | 0},${cur[2] | 0}`); root.style.setProperty("--fog", fogNow.toFixed(3)); hd.textContent = String(Math.round(dist / 12)).padStart(3, "0"); }
+    if (hudT > .4) { hudT = 0; root.style.setProperty("--scene", `${cur[0] | 0},${cur[1] | 0},${cur[2] | 0}`); root.style.setProperty("--fog", fogNow.toFixed(3)); hd.textContent = String(Math.round(dist / 12)).padStart(3, "0"); }
     draw(dt);
     requestAnimationFrame(frame);
   };
