@@ -76,24 +76,24 @@
     const lanes = small ? 3 : 6, span = W * 1.9;
     ctx.lineWidth = 1;
     for (let i = -lanes; i <= lanes; i++) {
-      const bx = VX + (i / lanes) * span * .5;
+      const sway = VX - W / 2, bx = W / 2 + (i / lanes) * span * .5;
       const edge = Math.abs(i) / lanes;
-      ctx.strokeStyle = rgba(.05 + (1 - edge) * .1); ctx.beginPath(); ctx.moveTo(VX, VY); ctx.lineTo(bx, H + 40); ctx.stroke();
+      ctx.strokeStyle = rgba(.05 + (1 - edge) * .1); ctx.beginPath(); ctx.moveTo(VX, VY); const mid = W / 2 + (bx - W / 2) * .5 + sway * .25; ctx.quadraticCurveTo(2 * mid - (VX + bx) / 2, (VY + H + 40) / 2, bx, H + 40); ctx.stroke();
     }
     // cross bars rush toward the camera as you scroll
     const rows = small ? 10 : 16, off = (dist * .0016) % 1;
     for (let k = 0; k < rows; k++) {
       const z = ((k / rows) + off) % 1, y = VY + (H - VY) * proj(z);
-      const half = span * .5 * proj(z);
-      ctx.strokeStyle = rgba(.03 + z * .14); ctx.beginPath(); ctx.moveTo(VX - half, y); ctx.lineTo(VX + half, y); ctx.stroke();
+      const half = span * .5 * proj(z), cxr = W / 2 + (VX - W / 2) * Math.pow(1 - proj(z), 2);
+      ctx.strokeStyle = rgba(.03 + z * .14); ctx.beginPath(); ctx.moveTo(cxr - half, y); ctx.lineTo(cxr + half, y); ctx.stroke();
     }
 
     // maze door-frames glide toward you down the corridor
     for (let k = 0; k < 4; k++) {
-      const z = ((k / 4) + off) % 1, p = proj(z), y = VY + (H - VY) * p, hw = W * .34 * p, hh = H * .5 * p;
+      const z = ((k / 4) + off) % 1, p = proj(z), y = VY + (H - VY) * p, hw = W * .34 * p, hh = H * .5 * p, cxf = W / 2 + (VX - W / 2) * Math.pow(1 - p, 2);
       ctx.strokeStyle = rgba(.04 + z * .32); ctx.lineWidth = .8 + z * 1.6;
-      ctx.strokeRect(VX - hw, y - hh, hw * 2, hh);
-      ctx.beginPath(); ctx.moveTo(VX - hw, y - hh * .5); ctx.lineTo(VX - hw * 1.5, y - hh * .5); ctx.moveTo(VX + hw, y - hh * .5); ctx.lineTo(VX + hw * 1.5, y - hh * .5); ctx.stroke();
+      ctx.strokeRect(cxf - hw, y - hh, hw * 2, hh);
+      ctx.beginPath(); ctx.moveTo(cxf - hw, y - hh * .5); ctx.lineTo(cxf - hw * 1.5, y - hh * .5); ctx.moveTo(cxf + hw, y - hh * .5); ctx.lineTo(cxf + hw * 1.5, y - hh * .5); ctx.stroke();
     }
     // light trails
     ctx.lineCap = "round";
@@ -148,6 +148,7 @@
     if (now - last < 30) { requestAnimationFrame(frame); return; }
     const dt = Math.min((now - last) / 1000, .05); last = now;
     sp = clamp(scrollY / max(), 0, 1);
+    vxt = Math.sin(sp * 16) * .3;
     vxo += (vxt - vxo) * (1 - Math.exp(-dt * 1.4)); VX = W / 2 + vxo * W;
     const dy = Math.abs(scrollY - lastY); lastY = scrollY;
     dist += dy;
