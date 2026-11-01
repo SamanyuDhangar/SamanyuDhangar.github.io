@@ -310,7 +310,7 @@
     const lines = (arr, cls = "out") => arr.map((t) => L(t, cls));
 
     const cmds = {
-      help: () => [L("available commands:", "dim"), ...lines(["  whoami      who am I", "  goal        what I'm aiming for", "  focus       cat focus.txt", "  about       short profile", "  skills      toolchain", "  projects    lab work", "  journey     milestones", "  credentials certificates", "  contact     find me online", "  ls          list sections", "  goto <name> jump to a section", "  clear       clear the screen", "  neofetch    system summary", "  theme       cycle colour theme", "  cinema      hide the UI, admire the sky", "  matrix      ???", "  ./build_future.sh"])],
+      help: () => [L("available commands:", "dim"), ...lines(["  whoami      who am I", "  goal        what I'm aiming for", "  focus       cat focus.txt", "  about       short profile", "  skills      toolchain", "  projects    lab work", "  journey     milestones", "  credentials certificates", "  contact     find me online", "  ls          list sections", "  goto <name> jump to a section", "  clear       clear the screen", "  neofetch    system summary", "  theme       cycle colour theme", "        hide the UI, admire the sky", "  matrix      ???", "  ./build_future.sh"])],
       whoami: () => lines(["Samanyu"]),
       goal: () => lines(["Aspiring AI & Cloud Cybersecurity Engineer."]),
       focus: () => lines(["networking", "linux", "cybersecurity", "cloud security", "ai security"]),
@@ -323,7 +323,6 @@
       ls: () => lines(["about  mission  skills  journey  projects  certifications  shell  contact"]),
       neofetch: () => lines(["samanyu@eclipse", "---------------", "role        aspiring AI & cloud cybersecurity engineer", "base        India", "foundation  networking / linux", "focus       cloud + ai security", "status      learning // building"]),
       theme: () => { const n = window.eclipseFx && window.eclipseFx.nextTheme(); return [L(n ? `theme → ${n}` : "themes unavailable", n ? "out" : "err")]; },
-      cinema: () => { window.eclipseFx && window.eclipseFx.cinema(true); return [L("entering cinema mode — press Esc to return", "dim")]; },
       matrix: () => { window.eclipseFx && window.eclipseFx.matrix(); return [L("wake up, samanyu…", "dim")]; },
       "sudo hire-me": () => [L("samanyu is not in the sudoers file. This incident will be reported.", "err"), L("…but you can say hi: type 'contact'", "dim")],
       "./build_future.sh": () => [L("[ OK ] networking"), L("[ OK ] linux"), L("[ OK ] wireshark"), L("[ .. ] cloud security   (in progress)", "dim"), L("[ .. ] ai security      (in progress)", "dim"), L("build running — keep learning.", "dim")]
