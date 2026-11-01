@@ -89,3 +89,12 @@ html,body{overflow-x:clip}
   .hub-grid button,.hub-grid a{padding:11px;font-size:11px}
   .timeline{padding-left:26px;gap:14px}.timeline-item::before{left:-32px}.timeline-item::after{left:-22px;width:22px}
 }
+
+/* no sideways drift: sections and content only rise in vertically */
+.section,.section[data-dir]{--dx:0px!important;will-change:auto!important;translate:none}
+
+/* NO LATERAL DRIFT: the old 3D "fly-in" (perspective + depth) pulled boxes sideways toward the centre.
+   Boxes now only fade and rise straight up, with no scale, rotation, blur or depth. */
+.js-maze .reveal,.js-maze .section .reveal{opacity:0;transform:none!important;filter:none!important;scale:1!important;translate:0 28px;transition:opacity .7s ease,translate .8s cubic-bezier(.2,.8,.2,1)}
+.js-maze .reveal.visible,.js-maze .section .reveal.visible{opacity:1;translate:0 0}
+@media(prefers-reduced-motion:reduce){.js-maze .reveal,.js-maze .section .reveal{translate:0 0;transition:none;opacity:1}}
