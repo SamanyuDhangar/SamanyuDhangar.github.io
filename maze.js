@@ -74,16 +74,47 @@
   document.body.appendChild(U);
   const say = $(".say", U); let talkT = 0;
   const LINES = ["Scanning visitor. Curiosity level: high.", "Every chamber hides a secret. Keep moving.", "Press the sound button for my full voice.", "Try the terminal. Type help.", "Samanyu builds. I observe."];
-  function talk(t) {
+  function talk(t, voice) {
     if (!t) return; say.textContent = t; U.classList.add("talk"); clearTimeout(talkT); talkT = setTimeout(() => U.classList.remove("talk"), 4200);
-    if (fx().soundOn && fx().soundOn() && "speechSynthesis" in window) {
+    if (voice && fx().soundOn && fx().soundOn() && "speechSynthesis" in window) {
       try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t); u.pitch = .1; u.rate = .82; u.volume = 1;
         const v = speechSynthesis.getVoices().filter((x) => /en/i.test(x.lang)); const m = v.find((x) => /male|david|daniel|alex|google uk english male|fred/i.test(x.name)) || v[0]; if (m) u.voice = m;
         fx().sfx && fx().sfx("blip"); speechSynthesis.speak(u); } catch (e) { /* voice unavailable */ }
     }
   }
   function moveUltron(i) { const left = i % 2 === 1; U.style.right = left ? "calc(100% - 96px)" : "22px"; U.style.bottom = (92 + (i % 3) * 120) + "px"; if (innerWidth < 760) { U.style.right = "10px"; } }
-  U.addEventListener("click", () => { talk(LINES[(Math.random() * LINES.length) | 0]); });
+  const KB = { about: ["who", "about", "samanyu", "bio", "you"], mission: ["mission", "goal", "target", "aim"], skills: ["skill", "tech", "know", "stack", "language", "tool"], journey: ["journey", "timeline", "path", "history", "story"], projects: ["project", "build", "lab", "work", "github", "made"], certifications: ["cert", "credential", "badge", "course", "proof"], shell: ["terminal", "shell", "command"], contact: ["contact", "hire", "email", "reach", "connect", "linkedin", "message"] };
+  const M = document.createElement("div"); M.className = "umenu";
+  M.innerHTML = '<b>ULTRON // ASSISTANT</b><div class="chips">' + [["tour", "▶ Tour"], ["map", "Map"], ["prev", "◀ Prev"], ["next", "Next ▶"], ["top", "Top"], ["theme", "Theme"], ["sound", "Sound"], ["cinema", "Cinema"]].map((c) => `<button type="button" data-c="${c[0]}">${c[1]}</button>`).join("") + '</div><div class="log">Ask me about skills, projects, journey, certificates or contact.</div><input type="text" placeholder="ask ultron…" aria-label="Ask Ultron" autocomplete="off">';
+  document.body.appendChild(M);
+  const log = $(".log", M), inp = $("input", M);
+  const idx = () => Math.max(0, CH.findIndex((c) => c[0] === lastSec));
+  function reply(t) { log.textContent = t; talk(t, true); }
+  function act(c) {
+    const f = fx();
+    if (c === "tour") { M.classList.remove("open"); tour(); }
+    else if (c === "map") { M.classList.remove("open"); open(hub, "Maze map online."); }
+    else if (c === "prev") travel(CH[Math.max(0, idx() - 1)][0]);
+    else if (c === "next") travel(CH[Math.min(CH.length - 1, idx() + 1)][0]);
+    else if (c === "top") travel("home");
+    else if (c === "theme") { f.nextTheme && f.nextTheme(); reply("Theme cycled."); }
+    else if (c === "sound") { f.toggleSound && f.toggleSound(); }
+    else if (c === "cinema") { f.cinema && f.cinema(); reply("Cinema mode toggled."); }
+  }
+  function ask(q) {
+    q = q.toLowerCase().trim(); if (!q) return;
+    if (/^(tour|map|next|prev|top|theme|sound|cinema)$/.test(q)) return act(q);
+    if (/help|what can/.test(q)) return reply("Try: skills, projects, journey, certificates, contact, tour, next, top.");
+    const hit = Object.keys(KB).find((id) => KB[id].some((w) => q.includes(w)));
+    if (!hit) return reply("No match in my database. Try skills, projects or contact.");
+    const sec = document.getElementById(hit), p = sec && $("p", sec), c = CH.find((x) => x[0] === hit);
+    const snip = p ? p.textContent.trim().replace(/\s+/g, " ").slice(0, 150) : c[3];
+    reply(`${c[2]}: ${snip}`); setTimeout(() => travel(hit, "Arrived."), 1800);
+  }
+  M.addEventListener("click", (e) => { const b = e.target.closest("[data-c]"); if (b) act(b.dataset.c); });
+  inp.addEventListener("keydown", (e) => { if (e.key === "Enter") { ask(inp.value); inp.value = ""; } e.stopPropagation(); });
+  U.addEventListener("click", () => { M.classList.toggle("open"); if (M.classList.contains("open")) { fx().autoSound && fx().autoSound(); talk(LINES[(Math.random() * LINES.length) | 0], true); } });
+  document.addEventListener("pointerdown", (e) => { if (!M.contains(e.target) && !U.contains(e.target)) M.classList.remove("open"); });
 
   /* hub (ENTER SYSTEM) and secure channel (CONNECT) */
   function overlay(cls, inner) {
@@ -94,7 +125,7 @@
   const chan = overlay("chan", `<h3>SECURE CHANNEL // OPEN</h3><p class="sub">Encrypted link established. Choose a route to Samanyu.</p><div class="hub-grid">${[["GITHUB", "Code and projects", "https://github.com/SamanyuDhangar"], ["LINKEDIN", "Professional profile", "https://www.linkedin.com/in/samanyu-dhangar-191529413/"], ["TRYHACKME", "Labs and rooms", "https://tryhackme.com/p/NatsukiSubaru"], ["EMAIL", "Send a message", "mailto:00natsukisubaru@proton.me"]].map((l, i) => `<a href="${l[2]}" ${l[2].startsWith("http") ? 'target="_blank" rel="noopener"' : ""} style="animation-delay:${i * 90}ms">${l[0]} ↗<small>${l[1]}</small></a>`).join("")}</div>`);
   hub.addEventListener("click", (e) => { const b = e.target.closest("[data-id]"); if (b) travel(b.dataset.id); else if (e.target.closest(".tour")) tour(); });
   function closeAll() { hub.classList.remove("open"); chan.classList.remove("open"); }
-  function open(w, line) { started = true; const f = fx(); if (f.autoSound) f.autoSound(); w.classList.add("open"); f.sfx && f.sfx("open"); setTimeout(() => talk(line), 500); }
+  function open(w, line) { started = true; const f = fx(); if (f.autoSound) f.autoSound(); w.classList.add("open"); f.sfx && f.sfx("open"); setTimeout(() => talk(line, true), 500); }
   addEventListener("keydown", (e) => { if (e.key === "Escape") closeAll(); });
   $$('a[href="#projects"].btn-primary').forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); open(hub, "Maze map online. Choose a chamber, visitor."); }));
   $$('.hero-actions a[href="#contact"]').forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); open(chan, "Secure channel open. Speak freely."); }));
