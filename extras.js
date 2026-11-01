@@ -2,7 +2,7 @@
    • Command palette   Ctrl/⌘ + K  or  /   — jump anywhere, open links, run actions
    • Colour themes     4 palettes; the whole site and the background re-colour live
    • Sound             evolving ambient music + click/hover/open sounds (off by default)
-   • Cinema mode       V — hide the interface and just watch the sky
+   
    • Root access       Konami code, `matrix` in the shell, or click the logo 5 times
    • Lab               password strength estimator + hash generator (all local)
    Nothing here touches the background's behaviour with the cursor or scroll. */
@@ -306,7 +306,6 @@
     items.push(
       { label: "Cycle colour theme", tag: "ACTION", run: nextTheme },
       { label: "Toggle ambient sound", tag: "ACTION", run: toggleSound },
-      { label: "Cinema mode — hide the UI", tag: "ACTION", run: () => cinema(true) },
       { label: "Root access (matrix)", tag: "SECRET", run: matrix },
       { label: "Copy link to this page", tag: "ACTION", run: () => { (navigator.clipboard ? navigator.clipboard.writeText(location.href) : Promise.reject()).then(() => toast("link copied"), () => toast("couldn't copy — copy it from the address bar")); } }
     );
@@ -365,7 +364,6 @@
       else if (e.key === "Escape") { if (wrap.classList.contains("open")) closePal(); else if (root.classList.contains("cinema")) cinema(false); }
       else if (!isTyping(e.target) && !e.ctrlKey && !e.metaKey && !e.altKey) {
         if (e.key === "/") { e.preventDefault(); openPal(); }
-        else if (k === "v") cinema();
       }
     });
     return openPal;
@@ -381,8 +379,7 @@
     d.innerHTML =
       `<button type="button" id="dock-cmd" aria-label="Open command palette"><b>⌕</b><span>COMMANDS</span><kbd>${mac ? "⌘K" : "CTRL K"}</kbd></button>` +
       '<button type="button" id="dock-theme" aria-label="Change colour theme"><i class="swatch"></i><span>THEME</span></button>' +
-      '<button type="button" id="dock-sound" aria-label="Toggle ambient sound" aria-pressed="false"><b>♪</b><span>SOUND</span></button>' +
-      '<button type="button" id="dock-view" aria-label="Cinema mode: hide the interface"><b>◎</b><span>VIEW</span></button>';
+      '<button type="button" id="dock-sound" aria-label="Toggle ambient sound" aria-pressed="false"><b>♪</b><span>SOUND</span></button>';
     document.body.appendChild(d);
     const hint = document.createElement("div");
     hint.className = "cinema-hint";
@@ -391,7 +388,6 @@
     $("#dock-cmd").addEventListener("click", openPal);
     $("#dock-theme").addEventListener("click", nextTheme);
     $("#dock-sound").addEventListener("click", toggleSound);
-    $("#dock-view").addEventListener("click", () => cinema());
   }
 
   /* ============================== ROOT ACCESS ========================== */
