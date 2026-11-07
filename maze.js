@@ -27,7 +27,7 @@
     const el = document.getElementById(id); if (!el || busy) return;
     const c = CH.find((x) => x[0] === id);
     if (reduce) { el.scrollIntoView(); return; }
-    busy = true; closeAll(); M.classList.remove("open");
+    busy = true; closeAll(); if (!window.UltronUI) M.classList.remove("open");   /* upgraded chat stays open while you travel */
     warp.innerHTML = `<b>ENTERING ${c ? c[2] : id.toUpperCase()}</b>`; warp.classList.add("go");
     setTimeout(() => el.scrollIntoView({ behavior: "auto" }), 400);
     setTimeout(() => { warp.classList.remove("go"); busy = false; }, 850);
@@ -63,7 +63,8 @@
   M.innerHTML = '<b>ULTRON // CHAT</b><div class="chips">' + chips.map((c) => `<button type="button" data-c="${c[0]}">${c[1]}</button>`).join("") + '</div><div class="log"></div><input type="text" placeholder="say something to Ultron…" aria-label="Chat with Ultron" autocomplete="off">';
   document.body.appendChild(M);
   const log = $(".log", M), inp = $("input", M);
-  function add(t, who) { const d = document.createElement("div"); d.textContent = t; if (who) d.className = who; log.appendChild(d); while (log.children.length > 30) log.firstChild.remove(); log.scrollTop = log.scrollHeight; return d; }
+  function add(t, who) { if (window.UltronUI) return window.UltronUI.add(t, who);   /* upgraded chat box (ultron-chat.js) */
+    const d = document.createElement("div"); d.textContent = t; if (who) d.className = who; log.appendChild(d); while (log.children.length > 30) log.firstChild.remove(); log.scrollTop = log.scrollHeight; return d; }
   const idx = () => Math.max(0, CH.findIndex((c) => c[0] === lastSec));
   function bot(t, go) { add(t); say(t, 7000); speak(t); if (go) setTimeout(() => travel(go), 1800); }
   function act(c) {
@@ -90,6 +91,7 @@
   function ctxText() { if (!chunks.length) buildChunks(); return chunks.map((c) => c.id + ": " + c.t).join("\n").slice(0, 3500); }
   async function ask(q) {
     started = true; add(q, "me"); hist.push({ role: "user", content: q });
+    if (window.UltronBrain) { try { if (await window.UltronBrain.handle(q)) return; } catch (e) { /* fall back to the classic brain */ } }
     const t = q.toLowerCase().trim(), hit = Object.keys(KB).find((id) => KB[id].some((w) => t.includes(w)));
     if (/^(tour|map|next|prev|top|theme|sound|voice)$/.test(t)) return act(t);
     if (/\b(take me|go to|show me|open|scroll to)\b/.test(t) && hit) { lastHit = hit; return bot("Heading to " + CH.find((x) => x[0] === hit)[2] + ".", hit); }
@@ -134,7 +136,7 @@
   inp.addEventListener("keydown", (e) => { e.stopPropagation(); if (e.key === "Enter" && inp.value.trim()) { ask(inp.value); inp.value = ""; } });
   U.addEventListener("click", () => {
     started = true; M.classList.toggle("open");
-    if (M.classList.contains("open")) { fx().autoSound && fx().autoSound(); if (!log.children.length) bot(`Hello${myName ? ", " + myName : ""}. I am Ultron. Talk to me, or ask about skills, projects, journey or contact.`); inp.focus(); }
+    if (M.classList.contains("open")) { fx().autoSound && fx().autoSound(); if (window.UltronUI ? window.UltronUI.needsGreeting() : !log.children.length) { if (window.UltronUI) window.UltronUI.greet(myName); else bot(`Hello${myName ? ", " + myName : ""}. I am Ultron. Talk to me, or ask about skills, projects, journey or contact.`); } window.UltronUI ? window.UltronUI.focus() : inp.focus(); }
   });
   document.addEventListener("pointerdown", (e) => { if (!M.contains(e.target) && !U.contains(e.target)) M.classList.remove("open"); });
 
@@ -181,5 +183,7 @@
   $$('a[href="#projects"].btn-primary').forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); open(hub, "Road map online. Choose a chamber."); }));
   $$('.hero-actions a[href="#contact"]').forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); open(chan, "Secure channel open. Speak freely."); }));
   function tour() { closeAll(); let i = 1; const step = () => { if (i >= CH.length) return; travel(CH[i++][0]); setTimeout(step, 6500); }; step(); }
+  window.UltronCore = { M, U, CH, KB, say, speak, bot, act, ask, travel, tour, open, hub, chan, store, hist, retrieve, getSection: () => lastSec, isVoice: () => voiceOn, getName: () => myName };
+  window.dispatchEvent(new Event("ultron:core"));
   frame();
 })();
