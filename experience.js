@@ -122,7 +122,7 @@
     scrollFns.push(() => {
       const max = document.documentElement.scrollHeight - innerHeight;
       const p = max > 0 ? clamp(scrollY / max, 0, 1) : 0;
-      bar.style.transform = `scaleX(${p})`;
+      if (bar) bar.style.transform = `scaleX(${p})`;
       rail.style.setProperty("--p", p.toFixed(3));
     });
     const io = new IntersectionObserver((entries) => {
@@ -172,6 +172,7 @@
 
   /* ---------- Section headings decrypt on reveal ---------- */
   function initHeadings() {
+    return;   // slides: headings are always shown as written, no scroll-triggered decrypt
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
         if (!e.isIntersecting) return;
@@ -193,7 +194,7 @@
       el.innerHTML = words.map((w) => `<span class="w" aria-hidden="true">${w}</span>`).join(" ");
       return { el, spans: $$(".w", el) };
     });
-    if (reduce) { blocks.forEach((b) => b.spans.forEach((s) => s.classList.add("on"))); return; }
+    blocks.forEach((b) => b.spans.forEach((s) => s.classList.add("on"))); return;   // slides: text is fully shown, no scroll-scrub
     blocks.forEach((b) => { b.n = -1; });
     scrollFns.push(() => {
       blocks.forEach((b) => {
@@ -261,7 +262,7 @@
   function initOrbit() {
     const wrap = $("#orbit-wrap"), orbit = $("#orbit"), read = $("#orbit-read");
     const rings = [
-      { r: 78,  d: 70,  rev: false, tag: "DEVELOPMENT", items: ["C", "PYTHON", "HTML", "CSS", "JAVASCRIPT", "GIT"] },
+      { r: 78,  d: 70,  rev: false, tag: "DEVELOPMENT", items: ["C", "GIT"] },
       { r: 126, d: 90,  rev: true,  tag: "LINUX",       items: ["CLI", "PERMISSIONS", "PROCESSES", "FILESYSTEMS", "SHELL"] },
       { r: 176, d: 110, rev: false, tag: "SECURITY",    items: ["WIRESHARK", "TRAFFIC ANALYSIS", "SECURITY LABS", "RECON CONCEPTS", "CLOUD SECURITY", "AI SECURITY"] },
       { r: 226, d: 130, rev: true,  tag: "NETWORKING",  items: ["TCP/IP", "HTTP(S)", "DNS", "ARP", "ICMP", "ROUTING", "VPN"] }
@@ -290,6 +291,7 @@
   /* ---------- Journey: packet follows scroll ---------- */
   function initTimeline() {
     const tl = $("#timeline"), items = $$(".timeline-item", tl);
+    return;   // slides: journey steps are shown one at a time, not lit by scrolling
     scrollFns.push(() => {
       const r = tl.getBoundingClientRect();
       const p = clamp((innerHeight * .62 - r.top) / r.height, 0, 1);
@@ -315,7 +317,7 @@
       goal: () => lines(["Aspiring AI & Cloud Cybersecurity Engineer."]),
       focus: () => lines(["networking", "linux", "cybersecurity", "cloud security", "ai security"]),
       about: () => lines(["Curious about how systems work — and how they can be secured.", "Building a cybersecurity foundation through hands-on learning, labs and small projects."]),
-      skills: () => lines(["networking   TCP/IP · HTTP(S) · DNS · ARP · ICMP · Routing · VPN fundamentals", "linux        CLI · permissions · processes · filesystems · shell fundamentals", "security     Wireshark · traffic analysis · security labs · recon concepts · cloud & AI security", "development  C · Python fundamentals · HTML · CSS · JavaScript · Git"]),
+      skills: () => lines(["networking   TCP/IP · HTTP(S) · DNS · ARP · ICMP · Routing · VPN fundamentals", "linux        CLI · permissions · processes · filesystems · shell fundamentals", "security     Wireshark · traffic analysis · security labs · recon concepts · cloud & AI security", "development  C · Git"]),
       projects: () => [...lines(["01  NETWORK TRAFFIC LAB   packets, protocols and traffic patterns with Wireshark", "02  LINUX SECURITY LAB    command-line practice and security experiments", "03  TOOLS                 a growing toolkit of security utilities"]), link("    → EyesOfTruth", "https://eyesoftruth.onrender.com/")],
       journey: () => lines(["01  Networking + Linux     foundation", "02  Pre Security Path      TryHackMe", "03  Wireshark Basics      traffic analysis", "04  Cloud + AI Security   next target"]),
       credentials: () => lines(["[VERIFIED]   TryHackMe — Pre Security Path", "[VERIFIED]   TryHackMe — SEC0", "[COMPLETED]  TryHackMe — Wireshark Basics"]),
