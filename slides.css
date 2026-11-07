@@ -1,0 +1,89 @@
+/* SLIDES — sections as small decks (see slides.js). Loaded last. */
+
+/* the deck replaces the old grid / list layout of its section */
+.deck-host { display: block !important; }
+.timeline.deck-host { padding-left: 0; border-left: 0; }
+.timeline-track { display: none; }                 /* old scroll-fill line */
+
+.deck { position: relative; }
+
+/* ---- sub-part tabs ---- */
+.deck-tabs { position: relative; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 26px; }
+.deck-tab { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 10px;
+  padding: 9px 15px; border: 1px solid var(--line); border-radius: 999px; background: rgba(var(--ab-a), .03);
+  color: var(--muted); font: 600 .68rem var(--mono); letter-spacing: .14em; white-space: nowrap;
+  transition: color .25s, border-color .25s, background .25s, box-shadow .25s; }
+.deck-tab b { color: var(--accent); font-weight: 600; }
+.deck-tab:hover { color: #fff; border-color: rgba(var(--ab-a), .5); }
+.deck-tab[aria-selected="true"] { color: #fff; border-color: var(--accent); background: rgba(var(--ab-a), .12); box-shadow: 0 0 22px -6px var(--accent); }
+.deck-tab:focus-visible, .deck-arrow:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* ---- stage: all slides share one cell, so the height is the tallest slide and never jumps ---- */
+.deck-stage { position: relative; display: grid; overflow: clip; padding: 28px; margin: -28px; touch-action: pan-y; }
+.slide { grid-area: 1 / 1; min-width: 0; align-self: center; opacity: 0; visibility: hidden; pointer-events: none;
+  transform: translate3d(var(--sx, 70px), 0, 0) scale(.97);
+  transition: opacity .4s ease, transform .6s var(--ease), visibility 0s linear .6s; }
+.slide.before { --sx: -70px; }
+.slide.after  { --sx: 70px; }
+.slide.on { opacity: 1; visibility: visible; pointer-events: auto; transform: none;
+  transition: opacity .5s ease .08s, transform .65s var(--ease) .08s, visibility 0s; }
+/* slides that are not showing do no animation work */
+.slide:not(.on) *, .slide:not(.on) *::before, .slide:not(.on) *::after { animation-play-state: paused !important; }
+
+/* ---- controls ---- */
+.deck-ctrl { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 28px; }
+.deck-arrow { all: unset; box-sizing: border-box; cursor: pointer; width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line);
+  display: grid; place-items: center; color: var(--accent); font: 600 1.05rem var(--mono);
+  transition: border-color .25s, box-shadow .25s, background .25s, opacity .25s; }
+.deck-arrow:hover:not(:disabled) { border-color: var(--accent); background: rgba(var(--ab-a), .1); box-shadow: 0 0 22px -6px var(--accent); }
+.deck-arrow:disabled { opacity: .28; cursor: default; }
+.deck-mid { display: flex; align-items: center; gap: 18px; }
+.deck-dots { display: flex; gap: 12px; }
+.deck-dot { width: 9px; height: 9px; rotate: 45deg; border: 1px solid #50606b; transition: background .3s, border-color .3s, box-shadow .3s, scale .3s var(--ease); }
+.deck-dot[data-on] { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 12px var(--accent); scale: 1.35; }
+.deck-count { font: 600 .72rem var(--mono); letter-spacing: .2em; color: var(--dim, var(--muted)); }
+
+/* ---- ABOUT ---- */
+.deck-about .terminal-panel { max-width: 680px; margin-inline: auto; }
+.deck-about .about-copy { max-width: 780px; margin-inline: auto; }
+.deck-about .mini-stats { max-width: 860px; margin: 0 auto; gap: 22px; }
+.deck-about .mini-stats div { padding: 26px 26px 24px; border: 1px solid var(--line); border-left: 2px solid var(--accent); border-radius: 12px; background: rgba(var(--ab-a), .03); }
+.deck-about .mini-stats strong { font-size: 2.6rem; margin-bottom: 6px; }
+.deck-about .mini-stats span { font-size: 1rem; }
+
+/* ---- SKILLS ---- */
+.deck-skills .skill-command { max-width: 640px; margin-inline: auto; position: static; }
+.deck-skills .skill-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.deck-skills .skill-card { min-height: 230px; align-content: center; }
+
+/* ---- JOURNEY ---- */
+.deck-journey .timeline-item { min-height: 240px; align-content: center; align-items: center; grid-template-columns: auto 1fr; gap: 28px; padding: 34px 38px; }
+.deck-journey .timeline-item::before, .deck-journey .timeline-item::after { display: none; }
+.deck-journey .timeline-item.lit, .deck-journey .timeline-item:hover { transform: none; }
+.deck-journey .timeline-index { font-size: 1.1rem; padding: 6px 14px; margin-right: 0; }
+.deck-journey .timeline-item h3 { font-size: 1.8rem; }
+
+/* ---- PROJECTS ---- */
+.deck-projects .project-card { max-width: 760px; margin-inline: auto; min-height: 420px; }
+
+/* ---- CREDENTIALS ---- */
+.credential-panel.deck-host { padding: 26px 26px 22px; overflow: hidden; }
+.deck-credentials .credential-item { min-height: 170px; border-bottom: 0; }
+/* the stamp now lands each time its slide opens */
+.credential-panel .slide:not(.on) .credential-status { animation: none; opacity: 0; rotate: -6deg; scale: 1.7; }
+.credential-panel .slide.on .credential-status { animation: stamp .55s cubic-bezier(.2, 1.5, .4, 1) .15s forwards; }
+
+/* ---- small screens ---- */
+@media (max-width: 760px) {
+  .deck-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-bottom: 20px; }
+  .deck-tabs::-webkit-scrollbar { display: none; }
+  .deck-skills .skill-cards { grid-template-columns: 1fr; }
+  .deck-about .mini-stats { grid-template-columns: 1fr; }
+  .deck-journey .timeline-item { grid-template-columns: 1fr; padding: 26px 22px; gap: 12px; }
+  .deck-journey .timeline-item h3 { font-size: 1.45rem; }
+  .deck-projects .project-card { min-height: 380px; }
+  .credential-panel.deck-host { padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .slide, .slide.on { transition: none; transform: none; }
+}
