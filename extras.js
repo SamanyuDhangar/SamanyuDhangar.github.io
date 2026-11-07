@@ -142,7 +142,8 @@
   const soft = (f, d = 0.07, v = 0.1, f2) => () => tone({ f, f2, type: "sine", d, v });
   Object.assign(SFX, { hover: soft(1800, 0.03, 0.03), click: soft(700, 0.07, 0.12), chime: soft(880, 0.3, 0.08), open: soft(300, 0.25, 0.1, 600), on: soft(220, 0.6, 0.14, 440), blip: soft(900, 0.08, 0.1) });
   Object.keys(SFX).forEach((n) => { if (!["hover", "click", "chime", "open", "on", "blip"].includes(n)) SFX[n] = soft(560, 0.08, 0.08); });
-  function sfx(name) { if (soundOn && ctx && SFX[name]) { try { SFX[name](); } catch (e) { /* audio hiccup */ } } }
+  function sfx(name) { if (name === "chime") return;   /* no section-arrival chime */
+    if (soundOn && ctx && SFX[name]) { try { SFX[name](); } catch (e) { /* audio hiccup */ } } }
 
   /* ---------- ambient music ---------- */
   function ambStart() {                 /* plain: one soft, slow pad */
@@ -175,9 +176,8 @@
       bus.gain.cancelScheduledValues(ctx.currentTime);
       bus.gain.setValueAtTime(bus.gain.value, ctx.currentTime);
       bus.gain.linearRampToValueAtTime(1.5, ctx.currentTime + 1.5);
-      amb = ambStart();
       sfx("on");
-      store.set("eclipse-sound", "on"); toast("sound on — robotic music + Ultron voice");
+      store.set("eclipse-sound", "on"); toast("sound on — Ultron voice + sound effects");
     } else {
       soundOn = false;
       bus.gain.cancelScheduledValues(ctx.currentTime);
