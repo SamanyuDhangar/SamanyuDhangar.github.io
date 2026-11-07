@@ -124,8 +124,7 @@
   /* ---- scenes + HUD ---- */
   const hud = document.createElement("div"); hud.className = "hud";
   hud.innerHTML = 'SCENE <b id="hud-n">Threshold</b><br>DISTANCE <b id="hud-d">000</b> M';
-  const gate = document.createElement("div"); gate.className = "gate";
-  document.body.append(hud, gate);
+  document.body.append(hud);
   const hn = hud.querySelector("#hud-n"), hd = hud.querySelector("#hud-d");
   let sceneId = "";
   const setScene = (id) => {
@@ -133,7 +132,6 @@
     const first = !sceneId; sceneId = id;
     tgt = [...s.c]; fogT = s.fog; vxt = SHIFT[id] || 0; hn.textContent = s.name;
     document.body.dataset.scene = id;
-    if (!first && !reduce) { gate.classList.remove("go"); void gate.offsetWidth; gate.classList.add("go"); }
   };
   const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && setScene(e.target.id)), { rootMargin: "-40% 0px -55% 0px" });
   document.querySelectorAll("main section[id]").forEach((s) => io.observe(s));
